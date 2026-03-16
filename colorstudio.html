@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ColorStudio</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#0e0e11;
+  --surface:#16161a;
+  --surface2:#1e1e24;
+  --border:#2a2a33;
+  --border2:#35353f;
+  --text:#f0f0f5;
+  --muted:#6e6e80;
+  --muted2:#3e3e4a;
+  --radius:10px;
+  --mono:'DM Mono',monospace;
+  --display:'Syne',sans-serif;
+  /* Dynamic — updated by JS */
+  --pick:#e879f9;
+  --pick-dim:rgba(232,121,249,.15);
+  --pick-rgb:232,121,249;
+}
+
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:var(--mono);
+  background:var(--bg);
+  color:var(--text);
+  display:flex;
+  flex-direction:column;
+}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ══ TOPBAR ══════════════════════════════ */
+.topbar{
+  height:52px;padding:0 20px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:16px;
+  flex-shrink:0;position:relative;
+  /* accent line color tracks current pick */
+  border-bottom-color:var(--pick);
+}
+.topbar-logo{
+  font-family:var(--display);
+  font-size:.95rem;font-weight:800;
+  display:flex;align-items:center;gap:8px;
+}
+.topbar-logo-dot{
+  width:14px;height:14px;border-radius:50%;
+  background:var(--pick);
+  transition:background .15s;
+  box-shadow:0 0 10px rgba(var(--pick-rgb),.5);
+}
+.topbar-actions{display:flex;gap:8px;margin-left:auto;align-items:center}
+.tb-btn{
+  padding:5px 13px;border-radius:6px;
+  border:1px solid var(--border2);
+  background:transparent;color:var(--muted);
+  font-family:var(--mono);font-size:.72rem;
+  cursor:pointer;transition:all .15s;letter-spacing:.04em;
+}
+.tb-btn:hover{border-color:var(--pick);color:var(--pick)}
+.tb-btn.active{background:var(--pick-dim);border-color:var(--pick);color:var(--pick)}
+
+/* ══ LAYOUT ══════════════════════════════ */
+.app{
+  flex:1;display:grid;
+  grid-template-columns:1fr 320px;
+  grid-template-rows:1fr;
+  overflow:hidden;
+  min-height:0;
+}
+
+/* ══ LEFT — PICKER ════════════════════════ */
+.picker-col{
+  display:flex;flex-direction:column;
+  overflow:hidden;padding:20px;gap:16px;
+}
+
+/* SL canvas */
+.sl-wrap{
+  position:relative;flex:1;min-height:0;border-radius:var(--radius);
+  overflow:hidden;cursor:crosshair;
+  border:1px solid var(--border);
+}
+#sl-canvas{width:100%;height:100%;display:block}
+.sl-cursor{
+  position:absolute;width:18px;height:18px;border-radius:50%;
+  border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.4);
+  transform:translate(-50%,-50%);pointer-events:none;
+  transition:none;
+}
+
+/* Hue slider */
+.hue-wrap{position:relative;height:18px;border-radius:9px;cursor:pointer;
+  background:linear-gradient(to right,
+    #f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00);
+  border:1px solid var(--border);
+}
+.hue-thumb{
+  position:absolute;top:50%;transform:translate(-50%,-50%);
+  width:22px;height:22px;border-radius:50%;
+  border:2px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,.5);
+  pointer-events:none;background:var(--pick);
+}
+
+/* Alpha slider */
+.alpha-wrap{
+  position:relative;height:18px;border-radius:9px;cursor:pointer;
+  border:1px solid var(--border);overflow:hidden;
+}
+.alpha-checker{
+  position:absolute;inset:0;
+  background-image:repeating-conic-gradient(#555 0% 25%,#333 0% 50%);
+  background-size:12px 12px;
+}
+.alpha-gradient{position:absolute;inset:0;border-radius:9px}
+.alpha-thumb{
+  position:absolute;top:50%;transform:translate(-50%,-50%);
+  width:22px;height:22px;border-radius:50%;
+  border:2px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,.5);
+  pointer-events:none;
+}
+
+/* Slider labels */
+.slider-row{display:flex;flex-direction:column;gap:6px}
+.slider-label{font-size:.62rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+
+/* ══ RIGHT — PANEL ════════════════════════ */
+.panel-col{
+  border-left:1px solid var(--border);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+
+/* Preview swatch */
+.preview-swatch{
+  height:100px;flex-shrink:0;position:relative;
+  transition:background .08s;
+}
+.preview-checker{
+  position:absolute;inset:0;
+  background-image:repeating-conic-gradient(#555 0% 25%,#333 0% 50%);
+  background-size:14px 14px;
+}
+.preview-color{position:absolute;inset:0;transition:background .08s}
+.preview-hex-badge{
+  position:absolute;bottom:10px;left:12px;
+  font-family:var(--mono);font-size:.8rem;font-weight:500;
+  padding:3px 9px;border-radius:5px;
+  background:rgba(0,0,0,.45);backdrop-filter:blur(4px);
+  color:#fff;letter-spacing:.08em;cursor:pointer;
+  transition:background .15s;
+  border:1px solid rgba(255,255,255,.1);
+}
+.preview-hex-badge:hover{background:rgba(0,0,0,.65)}
+
+/* Values */
+.values-section{padding:16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.values-grid{display:flex;flex-direction:column;gap:6px}
+.value-row{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 10px;border-radius:7px;
+  border:1px solid transparent;
+  cursor:pointer;transition:all .15s;
+}
+.value-row:hover{background:var(--pick-dim);border-color:var(--pick)}
+.value-label{
+  font-size:.6rem;color:var(--muted);letter-spacing:.1em;
+  text-transform:uppercase;width:44px;flex-shrink:0;
+}
+.value-text{
+  font-size:.8rem;color:var(--text);flex:1;
+  font-variant-numeric:tabular-nums;letter-spacing:.04em;
+}
+.value-copy{
+  font-size:.62rem;color:var(--muted2);
+  opacity:0;transition:opacity .12s;
+}
+.value-row:hover .value-copy{opacity:1}
+.value-row.copied{background:rgba(34,197,94,.08);border-color:#22c55e}
+.value-row.copied .value-copy{opacity:1;color:#22c55e}
+
+/* Input hex field */
+.hex-input-wrap{padding:10px 16px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;gap:8px;align-items:center}
+.hex-label{font-size:.62rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;flex-shrink:0}
+.hex-input{
+  flex:1;background:var(--surface2);border:1px solid var(--border2);
+  color:var(--text);font-family:var(--mono);font-size:.82rem;
+  padding:6px 10px;border-radius:6px;outline:none;letter-spacing:.06em;
+  transition:border-color .15s;
+}
+.hex-input:focus{border-color:var(--pick)}
+
+/* Eyedropper */
+.eyedropper-btn{
+  padding:6px 10px;border-radius:6px;border:1px solid var(--border2);
+  background:transparent;color:var(--muted);font-size:.85rem;
+  cursor:pointer;transition:all .15s;flex-shrink:0;
+}
+.eyedropper-btn:hover{border-color:var(--pick);color:var(--pick)}
+.eyedropper-btn.unsupported{opacity:.3;cursor:not-allowed}
+
+/* Harmony */
+.harmony-section{padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.section-title{
+  font-size:.62rem;color:var(--muted);letter-spacing:.12em;
+  text-transform:uppercase;margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+.harmony-tabs{display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap}
+.harmony-tab{
+  padding:3px 10px;border-radius:4px;border:1px solid var(--border2);
+  background:transparent;color:var(--muted);font-family:var(--mono);
+  font-size:.62rem;cursor:pointer;transition:all .12s;letter-spacing:.05em;
+}
+.harmony-tab:hover{border-color:var(--border2);color:var(--text)}
+.harmony-tab.active{background:var(--pick-dim);border-color:var(--pick);color:var(--pick)}
+.harmony-swatches{display:flex;gap:6px}
+.harmony-swatch{
+  flex:1;height:36px;border-radius:6px;cursor:pointer;
+  position:relative;border:1px solid rgba(255,255,255,.06);
+  transition:transform .12s;
+}
+.harmony-swatch:hover{transform:translateY(-2px)}
+.harmony-swatch-hex{
+  position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);
+  font-size:.6rem;color:var(--muted);white-space:nowrap;
+  font-family:var(--mono);letter-spacing:.04em;
+}
+
+/* Palette history */
+.palette-section{
+  flex:1;padding:14px 16px;overflow:hidden;display:flex;flex-direction:column;
+  min-height:0;
+}
+.palette-grid{
+  display:flex;flex-wrap:wrap;gap:6px;
+  overflow-y:auto;flex:1;align-content:flex-start;
+  padding-bottom:4px;
+}
+.palette-chip{
+  width:34px;height:34px;border-radius:6px;
+  cursor:pointer;border:1px solid rgba(255,255,255,.06);
+  transition:all .12s;position:relative;flex-shrink:0;
+}
+.palette-chip:hover{transform:scale(1.12);z-index:1}
+.palette-chip.active{border-color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.3)}
+.palette-chip-del{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.5);border-radius:5px;opacity:0;transition:opacity .12s;
+  font-size:.6rem;color:#fff;
+}
+.palette-chip:hover .palette-chip-del{opacity:1}
+.palette-actions{display:flex;gap:6px;margin-top:8px;flex-shrink:0}
+.pal-btn{
+  flex:1;padding:7px;border-radius:6px;
+  border:1px solid var(--border2);background:transparent;
+  color:var(--muted);font-family:var(--mono);font-size:.68rem;
+  cursor:pointer;transition:all .15s;letter-spacing:.05em;
+}
+.pal-btn:hover{border-color:var(--pick);color:var(--pick)}
+.pal-btn.add{background:var(--pick-dim);border-color:var(--pick);color:var(--pick)}
+.pal-btn.add:hover{filter:brightness(1.1)}
+
+/* ══ TOAST ════════════════════════════════ */
+.toast-wrap{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:999;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.toast{
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:8px;padding:8px 16px;font-size:.75rem;color:var(--text);
+  display:flex;align-items:center;gap:8px;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+  animation:toastIn .2s ease;white-space:nowrap;
+}
+.toast.ok{border-left:3px solid #22c55e}
+.toast.info{border-left:3px solid var(--pick)}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══ NO HARMONY WRAP ══════════════════════ */
+.harmony-outer{padding-bottom:20px}
+</style>
+</head>
+<body>
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="topbar-logo">
+    <div class="topbar-logo-dot" id="logo-dot"></div>
+    ColorStudio
+  </div>
+  <div class="topbar-actions">
+    <button class="tb-btn" id="eyedropper-btn" onclick="pickFromScreen()" title="Pick color from screen">💉 Eyedropper</button>
+    <button class="tb-btn" onclick="exportPalette()">⬇ Export</button>
+    <button class="tb-btn" onclick="clearPalette()">✕ Clear Palette</button>
+  </div>
+</div>
+
+<!-- App layout -->
+<div class="app">
+
+  <!-- LEFT: picker -->
+  <div class="picker-col">
+    <div class="sl-wrap" id="sl-wrap">
+      <canvas id="sl-canvas"></canvas>
+      <div class="sl-cursor" id="sl-cursor"></div>
+    </div>
+
+    <div class="slider-row">
+      <div class="slider-label">Hue</div>
+      <div class="hue-wrap" id="hue-wrap">
+        <div class="hue-thumb" id="hue-thumb"></div>
+      </div>
+    </div>
+
+    <div class="slider-row">
+      <div class="slider-label">Opacity</div>
+      <div class="alpha-wrap" id="alpha-wrap">
+        <div class="alpha-checker"></div>
+        <div class="alpha-gradient" id="alpha-gradient"></div>
+        <div class="alpha-thumb" id="alpha-thumb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: panel -->
+  <div class="panel-col">
+
+    <!-- Preview -->
+    <div class="preview-swatch">
+      <div class="preview-checker"></div>
+      <div class="preview-color" id="preview-color"></div>
+      <div class="preview-hex-badge" id="preview-hex" onclick="copyValue('hex')"></div>
+    </div>
+
+    <!-- Hex input + eyedropper -->
+    <div class="hex-input-wrap">
+      <div class="hex-label">Hex</div>
+      <input class="hex-input" id="hex-input" type="text" maxlength="9" placeholder="#e879f9"
+             oninput="onHexInput(this.value)" onblur="onHexBlur(this.value)">
+      <button class="eyedropper-btn" id="eyedropper-inline" onclick="pickFromScreen()" title="Eyedropper">💉</button>
+    </div>
+
+    <!-- Color values -->
+    <div class="values-section">
+      <div class="values-grid" id="values-grid">
+        <div class="value-row" onclick="copyValue('hex')">
+          <div class="value-label">HEX</div>
+          <div class="value-text" id="val-hex">#e879f9</div>
+          <div class="value-copy">copy</div>
+        </div>
+        <div class="value-row" onclick="copyValue('rgb')">
+          <div class="value-label">RGB</div>
+          <div class="value-text" id="val-rgb">rgb(232, 121, 249)</div>
+          <div class="value-copy">copy</div>
+        </div>
+        <div class="value-row" onclick="copyValue('hsl')">
+          <div class="value-label">HSL</div>
+          <div class="value-text" id="val-hsl">hsl(293, 92%, 73%)</div>
+          <div class="value-copy">copy</div>
+        </div>
+        <div class="value-row" onclick="copyValue('oklch')">
+          <div class="value-label">OKLCH</div>
+          <div class="value-text" id="val-oklch">oklch(0.73 0.19 303)</div>
+          <div class="value-copy">copy</div>
+        </div>
+        <div class="value-row" onclick="copyValue('css-var')">
+          <div class="value-label">CSS</div>
+          <div class="value-text" id="val-css">--color: #e879f9</div>
+          <div class="value-copy">copy</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Harmonies -->
+    <div class="harmony-section harmony-outer">
+      <div class="section-title">Color Harmonies</div>
+      <div class="harmony-tabs">
+        <button class="harmony-tab active" onclick="setHarmony('complement',this)">Complement</button>
+        <button class="harmony-tab" onclick="setHarmony('triadic',this)">Triadic</button>
+        <button class="harmony-tab" onclick="setHarmony('analogous',this)">Analogous</button>
+        <button class="harmony-tab" onclick="setHarmony('split',this)">Split</button>
+        <button class="harmony-tab" onclick="setHarmony('tetradic',this)">Tetradic</button>
+      </div>
+      <div style="position:relative;padding-bottom:24px">
+        <div class="harmony-swatches" id="harmony-swatches"></div>
+      </div>
+    </div>
+
+    <!-- Saved palette -->
+    <div class="palette-section">
+      <div class="section-title">Saved Palette</div>
+      <div class="palette-grid" id="palette-grid"></div>
+      <div class="palette-actions">
+        <button class="pal-btn add" onclick="addToPalette()">＋ Save Color</button>
+        <button class="pal-btn" onclick="exportPalette()">⬇ Export</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+// ══════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════
+let H = 293, S = 0.51, L_sl = 0.73; // HSL working state (S/L from SL canvas)
+let alpha = 1;
+let harmonyMode = 'complement';
+const PALETTE_KEY = 'colorstudio_palette';
+
+// SL canvas: S = x-axis (0=left=white, 1=right=full sat)
+//             L = y-axis (0=top=full bright, 1=bottom=black)
+// We store S and "value" V (HSV), convert to RGB directly.
+
+// ══════════════════════════════════════
+//  CANVAS SETUP
+// ══════════════════════════════════════
+const slWrap   = document.getElementById('sl-wrap');
+const slCanvas = document.getElementById('sl-canvas');
+const slCtx    = slCanvas.getContext('2d');
+const slCursor = document.getElementById('sl-cursor');
+
+let svX = 1, svY = 0; // S and (1-V) normalised 0..1, x and y in canvas
+
+function resizeCanvas() {
+  slCanvas.width  = slWrap.clientWidth;
+  slCanvas.height = slWrap.clientHeight;
+  drawSL();
+  positionCursor();
+}
+
+function drawSL() {
+  const w = slCanvas.width, h = slCanvas.height;
+  // Base: hue solid
+  const baseColor = hsvToRgb(H, 1, 1);
+  slCtx.fillStyle = `rgb(${baseColor.r},${baseColor.g},${baseColor.b})`;
+  slCtx.fillRect(0, 0, w, h);
+  // White gradient left→right (saturation)
+  const wGrad = slCtx.createLinearGradient(0, 0, w, 0);
+  wGrad.addColorStop(0, 'rgba(255,255,255,1)');
+  wGrad.addColorStop(1, 'rgba(255,255,255,0)');
+  slCtx.fillStyle = wGrad;
+  slCtx.fillRect(0, 0, w, h);
+  // Black gradient top→bottom (value)
+  const bGrad = slCtx.createLinearGradient(0, 0, 0, h);
+  bGrad.addColorStop(0, 'rgba(0,0,0,0)');
+  bGrad.addColorStop(1, 'rgba(0,0,0,1)');
+  slCtx.fillStyle = bGrad;
+  slCtx.fillRect(0, 0, w, h);
+}
+
+function positionCursor() {
+  const w = slCanvas.width, h = slCanvas.height;
+  slCursor.style.left = (svX * w) + 'px';
+  slCursor.style.top  = (svY * h) + 'px';
+  const bg = getCurrentRgb();
+  const lum = (bg.r * 299 + bg.g * 587 + bg.b * 114) / 1000;
+  slCursor.style.borderColor = lum > 128 ? '#333' : '#fff';
+}
+
+// ══════════════════════════════════════
+//  SLIDERS
+// ══════════════════════════════════════
+const hueWrap   = document.getElementById('hue-wrap');
+const hueThumb  = document.getElementById('hue-thumb');
+const alphaWrap = document.getElementById('alpha-wrap');
+const alphaGrad = document.getElementById('alpha-gradient');
+const alphaThumb= document.getElementById('alpha-thumb');
+
+function positionHueThumb() {
+  const pct = H / 360;
+  hueThumb.style.left = (pct * hueWrap.clientWidth) + 'px';
+  hueThumb.style.background = `hsl(${H},100%,50%)`;
+}
+
+function positionAlphaThumb() {
+  const rgb = getCurrentRgb();
+  alphaGrad.style.background =
+    `linear-gradient(to right, rgba(${rgb.r},${rgb.g},${rgb.b},0), rgb(${rgb.r},${rgb.g},${rgb.b}))`;
+  alphaThumb.style.left = (alpha * alphaWrap.clientWidth) + 'px';
+  alphaThumb.style.background = `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha})`;
+}
+
+// ══════════════════════════════════════
+//  DRAG HANDLERS
+// ══════════════════════════════════════
+function makeDraggable(el, onMove) {
+  el.addEventListener('mousedown', e => {
+    e.preventDefault();
+    onMove(e);
+    const mm = e2 => onMove(e2);
+    const mu = () => { document.removeEventListener('mousemove', mm); document.removeEventListener('mouseup', mu); };
+    document.addEventListener('mousemove', mm);
+    document.addEventListener('mouseup', mu);
+  });
+  el.addEventListener('touchstart', e => {
+    e.preventDefault();
+    onMove(e.touches[0]);
+    const tm = e2 => onMove(e2.touches[0]);
+    const te = () => { document.removeEventListener('touchmove', tm); document.removeEventListener('touchend', te); };
+    document.addEventListener('touchmove', tm, {passive:false});
+    document.addEventListener('touchend', te);
+  }, {passive:false});
+}
+
+makeDraggable(slWrap, e => {
+  const rect = slWrap.getBoundingClientRect();
+  svX = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  svY = Math.max(0, Math.min(1, (e.clientY - rect.top)  / rect.height));
+  positionCursor();
+  onColorChange();
+});
+
+makeDraggable(hueWrap, e => {
+  const rect = hueWrap.getBoundingClientRect();
+  H = Math.max(0, Math.min(360, ((e.clientX - rect.left) / rect.width) * 360));
+  drawSL();
+  positionHueThumb();
+  positionCursor();
+  onColorChange();
+});
+
+makeDraggable(alphaWrap, e => {
+  const rect = alphaWrap.getBoundingClientRect();
+  alpha = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  positionAlphaThumb();
+  onColorChange();
+});
+
+// ══════════════════════════════════════
+//  COLOR MATH
+// ══════════════════════════════════════
+function hsvToRgb(h, s, v) {
+  h = h % 360;
+  const c = v * s, x = c * (1 - Math.abs((h/60) % 2 - 1)), m = v - c;
+  let r=0,g=0,b=0;
+  if(h<60){r=c;g=x}else if(h<120){r=x;g=c}else if(h<180){g=c;b=x}
+  else if(h<240){g=x;b=c}else if(h<300){r=x;b=c}else{r=c;b=x}
+  return {r:Math.round((r+m)*255),g:Math.round((g+m)*255),b:Math.round((b+m)*255)};
+}
+
+function rgbToHsv(r,g,b) {
+  r/=255;g/=255;b/=255;
+  const max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min;
+  let h=0,s=max===0?0:d/max,v=max;
+  if(d!==0){
+    switch(max){
+      case r:h=((g-b)/d+(g<b?6:0))/6;break;
+      case g:h=((b-r)/d+2)/6;break;
+      case b:h=((r-g)/d+4)/6;break;
+    }
+  }
+  return {h:h*360,s,v};
+}
+
+function rgbToHsl(r,g,b) {
+  r/=255;g/=255;b/=255;
+  const max=Math.max(r,g,b),min=Math.min(r,g,b);
+  let h,s,l=(max+min)/2;
+  if(max===min){h=s=0}else{
+    const d=max-min;s=l>.5?d/(2-max-min):d/(max+min);
+    switch(max){case r:h=(g-b)/d+(g<b?6:0);break;case g:h=(b-r)/d+2;break;case b:h=(r-g)/d+4;break;}
+    h/=6;
+  }
+  return {h:Math.round(h*360),s:Math.round(s*100),l:Math.round(l*100)};
+}
+
+// Approximate OKLCH (no full conversion, perceptual estimate good enough for display)
+function rgbToOklch(r,g,b) {
+  // linearise
+  const lin = v => { v/=255; return v<=0.04045?v/12.92:Math.pow((v+0.055)/1.055,2.4); };
+  const lr=lin(r),lg=lin(g),lb=lin(b);
+  // XYZ D65
+  const X=0.4124*lr+0.3576*lg+0.1805*lb;
+  const Y=0.2126*lr+0.7152*lg+0.0722*lb;
+  const Z=0.0193*lr+0.1192*lg+0.9505*lb;
+  // OKLab
+  const l2=Math.cbrt(0.8189330101*X+0.3618667424*Y-0.1288597137*Z);
+  const m2=Math.cbrt(0.0329845436*X+0.9293118715*Y+0.0361456387*Z);
+  const s2=Math.cbrt(0.0482003018*X+0.2643662691*Y+0.6338517070*Z);
+  const L=0.2104542553*l2+0.7936177850*m2-0.0040720468*s2;
+  const A=1.9779984951*l2-2.4285922050*m2+0.4505937099*s2;
+  const B=0.0259040371*l2+0.7827717662*m2-0.8086757660*s2;
+  const C=Math.sqrt(A*A+B*B);
+  const hDeg=(Math.atan2(B,A)*180/Math.PI+360)%360;
+  return {L:Math.round(L*100)/100,C:Math.round(C*100)/100,H:Math.round(hDeg)};
+}
+
+function hexToRgb(hex) {
+  hex = hex.replace(/^#/,'');
+  if(hex.length===3) hex=hex.split('').map(c=>c+c).join('');
+  if(hex.length!==6&&hex.length!==8) return null;
+  const r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16);
+  const a=hex.length===8?parseInt(hex.slice(6,8),16)/255:1;
+  return {r,g,b,a};
+}
+
+function rgbToHex(r,g,b,a=1) {
+  const h = v => v.toString(16).padStart(2,'0');
+  const base = '#'+h(r)+h(g)+h(b);
+  return a < 1 ? base+h(Math.round(a*255)) : base;
+}
+
+function getCurrentRgb() {
+  return hsvToRgb(H, svX, 1 - svY);
+}
+
+function hslToHsv(h,s,l) {
+  s/=100;l/=100;
+  const v=l+s*Math.min(l,1-l);
+  const sv=v===0?0:2*(1-l/v);
+  return {h,s:sv,v};
+}
+
+// ══════════════════════════════════════
+//  COLOR CHANGE → update all UI
+// ══════════════════════════════════════
+function onColorChange() {
+  const rgb = getCurrentRgb();
+  const hex = rgbToHex(rgb.r, rgb.g, rgb.b, alpha);
+  const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+  const oklch = rgbToOklch(rgb.r, rgb.g, rgb.b);
+  const rgbStr = alpha < 1
+    ? `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${Math.round(alpha*100)/100})`
+    : `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+  const hslStr = alpha < 1
+    ? `hsla(${hsl.h}, ${hsl.s}%, ${hsl.l}%, ${Math.round(alpha*100)/100})`
+    : `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+  const oklchStr = `oklch(${oklch.L} ${oklch.C} ${oklch.H})`;
+  const hexFull = hex.toUpperCase();
+
+  // CSS vars
+  document.documentElement.style.setProperty('--pick', `rgb(${rgb.r},${rgb.g},${rgb.b})`);
+  document.documentElement.style.setProperty('--pick-dim', `rgba(${rgb.r},${rgb.g},${rgb.b},.15)`);
+  document.documentElement.style.setProperty('--pick-rgb', `${rgb.r},${rgb.g},${rgb.b}`);
+
+  // Preview
+  const previewBg = `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha})`;
+  document.getElementById('preview-color').style.background = previewBg;
+  document.getElementById('preview-hex').textContent = hexFull;
+  document.getElementById('logo-dot').style.background = previewBg;
+
+  // Values
+  document.getElementById('val-hex').textContent   = hexFull;
+  document.getElementById('val-rgb').textContent   = rgbStr;
+  document.getElementById('val-hsl').textContent   = hslStr;
+  document.getElementById('val-oklch').textContent = oklchStr;
+  document.getElementById('val-css').textContent   = `--color: ${hexFull}`;
+
+  // Hex input (don't overwrite while user is typing)
+  const hexEl = document.getElementById('hex-input');
+  if (document.activeElement !== hexEl) hexEl.value = hexFull;
+
+  // Sliders
+  positionHueThumb();
+  positionAlphaThumb();
+
+  // Harmony
+  renderHarmony();
+
+  // Store for copy
+  window._currentValues = {hex:hexFull, rgb:rgbStr, hsl:hslStr, oklch:oklchStr, 'css-var':`--color: ${hexFull}`};
+}
+
+// ══════════════════════════════════════
+//  HEX INPUT
+// ══════════════════════════════════════
+function onHexInput(val) {
+  const rgb = hexToRgb(val);
+  if (!rgb) return;
+  setFromRgb(rgb.r, rgb.g, rgb.b, rgb.a ?? 1);
+}
+function onHexBlur(val) { onHexInput(val); }
+
+function setFromRgb(r,g,b,a=1) {
+  const hsv = rgbToHsv(r,g,b);
+  H    = hsv.h;
+  svX  = hsv.s;
+  svY  = 1 - hsv.v;
+  alpha = a;
+  drawSL();
+  positionCursor();
+  onColorChange();
+}
+
+// ══════════════════════════════════════
+//  COPY VALUES
+// ══════════════════════════════════════
+function copyValue(key) {
+  const val = window._currentValues?.[key];
+  if (!val) return;
+  navigator.clipboard?.writeText(val).then(() => {
+    toast('Copied: ' + val, 'ok');
+    // Flash the row
+    const rows = document.querySelectorAll('.value-row');
+    const labels = {hex:0,rgb:1,hsl:2,oklch:3,'css-var':4};
+    const row = rows[labels[key]];
+    if (row) {
+      row.classList.add('copied');
+      row.querySelector('.value-copy').textContent = '✓';
+      setTimeout(()=>{ row.classList.remove('copied'); row.querySelector('.value-copy').textContent='copy'; }, 1500);
+    }
+  });
+}
+
+// ══════════════════════════════════════
+//  HARMONY
+// ══════════════════════════════════════
+const HARMONY_OFFSETS = {
+  complement:  [180],
+  triadic:     [120, 240],
+  analogous:   [-30, 30],
+  split:       [150, 210],
+  tetradic:    [90, 180, 270],
+};
+
+function setHarmony(mode, el) {
+  harmonyMode = mode;
+  document.querySelectorAll('.harmony-tab').forEach(t=>t.classList.remove('active'));
+  if(el) el.classList.add('active');
+  renderHarmony();
+}
+
+function renderHarmony() {
+  const offsets = HARMONY_OFFSETS[harmonyMode] || [];
+  const container = document.getElementById('harmony-swatches');
+  const rgb = getCurrentRgb();
+  const baseHex = rgbToHex(rgb.r, rgb.g, rgb.b).toUpperCase();
+
+  const swatches = [
+    { h: H, hex: baseHex, label: 'Base' },
+    ...offsets.map(offset => {
+      const nh = ((H + offset) % 360 + 360) % 360;
+      const c = hsvToRgb(nh, svX, 1 - svY);
+      return { h: nh, hex: rgbToHex(c.r, c.g, c.b).toUpperCase(), label: '' };
+    })
+  ];
+
+  container.innerHTML = swatches.map(s =>
+    `<div class="harmony-swatch" style="background:${s.hex}" title="${s.hex}"
+          onclick="setFromRgb(...hexToRgbArr('${s.hex}'))">
+       <div class="harmony-swatch-hex">${s.hex}</div>
+     </div>`
+  ).join('');
+}
+
+function hexToRgbArr(hex) {
+  const c = hexToRgb(hex);
+  return c ? [c.r, c.g, c.b] : [0,0,0];
+}
+window.hexToRgbArr = hexToRgbArr;
+
+// ══════════════════════════════════════
+//  PALETTE
+// ══════════════════════════════════════
+function loadPalette() {
+  try { return JSON.parse(localStorage.getItem(PALETTE_KEY)) || []; } catch { return []; }
+}
+function savePaletteData(p) { localStorage.setItem(PALETTE_KEY, JSON.stringify(p)); }
+
+function renderPalette() {
+  const pal = loadPalette();
+  const grid = document.getElementById('palette-grid');
+  if (!pal.length) {
+    grid.innerHTML = '<div style="font-size:.72rem;color:var(--muted);font-style:italic;padding:4px">No colors saved yet</div>';
+    return;
+  }
+  grid.innerHTML = pal.map((hex, i) =>
+    `<div class="palette-chip" style="background:${hex}" title="${hex}"
+          onclick="setFromRgb(...hexToRgbArr('${hex}'))">
+       <div class="palette-chip-del" onclick="event.stopPropagation();removePalette(${i})">✕</div>
+     </div>`
+  ).join('');
+}
+
+function addToPalette() {
+  const rgb = getCurrentRgb();
+  const hex = rgbToHex(rgb.r, rgb.g, rgb.b, alpha).toUpperCase();
+  const pal = loadPalette();
+  if (pal.includes(hex)) { toast('Already in palette', 'info'); return; }
+  pal.unshift(hex);
+  if (pal.length > 80) pal.length = 80;
+  savePaletteData(pal);
+  renderPalette();
+  toast('Saved to palette', 'ok');
+}
+
+function removePalette(i) {
+  const pal = loadPalette();
+  pal.splice(i, 1);
+  savePaletteData(pal);
+  renderPalette();
+}
+
+function clearPalette() {
+  if (!confirm('Clear all saved colors?')) return;
+  localStorage.removeItem(PALETTE_KEY);
+  renderPalette();
+}
+
+function exportPalette() {
+  const pal = loadPalette();
+  if (!pal.length) { toast('Palette is empty', 'info'); return; }
+  const css = `:root {\n${pal.map((h,i)=>`  --color-${i+1}: ${h};`).join('\n')}\n}`;
+  const blob = new Blob([css], {type:'text/css'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'palette.css';
+  a.click();
+  toast('Exported as palette.css', 'ok');
+}
+
+// ══════════════════════════════════════
+//  EYEDROPPER
+// ══════════════════════════════════════
+async function pickFromScreen() {
+  if (!window.EyeDropper) {
+    toast('Eyedropper not supported in this browser', 'info');
+    return;
+  }
+  try {
+    const dropper = new EyeDropper();
+    const result = await dropper.open();
+    const rgb = hexToRgb(result.sRGBHex);
+    if (rgb) setFromRgb(rgb.r, rgb.g, rgb.b);
+  } catch(e) {
+    // User cancelled — do nothing
+  }
+}
+
+// Check eyedropper support
+if (!window.EyeDropper) {
+  document.getElementById('eyedropper-btn').classList.add('unsupported');
+  document.getElementById('eyedropper-btn').title = 'Eyedropper not supported in this browser';
+  document.getElementById('eyedropper-inline').classList.add('unsupported');
+}
+
+// ══════════════════════════════════════
+//  KEYBOARD SHORTCUTS
+// ══════════════════════════════════════
+document.addEventListener('keydown', e => {
+  if (e.target.matches('input')) return;
+  if ((e.metaKey||e.ctrlKey) && e.key==='c') { copyValue('hex'); e.preventDefault(); }
+  if (e.key==='s' && !e.metaKey && !e.ctrlKey) addToPalette();
+  if (e.key==='e') pickFromScreen();
+});
+
+// ══════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════
+function toast(msg, type='info') {
+  const wrap = document.getElementById('toast-wrap');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  wrap.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
+// ══════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+// Set initial cursor position (H=293, S=0.51, V=0.98 ≈ #e879f9)
+svX = 0.51; svY = 0.02;
+positionCursor();
+onColorChange();
+renderPalette();
+</script>
+</body>
+</html>

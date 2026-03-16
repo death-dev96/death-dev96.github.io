@@ -555,6 +555,31 @@ footer{
 
   </div>
 
+  <div class="section-label" style="margin-top:48px">Utilities</div>
+
+  <div class="tool-grid">
+
+    <!-- ColorStudio -->
+    <div class="tool-card" style="--card-color:#e879f9"
+         onclick="openTool('colorstudio')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🎨</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">ColorStudio</div>
+      <div class="tool-desc">Professional color picker with HEX, RGB, HSL & OKLCH readouts, harmony generator, eyedropper, and exportable saved palettes.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags">
+          <span class="tool-tag">color</span>
+          <span class="tool-tag">design</span>
+          <span class="tool-tag">palette</span>
+        </div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+  </div>
+
   <div class="section-label" style="margin-top:48px">Game Companions</div>
 
   <div class="tool-grid">
@@ -627,6 +652,13 @@ const TOOLS = {
     desc: 'Personal knowledge network',
     color: '#7c6cfc',
     src: 'wikiverse.html',
+  },
+  colorstudio: {
+    name: 'ColorStudio',
+    icon: '🎨',
+    desc: 'Professional color picker with harmonies & palette',
+    color: '#e879f9',
+    src: 'colorstudio.html',
   },
   runmanager: {
     name: 'Run Manager',
