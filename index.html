@@ -895,9 +895,20 @@ textarea.input{resize:vertical;line-height:1.6}
 // STATE
 // ════════════════════════════════════════
 let runs = {};           // all runs keyed by id
+let userSeeds = [];      // user-saved seeds — persisted to localStorage
+let eqSyncMode = false;  // when true, built-in EQ is hidden; catalog = synced customEQ only
 const APP_VERSION = 'v1.0.0';
 
 const APP_CHANGELOG = [
+  {
+    version: 'v1.0.1',
+    date: '2026-03-16',
+    entries: [
+      { type: 'change', text: 'Equipment catalog sync now performs a full replace — clears all existing entries and repopulates from the source URL' },
+      { type: 'change', text: 'Sync button renamed to ⟳ SYNC & REPLACE with a danger style and amber warning in the modal' },
+      { type: 'remove', text: 'Player-added custom equipment is no longer preserved after a sync' },
+    ]
+  },
   {
     version: 'v1.0.0',
     date: '2026-03-16',
@@ -2447,7 +2458,7 @@ function openDevicePicker(fid){
 
 function renderDPicker(){
   const s=(dpSearch||'').toLowerCase();
-  const allEQ=[...EQ,...customEQ];
+  const allEQ=[...(eqSyncMode?[]:EQ),...customEQ];
   const items=allEQ.filter(e=>e.cat===dpCat&&(!s||e.name.toLowerCase().includes(s)||(e.v||'').toLowerCase().includes(s)));
   const grid=document.getElementById('dpicker-grid'); if(!grid) return;
   if(!items.length){grid.innerHTML='<div style="font-family:var(--mono);font-size:11px;color:var(--text3);padding:12px;grid-column:1/-1">No items match</div>';return;}
@@ -2474,7 +2485,7 @@ function addDeviceToFloor(fid,name,cat,price){
   const f=floors.find(x=>x.id===fid); if(!f) return;
   if(!f.devices) f.devices=[];
   // Carry pw from catalog so power calculations work even if name doesn't match later
-  const allEQ=[...EQ,...customEQ];
+  const allEQ=[...(eqSyncMode?[]:EQ),...customEQ];
   const ref=allEQ.find(e=>e.name===name)||{};
   const pw=ref.pw||null;
   f.devices.push({id:Date.now()+Math.random()*9999|0,name,cat,price,qty:1,label:'',connections:[],pw});
@@ -4442,7 +4453,7 @@ function renderEq(){
     return;
   }
 
-  const allEQ=[...EQ,...customEQ];
+  const allEQ=[...(eqSyncMode?[]:EQ),...customEQ];
 
   // Tally all devices across floors — group by floor, then aggregate by device name
   let grandTotal=0, grandCost=0;
@@ -4739,10 +4750,23 @@ async function loadCustomEQ(){
     const raw = localStorage.getItem('tni_toolkit_customEQ');
     if(raw) customEQ = JSON.parse(raw);
   }catch(e){}
+  try{
+    const flag = localStorage.getItem('tni_toolkit_eqSyncMode');
+    if(flag !== null) eqSyncMode = flag === 'true';
+  }catch(e){}
 }
 
 async function saveCustomEQ(){
   try{ localStorage.setItem('tni_toolkit_customEQ', JSON.stringify(customEQ)); }catch(e){}
+  try{ localStorage.setItem('tni_toolkit_eqSyncMode', String(eqSyncMode)); }catch(e){}
+}
+
+async function resetEqToBuiltins(){
+  customEQ = [];
+  eqSyncMode = false;
+  await saveCustomEQ();
+  toast('Catalog reset to built-in items','var(--blue)');
+  openEquipmentManager();
 }
 
 function openEquipmentManager(){
@@ -4752,8 +4776,9 @@ function openEquipmentManager(){
 function _renderEqManagerModal(filterCat='all', search=''){
   // Build override set: custom items with _overridesBuiltin hide the built-in entry
   const overriddenNames = new Set(customEQ.filter(e=>e._overridesBuiltin).map(e=>e._overridesBuiltin));
+  const builtins = eqSyncMode ? [] : EQ.filter(e=>!overriddenNames.has(e.name)).map(e=>({...e,_builtin:true}));
   const allItems = [
-    ...EQ.filter(e=>!overriddenNames.has(e.name)).map(e=>({...e,_builtin:true})),
+    ...builtins,
     ...customEQ.map(e=>({...e,_builtin:false}))
   ];
   const filtered = allItems.filter(e=>
@@ -4773,7 +4798,9 @@ function _renderEqManagerModal(filterCat='all', search=''){
         style="flex:1;min-width:160px" oninput="_renderEqManagerModal('${filterCat}',this.value)">
       <button class="btn blue sm" onclick="openAddEquipmentForm()">+ ADD ITEM</button>
       <button class="btn sm" onclick="openSyncEquipment()" style="color:var(--accent);border-color:var(--accentd)">⟳ SYNC</button>
+      ${eqSyncMode?`<button class="btn sm" style="color:var(--red);border-color:var(--red)" onclick="resetEqToBuiltins()" title="Discard synced data and restore built-in catalog">✕ RESET TO BUILT-INS</button>`:''}
     </div>
+    ${eqSyncMode?`<div style="font-family:var(--mono);font-size:10px;color:var(--amber);padding:5px 8px;background:var(--bg3);border:1px solid var(--amber);margin-bottom:8px">⟳ SYNCED MODE — built-in items hidden. Showing ${customEQ.length} synced items only.</div>`:''}
     <div class="dpicker-cats" style="margin-bottom:10px">${catBar}</div>
     <div style="max-height:55vh;overflow-y:auto;display:flex;flex-direction:column;gap:4px" id="eqm-list">
       ${filtered.length===0
@@ -4899,10 +4926,11 @@ async function deleteCustomEqItem(customId){
 // ── Sync from store reference URL ────────────────────────────────
 function openSyncEquipment(){
   openModal('⟳ SYNC FROM STORE',`
-    <div style="font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:12px;line-height:1.7">
-      Paste a store reference URL to sync equipment data into the catalog.<br>
-      Items with the same name will be updated; new items will be added as custom entries.<br>
-      Built-in items are never modified.
+    <div style="font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:8px;line-height:1.7">
+      Paste a store reference URL to sync equipment data into the catalog.
+    </div>
+    <div style="font-family:var(--mono);font-size:10px;color:var(--amber);background:var(--bg3);border:1px solid var(--amber);padding:8px 10px;margin-bottom:12px;line-height:1.6">
+      ⚠ <b>Full replace:</b> Syncing will clear the entire catalog and replace it with data from the URL. Any equipment you added manually will be <b>permanently removed</b>.
     </div>
     <div class="label">STORE REFERENCE URL</div>
     <input class="input" id="sync-url" style="width:100%;margin-bottom:10px"
@@ -4910,7 +4938,7 @@ function openSyncEquipment(){
       placeholder="https://…">
     <div id="sync-status" style="font-family:var(--mono);font-size:11px;color:var(--text3);min-height:18px"></div>`,
     `<button class="btn" onclick="openEquipmentManager()">CANCEL</button>
-     <button class="btn primary" onclick="_doSyncEquipment()">⟳ SYNC NOW</button>`
+     <button class="btn danger" onclick="_doSyncEquipment()">⟳ SYNC & REPLACE</button>`
   );
 }
 
@@ -4919,7 +4947,7 @@ async function _doSyncEquipment(){
   if(!url){ toast('Enter a URL','var(--red)'); return; }
   const status = document.getElementById('sync-status');
   if(status) status.textContent = 'Fetching…';
-  const syncBtn = document.querySelector('#modal-foot .btn.primary');
+  const syncBtn = document.querySelector('#modal-foot .btn.danger');
   if(syncBtn){ syncBtn.disabled=true; syncBtn.textContent='Syncing…'; }
 
   let html;
@@ -4937,33 +4965,57 @@ async function _doSyncEquipment(){
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
   const tables = doc.querySelectorAll('table');
-  let added=0, updated=0;
+  // Clear catalog and rebuild entirely from sync source
+  const freshEQ = [];
+  let added=0;
 
-  // Map section headings to category names
   const sectionCatMap = {
-    'switches':'switch','switch':'switch',
-    'routers':'router','router':'router',
-    'servers':'server','server':'server',
-    'firewalls':'firewall','firewall':'firewall','taps':'firewall',
-    'converters':'converter','converter':'converter','repeaters':'converter',
-    'power':'power','ups':'power','surge':'power','power expanders':'power','power cables':'power',
-    'cables':'cable','network cables':'cable','cabling':'cable',
-    'racks':'rack','rack':'rack','shelving':'rack',
-    'debuggers':'server','decentro':'server','peripherals':'server','monitors':'server',
+    'switches':'switch','switch':'switch','switching':'switch',
+    'routers':'router','router':'router','routing':'router',
+    'servers':'server','server':'server','computing':'server','debugger':'server','decentro':'server','peripheral':'server','monitor':'server',
+    'firewalls':'firewall','firewall':'firewall','tap':'firewall','security':'firewall',
+    'converters':'converter','converter':'converter','repeater':'converter','media converter':'converter',
+    'power':'power','ups':'power','surge':'power','expander':'power','power cable':'power','pdu':'power',
+    'cables':'cable','cable':'cable','network cable':'cable','cabling':'cable','sfp':'cable','transceiver':'cable',
+    'racks':'rack','rack':'rack','shelf':'rack','shelving':'rack','enclosure':'rack',
   };
 
   tables.forEach(table=>{
-    // Find associated heading
-    let cat = 'server';
+    // Strategy 1: walk backwards through siblings to nearest heading
+    let cat = null;
     let el = table.previousElementSibling;
     while(el){
-      const txt = (el.textContent||'').toLowerCase().replace(/[^a-z &]/g,'').trim();
+      const tag = (el.tagName||'').toUpperCase();
+      const txt = (el.textContent||'').toLowerCase().replace(/[^a-z0-9 &]/g,'').trim();
       for(const [k,v] of Object.entries(sectionCatMap)){
         if(txt.includes(k)){ cat=v; break; }
       }
-      if(el.tagName && el.tagName.match(/^H[1-6]$/)) break;
+      if(cat) break;
+      if(tag.match(/^H[1-6]$/)) break;
       el=el.previousElementSibling;
     }
+    // Strategy 2: walk up DOM ancestors, check their id/class and first heading child
+    if(!cat){
+      let parent=table.parentElement;
+      while(parent && parent!==doc.body){
+        const search=(parent.id||'')+' '+(parent.className||'');
+        for(const [k,v] of Object.entries(sectionCatMap)){
+          if(search.toLowerCase().includes(k)){ cat=v; break; }
+        }
+        if(!cat){
+          const h=Array.from(parent.querySelectorAll('h1,h2,h3,h4,h5,h6')).find(x=>x.compareDocumentPosition(table)&4);
+          if(h){
+            const htxt=(h.textContent||'').toLowerCase().replace(/[^a-z0-9 &]/g,'').trim();
+            for(const [k,v] of Object.entries(sectionCatMap)){
+              if(htxt.includes(k)){ cat=v; break; }
+            }
+          }
+        }
+        if(cat) break;
+        parent=parent.parentElement;
+      }
+    }
+    if(!cat) cat='server'; // fallback
 
     const headers = Array.from(table.querySelectorAll('thead th')).map(th=>(th.textContent||'').toLowerCase().trim());
     const rows = table.querySelectorAll('tbody tr');
@@ -5011,14 +5063,16 @@ async function _doSyncEquipment(){
       };
       if(!item.name || item.price===0) return;
 
-      const existing = customEQ.findIndex(e=>e._customId===item._customId);
-      if(existing>=0){ customEQ[existing]=item; updated++; }
-      else { customEQ.push(item); added++; }
+      freshEQ.push(item);
+      added++;
     });
   });
 
+  // Replace entire catalog with synced data; suppress built-ins
+  customEQ = freshEQ;
+  eqSyncMode = true;
   await saveCustomEQ();
-  const msg = `Sync complete: ${added} added, ${updated} updated.`;
+  const msg = `Sync complete: catalog replaced with ${added} items. Any custom equipment has been cleared.`;
   if(status) status.textContent = msg;
   toast(msg,'var(--green)');
   if(syncBtn){ syncBtn.disabled=false; syncBtn.textContent='⟳ SYNC NOW'; }
@@ -6530,7 +6584,7 @@ function renderBudgetPlanner(){
   const run=runs[currentRunId];
   const balance=run.accountBalance!==undefined?run.accountBalance:(run.budget||0);
   const spent=floors.reduce((a,f)=>(f.devices||[]).reduce((b,d)=>b+(d.price||0)*(d.qty||1),a),0);
-  const allEQ=[...EQ,...customEQ];
+  const allEQ=[...(eqSyncMode?[]:EQ),...customEQ];
   if(!window._bpCart) window._bpCart=[];
   window._bpBalance=balance;
 
@@ -6563,7 +6617,7 @@ function renderBudgetPlanner(){
 function renderBpPicker(){
   const cat=(document.getElementById('bp-cat')||{}).value||'all';
   const s=((document.getElementById('bp-search')||{}).value||'').toLowerCase();
-  const allEQ=[...EQ,...customEQ];
+  const allEQ=[...(eqSyncMode?[]:EQ),...customEQ];
   const items=allEQ.filter(e=>(cat==='all'||e.cat===cat)&&(!s||e.name.toLowerCase().includes(s)||(e.v||'').toLowerCase().includes(s)));
   const el=document.getElementById('bp-picker'); if(!el) return;
   el.innerHTML=items.slice(0,80).map(e=>{
@@ -6826,7 +6880,7 @@ function openBudgetPlanner(){
 function _bpRenderPicker(){
   const cat=(document.getElementById('bp-cat')||{}).value||'all';
   const s=((document.getElementById('bp-search')||{}).value||'').toLowerCase();
-  const allEQ=[...EQ,...customEQ];
+  const allEQ=[...(eqSyncMode?[]:EQ),...customEQ];
   const items=allEQ.filter(e=>(cat==='all'||e.cat===cat)&&(!s||e.name.toLowerCase().includes(s)||(e.v||'').toLowerCase().includes(s)));
   const el=document.getElementById('bp-picker'); if(!el) return;
   el.innerHTML=items.slice(0,80).map(e=>{
@@ -7204,7 +7258,7 @@ function renderRunDashboard(){
   document.getElementById('rdash-run-name').textContent=run.name;
 
   const liveFloors=(floors&&floors.length)?floors:run.floors||[];
-  const allEQ=[...EQ,...customEQ];
+  const allEQ=[...(eqSyncMode?[]:EQ),...customEQ];
   const allUsers=liveFloors.flatMap(f=>f.users||[]);
   const slaUsers=allUsers.filter(u=>u.sla);
   const totalDevices=liveFloors.reduce((a,f)=>a+(f.devices||[]).length,0);
@@ -7928,7 +7982,7 @@ function renderPower(){
   const runFloors=run?run.floors:[];
   // Use the live floors array (which is kept in sync with the run)
   const liveFloors=(floors&&floors.length)?floors:runFloors||[];
-  const allEQ=[...EQ,...customEQ];
+  const allEQ=[...(eqSyncMode?[]:EQ),...customEQ];
   let totalDraw=0, totalCapacity=0;
 
   const floorCards=liveFloors.map(f=>{
@@ -8166,7 +8220,7 @@ function openPowerCalculator(){
     showSubpage('power'); return;
   }
   // Otherwise open standalone what-if modal
-  const allEQ=[...EQ,...customEQ];
+  const allEQ=[...(eqSyncMode?[]:EQ),...customEQ];
   const cats=['router','switch','server','firewall','power','converter','cable','rack'];
 
   openModal('⚡ POWER CALCULATOR',
@@ -8190,7 +8244,7 @@ function openPowerCalculator(){
 function _renderPwTable(){
   const cat=(document.getElementById('pw-cat')||{}).value||'all';
   const s=((document.getElementById('pw-search')||{}).value||'').toLowerCase();
-  const allEQ=[...EQ,...customEQ];
+  const allEQ=[...(eqSyncMode?[]:EQ),...customEQ];
   const rows=allEQ.filter(e=>(cat==='all'||e.cat===cat)&&(!s||e.name.toLowerCase().includes(s)||(e.v||'').toLowerCase().includes(s)));
   const tb=document.getElementById('pw-tbody'); if(!tb) return;
   tb.innerHTML=rows.slice(0,120).map(e=>
@@ -8492,7 +8546,7 @@ function _doRunComparison(){
 // ════════════════════════════════════════
 function openDeviceCompat(){
   // Collect all servers from EQ catalog
-  const allEQ=[...EQ,...customEQ];
+  const allEQ=[...(eqSyncMode?[]:EQ),...customEQ];
   const servers=allEQ.filter(e=>e.cat==='server');
   const serverOpts=servers.map(s=>
     '<option value="'+safeB64(s.name)+'">'+s.name+(s.v?' — '+s.v:'')+
@@ -8634,11 +8688,18 @@ const SEED_DB = {"version":"20251215","count":3794,"seeds":[{"s":"00IZH","p":["L
 
 const SEED_USER_KEY = 'tni_toolkit_user_seeds';
 
-function _sfLoadUserSeeds(){
-  try{ const r=localStorage.getItem(SEED_USER_KEY); return r?JSON.parse(r):[]; }catch(e){ return []; }
+// ════════════════════════════════════════
+// USER SEEDS — localStorage (mirrors customEQ pattern)
+// ════════════════════════════════════════
+async function loadUserSeeds(){
+  try{
+    const raw = localStorage.getItem(SEED_USER_KEY);
+    if(raw) userSeeds = JSON.parse(raw);
+  }catch(e){}
 }
-function _sfSaveUserSeeds(s){
-  try{ localStorage.setItem(SEED_USER_KEY,JSON.stringify(s)); }catch(e){}
+
+async function saveUserSeeds(){
+  try{ localStorage.setItem(SEED_USER_KEY, JSON.stringify(userSeeds)); }catch(e){}
 }
 
 // ── Open seed finder modal ────────────────────────────────────
@@ -8669,7 +8730,7 @@ function openSeedFinder(){
     return card;
   }).join('');
 
-  const userSeeds = _sfLoadUserSeeds();
+  
 
   openModal('⚙ SEED FINDER',
     // Info bar
@@ -8752,7 +8813,7 @@ function _sfRenderResults(){
   );
 
   // Filter user seeds
-  const userSeeds = _sfLoadUserSeeds();
+  
   const userMatches = userSeeds.filter(s=>
     selected.every(p => (s.proposals||[]).includes(p))
   );
@@ -8804,7 +8865,7 @@ function _sfAddUserSeed(){
   const props = [...(window._sfSelected||[])];
   if(!props.length){ toast('Select proposals above first','var(--amber)'); return; }
 
-  const userSeeds = _sfLoadUserSeeds();
+  
   const existing = userSeeds.find(s=>s.seed===seed);
   if(existing){
     props.forEach(p=>{ if(!existing.proposals.includes(p)) existing.proposals.push(p); });
@@ -8813,7 +8874,7 @@ function _sfAddUserSeed(){
     userSeeds.push({seed, proposals:props});
     toast('Seed '+seed+' added','var(--green)');
   }
-  _sfSaveUserSeeds(userSeeds);
+  saveUserSeeds();
   el.value='';
   openSeedFinder();
   _sfRenderResults();
@@ -8836,14 +8897,15 @@ function _sfCopySeed(btn){
 function _sfSearch(){ if(window._sfSelected&&window._sfSelected.size) _sfRenderResults(); }
 function _sfToggleFilter(sid){ _sfPickProposal(sid); }
 function _sfClearFilters(){ _sfClearAll(); }
-function _loadSeeds(){ return _sfLoadUserSeeds(); }
-function _saveSeeds(s){ _sfSaveUserSeeds(s); }
+function _loadSeeds(){ return userSeeds; }
+function _saveSeeds(s){ userSeeds=s; saveUserSeeds(); }
 function _defaultSeeds(){ return []; }
 
 
 async function init(){
   await loadCustomEQ();       // load custom equipment before anything else
   await loadCustomPrograms();  // load custom programs before anything else
+  await loadUserSeeds();       // load saved seeds before anything else
   // Load from BOTH backends — local takes precedence for runs that exist in both
   const allKeys = await Store.listAll();
   for(const k of allKeys){
