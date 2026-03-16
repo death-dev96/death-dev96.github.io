@@ -948,7 +948,7 @@ function openNewRunModal(){
             ⬡ LOCAL<br><span style="font-size:9px;opacity:0.7">Saved on this machine</span>
           </button>
         </div>
-        <div id="nr-backend-note" style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:5px">Session: data lives in this browser tab. Local: persists on this device across sessions.</div>
+        <div id="nr-backend-note" style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:5px"><span style="color:var(--amber)">⚠ Session storage is <b>temporary</b> — this run will be <b>lost</b> if you refresh or close this browser tab. Use Local storage to save permanently.</span></div>
       </div>
       <div><div class="label">NOTES (optional)</div><textarea class="input" id="nr-notes" rows="2" placeholder="Goals, strategy…"></textarea></div>
 
@@ -1052,9 +1052,13 @@ function setNrBackend(val){
   document.getElementById('nr-backend-session').className='storage-toggle-opt'+(val==='session'?' active session':'');
   document.getElementById('nr-backend-local').className='storage-toggle-opt'+(val==='local'?' active local':'');
   const note=document.getElementById('nr-backend-note');
-  if(note) note.textContent=val==='local'
-    ?'Local: this run will be saved to localStorage on this device and persist across sessions and page refreshes.'
-    :'Session: data lives in the cloud/tab storage provided by this app environment.';
+  if(note){
+    if(val==='session'){
+      note.innerHTML='<span style="color:var(--amber)">⚠ Session storage is <b>temporary</b> — this run will be <b>lost</b> if you refresh or close this browser tab. Use Local storage to save permanently.</span>';
+    } else {
+      note.textContent='Local: this run will be saved to localStorage on this device and persist across sessions and page refreshes.';
+    }
+  }
 }
 
 function toggleFixRun(){
