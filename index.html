@@ -705,6 +705,116 @@ footer{
 
   </div>
 
+  <div class="section-label" style="margin-top:48px">Developer Tools</div>
+
+  <div class="tool-grid">
+
+    <!-- IconFinder -->
+    <div class="tool-card" style="--card-color:#fb923c" onclick="openTool('iconfinder')">
+      <div class="tool-card-header">
+        <div class="tool-icon">✨</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">IconFinder</div>
+      <div class="tool-desc">Browse and search the full Unicode emoji set by name or category. Click any icon to copy the character, code point, or HTML entity.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">emoji</span><span class="tool-tag">unicode</span><span class="tool-tag">symbols</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- RegexTester -->
+    <div class="tool-card" style="--card-color:#34d399" onclick="openTool('regextester')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🔍</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">RegexTester</div>
+      <div class="tool-desc">Live regex pattern tester with highlighted matches, capture group breakdown, preset patterns, and plain-English pattern explanations.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">regex</span><span class="tool-tag">pattern</span><span class="tool-tag">dev</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-label" style="margin-top:48px">Personal</div>
+
+  <div class="tool-grid">
+
+    <!-- OutlineBuilder -->
+    <div class="tool-card" style="--card-color:#60a5fa" onclick="openTool('outlinebuilder')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🗂️</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">OutlineBuilder</div>
+      <div class="tool-desc">Hierarchical outliner for plans, arguments, and documents. Indent, collapse, drag to reorder, and export to Markdown or plain text.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">outline</span><span class="tool-tag">planning</span><span class="tool-tag">writing</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- FlashCards -->
+    <div class="tool-card" style="--card-color:#f472b6" onclick="openTool('flashcards')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🃏</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">FlashCards</div>
+      <div class="tool-desc">Create study decks with front and back cards. Flip to reveal, score yourself with Got It / Almost / No Idea, then retry just the ones you missed.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">study</span><span class="tool-tag">flashcards</span><span class="tool-tag">learning</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- ReadingList -->
+    <div class="tool-card" style="--card-color:#818cf8" onclick="openTool('readinglist')">
+      <div class="tool-card-header">
+        <div class="tool-icon">📚</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">ReadingList</div>
+      <div class="tool-desc">Track books, articles, and videos across three shelves — Want to Read, Currently Reading, and Finished — with ratings, notes, and tags.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">books</span><span class="tool-tag">reading</span><span class="tool-tag">tracker</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- PasswordGen -->
+    <div class="tool-card" style="--card-color:#2dd4bf" onclick="openTool('passwordgen')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🔐</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">PasswordGen</div>
+      <div class="tool-desc">Generate secure passwords with configurable length, character sets, and exclusions. Strength meter, batch mode, presets. Nothing is ever stored.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">password</span><span class="tool-tag">security</span><span class="tool-tag">generator</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- RecipeBox -->
+    <div class="tool-card" style="--card-color:#f97316" onclick="openTool('recipebox')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🍽️</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">RecipeBox</div>
+      <div class="tool-desc">Store your recipes with ingredients, step-by-step instructions, and a live serving scaler. Tag by meal type. No ads, no accounts, no noise.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">recipes</span><span class="tool-tag">cooking</span><span class="tool-tag">food</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+  </div>
+
   <div class="section-label" style="margin-top:48px">Game Companions</div>
 
   <div class="tool-grid">
@@ -765,6 +875,13 @@ footer{
         <button class="issue-chip" data-app="QuickCalc" onclick="selectApp(this)">🧮 QuickCalc</button>
         <button class="issue-chip" data-app="DailyLog" onclick="selectApp(this)">📓 DailyLog</button>
         <button class="issue-chip" data-app="QuoteWall" onclick="selectApp(this)">💬 QuoteWall</button>
+        <button class="issue-chip" data-app="IconFinder" onclick="selectApp(this)">✨ IconFinder</button>
+        <button class="issue-chip" data-app="RegexTester" onclick="selectApp(this)">🔍 RegexTester</button>
+        <button class="issue-chip" data-app="OutlineBuilder" onclick="selectApp(this)">🗂️ OutlineBuilder</button>
+        <button class="issue-chip" data-app="FlashCards" onclick="selectApp(this)">🃏 FlashCards</button>
+        <button class="issue-chip" data-app="ReadingList" onclick="selectApp(this)">📚 ReadingList</button>
+        <button class="issue-chip" data-app="PasswordGen" onclick="selectApp(this)">🔐 PasswordGen</button>
+        <button class="issue-chip" data-app="RecipeBox" onclick="selectApp(this)">🍽️ RecipeBox</button>
         <button class="issue-chip" data-app="Run Manager" onclick="selectApp(this)">🎮 Run Manager</button>
       </div>
     </div>
@@ -870,6 +987,55 @@ const TOOLS = {
     desc: 'Personal quote collection with tags and random display',
     color: '#a78bfa',
     src: 'quotewall.html',
+  },
+  iconfinder: {
+    name: 'IconFinder',
+    icon: '✨',
+    desc: 'Browse & search emoji and Unicode symbols, click to copy',
+    color: '#fb923c',
+    src: 'iconfinder.html',
+  },
+  regextester: {
+    name: 'RegexTester',
+    icon: '🔍',
+    desc: 'Live regex tester with match highlights and plain-English explanations',
+    color: '#34d399',
+    src: 'regextester.html',
+  },
+  outlinebuilder: {
+    name: 'OutlineBuilder',
+    icon: '🗂️',
+    desc: 'Hierarchical outliner with collapsible nodes and Markdown export',
+    color: '#60a5fa',
+    src: 'outlinebuilder.html',
+  },
+  flashcards: {
+    name: 'FlashCards',
+    icon: '🃏',
+    desc: 'Create decks and study with flip cards and spaced repetition scoring',
+    color: '#f472b6',
+    src: 'flashcards.html',
+  },
+  readinglist: {
+    name: 'ReadingList',
+    icon: '📚',
+    desc: 'Track books and articles across Want to Read, Reading, and Finished shelves',
+    color: '#818cf8',
+    src: 'readinglist.html',
+  },
+  passwordgen: {
+    name: 'PasswordGen',
+    icon: '🔐',
+    desc: 'Generate secure passwords with strength meter — nothing ever stored',
+    color: '#2dd4bf',
+    src: 'passwordgen.html',
+  },
+  recipebox: {
+    name: 'RecipeBox',
+    icon: '🍽️',
+    desc: 'Store recipes with ingredients, steps, and a live serving scaler',
+    color: '#f97316',
+    src: 'recipebox.html',
   },
   runmanager: {
     name: 'Run Manager',
