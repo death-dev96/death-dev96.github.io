@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IconFinder</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0d14;--surface:#13131e;--surface2:#1a1a28;--border:#222234;--border2:#2e2e46;
+  --text:#eeeef8;--muted:#5a5a80;--muted2:#30304a;
+  --accent:#fb923c;--accent-dim:rgba(251,146,60,.1);
+  --mono:'DM Mono',monospace;--display:'Syne',sans-serif;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--mono);background:var(--bg);color:var(--text);display:flex;flex-direction:column}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+.topbar{height:52px;background:var(--surface);border-bottom:2px solid var(--accent);
+  padding:0 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.logo{font-family:var(--display);font-weight:800;font-size:.95rem;display:flex;align-items:center;gap:8px}
+.logo span{color:var(--accent)}
+.search-wrap{flex:1;max-width:480px;position:relative}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:.85rem;pointer-events:none}
+.search-input{width:100%;padding:7px 12px 7px 32px;border-radius:7px;
+  border:1px solid var(--border2);background:var(--surface2);color:var(--text);
+  font-family:var(--mono);font-size:.82rem;outline:none;transition:border-color .15s}
+.search-input:focus{border-color:var(--accent)}
+.search-input::placeholder{color:var(--muted2)}
+.result-count{font-size:.7rem;color:var(--muted);margin-left:auto;font-family:var(--mono)}
+
+.app{flex:1;display:flex;overflow:hidden;min-height:0}
+
+/* SIDEBAR */
+.cats{width:180px;border-right:1px solid var(--border);background:var(--surface);
+  overflow-y:auto;flex-shrink:0;padding:8px}
+.cat-btn{width:100%;text-align:left;padding:8px 11px;border-radius:7px;border:none;
+  background:transparent;color:var(--muted);font-family:var(--mono);font-size:.75rem;
+  cursor:pointer;transition:all .12s;display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.cat-btn:hover{background:var(--surface2);color:var(--text)}
+.cat-btn.active{background:var(--accent-dim);color:var(--accent);border:1px solid rgba(251,146,60,.2)}
+.cat-icon{font-size:1rem;width:20px;text-align:center;flex-shrink:0}
+.cat-count{margin-left:auto;font-size:.62rem;color:var(--muted2)}
+
+/* GRID */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.grid-wrap{flex:1;overflow-y:auto;padding:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(56px,1fr));gap:6px}
+.icon-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;padding:10px 4px;border-radius:8px;border:1px solid var(--border);
+  background:var(--surface);cursor:pointer;transition:all .12s;
+  position:relative;min-height:64px}
+.icon-btn:hover{border-color:var(--accent);background:var(--accent-dim);transform:scale(1.06)}
+.icon-glyph{font-size:1.55rem;line-height:1;user-select:none}
+.icon-name{font-size:.44rem;color:var(--muted2);text-align:center;line-height:1.2;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;padding:0 2px}
+.icon-btn.copied{border-color:#22c55e;background:rgba(34,197,94,.1)}
+
+/* DETAIL */
+.detail{height:110px;border-top:1px solid var(--border);background:var(--surface);
+  flex-shrink:0;padding:14px 20px;display:flex;align-items:center;gap:20px}
+.detail-glyph{font-size:3rem;flex-shrink:0;width:60px;text-align:center}
+.detail-info{flex:1;display:flex;flex-direction:column;gap:5px}
+.detail-name{font-family:var(--display);font-weight:700;font-size:.95rem;margin-bottom:2px}
+.detail-meta{font-size:.7rem;color:var(--muted)}
+.detail-actions{display:flex;gap:8px;flex-wrap:wrap}
+.copy-btn{padding:6px 14px;border-radius:6px;border:1px solid var(--border2);
+  background:transparent;color:var(--muted);font-family:var(--mono);font-size:.72rem;
+  cursor:pointer;transition:all .15s}
+.copy-btn:hover{border-color:var(--accent);color:var(--accent)}
+.copy-btn.primary{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+.detail-empty{color:var(--muted2);font-size:.82rem;font-style:italic;width:100%;text-align:center}
+
+/* RECENTS */
+.recents-row{padding:8px 16px;border-bottom:1px solid var(--border);background:var(--surface);
+  display:flex;align-items:center;gap:8px;flex-shrink:0;min-height:44px}
+.recents-label{font-size:.62rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;flex-shrink:0}
+.recents-chips{display:flex;gap:6px;overflow-x:auto;flex:1}
+.recent-chip{font-size:1.1rem;cursor:pointer;padding:3px 6px;border-radius:5px;
+  border:1px solid var(--border);background:transparent;transition:all .12s;flex-shrink:0}
+.recent-chip:hover{border-color:var(--accent);background:var(--accent-dim)}
+
+/* TOAST */
+.toast-wrap{position:fixed;bottom:120px;left:50%;transform:translateX(-50%);
+  z-index:999;display:flex;flex-direction:column;gap:5px;pointer-events:none}
+.toast{background:var(--surface2);border:1px solid var(--border2);border-radius:8px;
+  padding:7px 14px;font-size:.75rem;color:var(--text);display:flex;align-items:center;
+  gap:8px;box-shadow:0 4px 20px rgba(0,0,0,.5);animation:tIn .15s ease;
+  border-left:3px solid var(--accent);white-space:nowrap}
+@keyframes tIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.no-results{grid-column:1/-1;padding:40px;text-align:center;color:var(--muted);font-style:italic}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">Icon<span>Finder</span></div>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" id="search" type="text" placeholder="Search emoji by name… e.g. heart, fire, star"
+           oninput="onSearch(this.value)" autocomplete="off">
+  </div>
+  <div class="result-count" id="result-count"></div>
+</div>
+
+<div class="app">
+  <div class="cats" id="cats"></div>
+  <div class="main">
+    <div class="recents-row">
+      <span class="recents-label">Recent</span>
+      <div class="recents-chips" id="recents-chips"></div>
+    </div>
+    <div class="grid-wrap">
+      <div class="grid" id="grid"></div>
+    </div>
+    <div class="detail" id="detail">
+      <div class="detail-empty">Click any icon to see details and copy options</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+// ── EMOJI DATA ────────────────────────
+const CATEGORIES = [
+  { id:'all',    label:'All',         icon:'✨' },
+  { id:'faces',  label:'Faces',       icon:'😀' },
+  { id:'people', label:'People',      icon:'👤' },
+  { id:'nature', label:'Nature',      icon:'🌿' },
+  { id:'food',   label:'Food',        icon:'🍎' },
+  { id:'travel', label:'Travel',      icon:'✈️' },
+  { id:'objects',label:'Objects',     icon:'💡' },
+  { id:'symbols',label:'Symbols',     icon:'♾️' },
+  { id:'flags',  label:'Flags',       icon:'🏳️' },
+  { id:'shapes', label:'Shapes',      icon:'◼️' },
+];
+
+// Curated emoji set with names and categories
+const EMOJIS = [
+  // Faces
+  {e:'😀',n:'Grinning Face',c:'faces'},{e:'😁',n:'Beaming Face',c:'faces'},{e:'😂',n:'Face with Tears of Joy',c:'faces'},
+  {e:'🤣',n:'Rolling on Floor Laughing',c:'faces'},{e:'😃',n:'Grinning Face Big Eyes',c:'faces'},
+  {e:'😄',n:'Grinning Squinting Face',c:'faces'},{e:'😅',n:'Grinning Sweat',c:'faces'},
+  {e:'😆',n:'Squinting Face',c:'faces'},{e:'😉',n:'Winking Face',c:'faces'},{e:'😊',n:'Smiling Face',c:'faces'},
+  {e:'😋',n:'Savoring Food',c:'faces'},{e:'😎',n:'Sunglasses',c:'faces'},{e:'😍',n:'Heart Eyes',c:'faces'},
+  {e:'🥰',n:'Smiling Hearts',c:'faces'},{e:'😘',n:'Face Blowing Kiss',c:'faces'},{e:'😗',n:'Kissing Face',c:'faces'},
+  {e:'😙',n:'Kissing Smiling Eyes',c:'faces'},{e:'😚',n:'Kissing Closed Eyes',c:'faces'},
+  {e:'🙂',n:'Slightly Smiling',c:'faces'},{e:'🤗',n:'Hugging Face',c:'faces'},
+  {e:'🤩',n:'Star Struck',c:'faces'},{e:'🤔',n:'Thinking Face',c:'faces'},{e:'🤨',n:'Raised Eyebrow',c:'faces'},
+  {e:'😐',n:'Neutral Face',c:'faces'},{e:'😑',n:'Expressionless Face',c:'faces'},
+  {e:'😶',n:'Face Without Mouth',c:'faces'},{e:'😏',n:'Smirking Face',c:'faces'},
+  {e:'😒',n:'Unamused Face',c:'faces'},{e:'🙄',n:'Rolling Eyes',c:'faces'},
+  {e:'😬',n:'Grimacing Face',c:'faces'},{e:'🤥',n:'Lying Face',c:'faces'},
+  {e:'😌',n:'Relieved Face',c:'faces'},{e:'😔',n:'Pensive Face',c:'faces'},
+  {e:'😪',n:'Sleepy Face',c:'faces'},{e:'🤤',n:'Drooling Face',c:'faces'},
+  {e:'😴',n:'Sleeping Face',c:'faces'},{e:'😷',n:'Face with Mask',c:'faces'},
+  {e:'🤒',n:'Face Thermometer',c:'faces'},{e:'🤕',n:'Face Bandage',c:'faces'},
+  {e:'🤢',n:'Nauseated Face',c:'faces'},{e:'🤧',n:'Sneezing Face',c:'faces'},
+  {e:'🥵',n:'Hot Face',c:'faces'},{e:'🥶',n:'Cold Face',c:'faces'},
+  {e:'😵',n:'Dizzy Face',c:'faces'},{e:'🤯',n:'Exploding Head',c:'faces'},
+  {e:'🤠',n:'Cowboy Hat Face',c:'faces'},{e:'🥳',n:'Partying Face',c:'faces'},
+  {e:'😎',n:'Cool Face',c:'faces'},{e:'🤓',n:'Nerd Face',c:'faces'},
+  {e:'😭',n:'Loudly Crying',c:'faces'},{e:'😢',n:'Crying Face',c:'faces'},
+  {e:'😤',n:'Face Steam',c:'faces'},{e:'😠',n:'Angry Face',c:'faces'},
+  {e:'😡',n:'Pouting Face',c:'faces'},{e:'🤬',n:'Cursing Face',c:'faces'},
+  {e:'😱',n:'Screaming Fear',c:'faces'},{e:'😨',n:'Fearful Face',c:'faces'},
+  {e:'😰',n:'Cold Sweat',c:'faces'},{e:'😥',n:'Sad Sweat',c:'faces'},
+  {e:'🙁',n:'Slightly Frowning',c:'faces'},{e:'☹️',n:'Frowning Face',c:'faces'},
+  {e:'😳',n:'Flushed Face',c:'faces'},{e:'🥺',n:'Pleading Face',c:'faces'},
+  {e:'😦',n:'Frowning Open Mouth',c:'faces'},{e:'😧',n:'Anguished Face',c:'faces'},
+  {e:'😮',n:'Face Open Mouth',c:'faces'},{e:'😲',n:'Astonished Face',c:'faces'},
+  {e:'🥱',n:'Yawning Face',c:'faces'},{e:'😴',n:'Sleeping Face',c:'faces'},
+  {e:'🤑',n:'Money Mouth',c:'faces'},{e:'😜',n:'Winking Tongue',c:'faces'},
+  {e:'🤪',n:'Zany Face',c:'faces'},{e:'😝',n:'Squinting Tongue',c:'faces'},
+  {e:'🤫',n:'Shushing Face',c:'faces'},{e:'🧐',n:'Monocle Face',c:'faces'},
+  {e:'🥸',n:'Disguised Face',c:'faces'},{e:'👻',n:'Ghost',c:'faces'},
+  {e:'💀',n:'Skull',c:'faces'},{e:'☠️',n:'Skull Crossbones',c:'faces'},
+  {e:'👽',n:'Alien',c:'faces'},{e:'👾',n:'Alien Monster',c:'faces'},
+  {e:'🤖',n:'Robot',c:'faces'},{e:'🎃',n:'Jack-O-Lantern',c:'faces'},
+  {e:'😈',n:'Smiling Imp',c:'faces'},{e:'👿',n:'Angry Imp',c:'faces'},
+  // People
+  {e:'👋',n:'Waving Hand',c:'people'},{e:'🤚',n:'Raised Back Hand',c:'people'},
+  {e:'🖐️',n:'Hand Fingers Splayed',c:'people'},{e:'✋',n:'Raised Hand',c:'people'},
+  {e:'🖖',n:'Vulcan Salute',c:'people'},{e:'👌',n:'OK Hand',c:'people'},
+  {e:'🤌',n:'Pinched Fingers',c:'people'},{e:'✌️',n:'Victory Hand',c:'people'},
+  {e:'🤞',n:'Crossed Fingers',c:'people'},{e:'🤟',n:'Love You Gesture',c:'people'},
+  {e:'🤘',n:'Sign of Horns',c:'people'},{e:'🤙',n:'Call Me Hand',c:'people'},
+  {e:'👈',n:'Backhand Index Left',c:'people'},{e:'👉',n:'Backhand Index Right',c:'people'},
+  {e:'👆',n:'Backhand Index Up',c:'people'},{e:'🖕',n:'Middle Finger',c:'people'},
+  {e:'👇',n:'Backhand Index Down',c:'people'},{e:'☝️',n:'Index Pointing Up',c:'people'},
+  {e:'👍',n:'Thumbs Up',c:'people'},{e:'👎',n:'Thumbs Down',c:'people'},
+  {e:'✊',n:'Raised Fist',c:'people'},{e:'👊',n:'Oncoming Fist',c:'people'},
+  {e:'🤛',n:'Left Fist',c:'people'},{e:'🤜',n:'Right Fist',c:'people'},
+  {e:'👏',n:'Clapping Hands',c:'people'},{e:'🙌',n:'Raising Hands',c:'people'},
+  {e:'👐',n:'Open Hands',c:'people'},{e:'🤲',n:'Palms Up',c:'people'},
+  {e:'🙏',n:'Folded Hands',c:'people'},{e:'✍️',n:'Writing Hand',c:'people'},
+  {e:'💅',n:'Nail Polish',c:'people'},{e:'🤳',n:'Selfie',c:'people'},
+  {e:'💪',n:'Flexed Bicep',c:'people'},{e:'🦾',n:'Mechanical Arm',c:'people'},
+  {e:'🦿',n:'Mechanical Leg',c:'people'},{e:'🦵',n:'Leg',c:'people'},
+  {e:'🦶',n:'Foot',c:'people'},{e:'👂',n:'Ear',c:'people'},
+  {e:'🦻',n:'Ear Hearing Aid',c:'people'},{e:'👃',n:'Nose',c:'people'},
+  {e:'🧠',n:'Brain',c:'people'},{e:'🫀',n:'Anatomical Heart',c:'people'},
+  {e:'🫁',n:'Lungs',c:'people'},{e:'🦷',n:'Tooth',c:'people'},
+  {e:'🦴',n:'Bone',c:'people'},{e:'👁️',n:'Eye',c:'people'},
+  {e:'👅',n:'Tongue',c:'people'},{e:'👄',n:'Mouth',c:'people'},
+  {e:'👶',n:'Baby',c:'people'},{e:'🧒',n:'Child',c:'people'},
+  {e:'👦',n:'Boy',c:'people'},{e:'👧',n:'Girl',c:'people'},
+  {e:'🧑',n:'Person',c:'people'},{e:'👱',n:'Blond Person',c:'people'},
+  {e:'👨',n:'Man',c:'people'},{e:'👩',n:'Woman',c:'people'},
+  {e:'🧔',n:'Person Beard',c:'people'},{e:'👴',n:'Old Man',c:'people'},
+  {e:'👵',n:'Old Woman',c:'people'},{e:'🧓',n:'Older Person',c:'people'},
+  {e:'👮',n:'Police Officer',c:'people'},{e:'🕵️',n:'Detective',c:'people'},
+  {e:'💂',n:'Guard',c:'people'},{e:'🧑‍⚕️',n:'Health Worker',c:'people'},
+  {e:'👷',n:'Construction Worker',c:'people'},{e:'🤴',n:'Prince',c:'people'},
+  {e:'👸',n:'Princess',c:'people'},{e:'🧙',n:'Mage',c:'people'},
+  {e:'🧚',n:'Fairy',c:'people'},{e:'🧛',n:'Vampire',c:'people'},
+  {e:'🧜',n:'Merperson',c:'people'},{e:'🧝',n:'Elf',c:'people'},
+  {e:'🧞',n:'Genie',c:'people'},{e:'🧟',n:'Zombie',c:'people'},
+  {e:'💆',n:'Face Massage',c:'people'},{e:'💇',n:'Person Haircut',c:'people'},
+  {e:'🚶',n:'Person Walking',c:'people'},{e:'🏃',n:'Person Running',c:'people'},
+  {e:'💃',n:'Woman Dancing',c:'people'},{e:'🕺',n:'Man Dancing',c:'people'},
+  {e:'🧖',n:'Person Sauna',c:'people'},{e:'🧘',n:'Person Lotus',c:'people'},
+  // Nature
+  {e:'🐶',n:'Dog',c:'nature'},{e:'🐱',n:'Cat',c:'nature'},{e:'🐭',n:'Mouse',c:'nature'},
+  {e:'🐹',n:'Hamster',c:'nature'},{e:'🐰',n:'Rabbit',c:'nature'},{e:'🦊',n:'Fox',c:'nature'},
+  {e:'🐻',n:'Bear',c:'nature'},{e:'🐼',n:'Panda',c:'nature'},{e:'🐨',n:'Koala',c:'nature'},
+  {e:'🐯',n:'Tiger',c:'nature'},{e:'🦁',n:'Lion',c:'nature'},{e:'🐮',n:'Cow',c:'nature'},
+  {e:'🐷',n:'Pig',c:'nature'},{e:'🐸',n:'Frog',c:'nature'},{e:'🐵',n:'Monkey',c:'nature'},
+  {e:'🐔',n:'Chicken',c:'nature'},{e:'🐧',n:'Penguin',c:'nature'},{e:'🐦',n:'Bird',c:'nature'},
+  {e:'🦆',n:'Duck',c:'nature'},{e:'🦅',n:'Eagle',c:'nature'},{e:'🦉',n:'Owl',c:'nature'},
+  {e:'🦇',n:'Bat',c:'nature'},{e:'🐺',n:'Wolf',c:'nature'},{e:'🐗',n:'Boar',c:'nature'},
+  {e:'🐴',n:'Horse',c:'nature'},{e:'🦄',n:'Unicorn',c:'nature'},{e:'🐝',n:'Bee',c:'nature'},
+  {e:'🐛',n:'Bug',c:'nature'},{e:'🦋',n:'Butterfly',c:'nature'},{e:'🐌',n:'Snail',c:'nature'},
+  {e:'🐞',n:'Ladybug',c:'nature'},{e:'🐜',n:'Ant',c:'nature'},{e:'🦟',n:'Mosquito',c:'nature'},
+  {e:'🐢',n:'Turtle',c:'nature'},{e:'🐍',n:'Snake',c:'nature'},{e:'🦎',n:'Lizard',c:'nature'},
+  {e:'🐙',n:'Octopus',c:'nature'},{e:'🦑',n:'Squid',c:'nature'},{e:'🦐',n:'Shrimp',c:'nature'},
+  {e:'🐠',n:'Tropical Fish',c:'nature'},{e:'🐟',n:'Fish',c:'nature'},{e:'🐡',n:'Blowfish',c:'nature'},
+  {e:'🐬',n:'Dolphin',c:'nature'},{e:'🦈',n:'Shark',c:'nature'},{e:'🐳',n:'Whale',c:'nature'},
+  {e:'🌸',n:'Cherry Blossom',c:'nature'},{e:'🌹',n:'Rose',c:'nature'},{e:'🌺',n:'Hibiscus',c:'nature'},
+  {e:'🌻',n:'Sunflower',c:'nature'},{e:'🌼',n:'Blossom',c:'nature'},{e:'🌷',n:'Tulip',c:'nature'},
+  {e:'🌱',n:'Seedling',c:'nature'},{e:'🌲',n:'Evergreen Tree',c:'nature'},{e:'🌳',n:'Deciduous Tree',c:'nature'},
+  {e:'🌴',n:'Palm Tree',c:'nature'},{e:'🌵',n:'Cactus',c:'nature'},{e:'🍄',n:'Mushroom',c:'nature'},
+  {e:'🌾',n:'Sheaf of Rice',c:'nature'},{e:'💐',n:'Bouquet',c:'nature'},{e:'🍀',n:'Four Leaf Clover',c:'nature'},
+  {e:'🍁',n:'Maple Leaf',c:'nature'},{e:'🍂',n:'Fallen Leaf',c:'nature'},{e:'🍃',n:'Leaf Fluttering',c:'nature'},
+  {e:'🌍',n:'Globe Europe Africa',c:'nature'},{e:'🌎',n:'Globe Americas',c:'nature'},{e:'🌏',n:'Globe Asia Australia',c:'nature'},
+  {e:'🌙',n:'Crescent Moon',c:'nature'},{e:'☀️',n:'Sun',c:'nature'},{e:'🌤',n:'Sun Small Cloud',c:'nature'},
+  {e:'⛅',n:'Sun Behind Cloud',c:'nature'},{e:'🌧',n:'Cloud Rain',c:'nature'},{e:'⛈',n:'Thunderstorm',c:'nature'},
+  {e:'🌩',n:'Lightning Cloud',c:'nature'},{e:'❄️',n:'Snowflake',c:'nature'},{e:'🌈',n:'Rainbow',c:'nature'},
+  {e:'🌊',n:'Water Wave',c:'nature'},{e:'🔥',n:'Fire',c:'nature'},{e:'💧',n:'Droplet',c:'nature'},
+  {e:'🌬',n:'Wind Face',c:'nature'},{e:'🌪',n:'Tornado',c:'nature'},{e:'⭐',n:'Star',c:'nature'},
+  {e:'🌟',n:'Glowing Star',c:'nature'},{e:'✨',n:'Sparkles',c:'nature'},{e:'🌠',n:'Shooting Star',c:'nature'},
+  // Food
+  {e:'🍎',n:'Red Apple',c:'food'},{e:'🍊',n:'Tangerine',c:'food'},{e:'🍋',n:'Lemon',c:'food'},
+  {e:'🍇',n:'Grapes',c:'food'},{e:'🍓',n:'Strawberry',c:'food'},{e:'🫐',n:'Blueberries',c:'food'},
+  {e:'🍈',n:'Melon',c:'food'},{e:'🍉',n:'Watermelon',c:'food'},{e:'🍌',n:'Banana',c:'food'},
+  {e:'🍍',n:'Pineapple',c:'food'},{e:'🥭',n:'Mango',c:'food'},{e:'🍑',n:'Peach',c:'food'},
+  {e:'🍒',n:'Cherries',c:'food'},{e:'🍐',n:'Pear',c:'food'},{e:'🥝',n:'Kiwi',c:'food'},
+  {e:'🍅',n:'Tomato',c:'food'},{e:'🥥',n:'Coconut',c:'food'},{e:'🥑',n:'Avocado',c:'food'},
+  {e:'🍆',n:'Eggplant',c:'food'},{e:'🥦',n:'Broccoli',c:'food'},{e:'🥕',n:'Carrot',c:'food'},
+  {e:'🌽',n:'Corn',c:'food'},{e:'🌶',n:'Hot Pepper',c:'food'},{e:'🫑',n:'Bell Pepper',c:'food'},
+  {e:'🧄',n:'Garlic',c:'food'},{e:'🧅',n:'Onion',c:'food'},{e:'🥔',n:'Potato',c:'food'},
+  {e:'🍞',n:'Bread',c:'food'},{e:'🥐',n:'Croissant',c:'food'},{e:'🥨',n:'Pretzel',c:'food'},
+  {e:'🧀',n:'Cheese',c:'food'},{e:'🥚',n:'Egg',c:'food'},{e:'🍳',n:'Cooking',c:'food'},
+  {e:'🥞',n:'Pancakes',c:'food'},{e:'🧇',n:'Waffle',c:'food'},{e:'🥓',n:'Bacon',c:'food'},
+  {e:'🍔',n:'Hamburger',c:'food'},{e:'🍟',n:'Fries',c:'food'},{e:'🍕',n:'Pizza',c:'food'},
+  {e:'🌭',n:'Hot Dog',c:'food'},{e:'🥪',n:'Sandwich',c:'food'},{e:'🌮',n:'Taco',c:'food'},
+  {e:'🌯',n:'Burrito',c:'food'},{e:'🍜',n:'Steaming Bowl',c:'food'},{e:'🍝',n:'Spaghetti',c:'food'},
+  {e:'🍣',n:'Sushi',c:'food'},{e:'🍱',n:'Bento Box',c:'food'},{e:'🍛',n:'Curry Rice',c:'food'},
+  {e:'🍦',n:'Soft Ice Cream',c:'food'},{e:'🍧',n:'Shaved Ice',c:'food'},{e:'🍨',n:'Ice Cream',c:'food'},
+  {e:'🍩',n:'Doughnut',c:'food'},{e:'🍪',n:'Cookie',c:'food'},{e:'🎂',n:'Birthday Cake',c:'food'},
+  {e:'🍰',n:'Shortcake',c:'food'},{e:'🧁',n:'Cupcake',c:'food'},{e:'🍫',n:'Chocolate',c:'food'},
+  {e:'🍬',n:'Candy',c:'food'},{e:'🍭',n:'Lollipop',c:'food'},{e:'☕',n:'Coffee',c:'food'},
+  {e:'🍵',n:'Tea',c:'food'},{e:'🧃',n:'Juice Box',c:'food'},{e:'🥤',n:'Cup Straw',c:'food'},
+  {e:'🍺',n:'Beer Mug',c:'food'},{e:'🍷',n:'Wine Glass',c:'food'},{e:'🥂',n:'Clinking Glasses',c:'food'},
+  // Travel
+  {e:'🚗',n:'Car',c:'travel'},{e:'🚕',n:'Taxi',c:'travel'},{e:'🚌',n:'Bus',c:'travel'},
+  {e:'🚎',n:'Trolleybus',c:'travel'},{e:'🏎',n:'Racing Car',c:'travel'},{e:'🚓',n:'Police Car',c:'travel'},
+  {e:'🚑',n:'Ambulance',c:'travel'},{e:'🚒',n:'Fire Engine',c:'travel'},
+  {e:'🚐',n:'Minibus',c:'travel'},{e:'🚚',n:'Delivery Truck',c:'travel'},
+  {e:'🛻',n:'Pickup Truck',c:'travel'},{e:'🚛',n:'Semi Truck',c:'travel'},
+  {e:'🏍',n:'Motorcycle',c:'travel'},{e:'🛵',n:'Motor Scooter',c:'travel'},
+  {e:'🚲',n:'Bicycle',c:'travel'},{e:'🛴',n:'Kick Scooter',c:'travel'},
+  {e:'✈️',n:'Airplane',c:'travel'},{e:'🚀',n:'Rocket',c:'travel'},{e:'🛸',n:'Flying Saucer',c:'travel'},
+  {e:'🚁',n:'Helicopter',c:'travel'},{e:'🛶',n:'Canoe',c:'travel'},{e:'⛵',n:'Sailboat',c:'travel'},
+  {e:'🚢',n:'Ship',c:'travel'},{e:'⚓',n:'Anchor',c:'travel'},
+  {e:'🏠',n:'House',c:'travel'},{e:'🏡',n:'House Garden',c:'travel'},{e:'🏢',n:'Office Building',c:'travel'},
+  {e:'🏣',n:'Post Office',c:'travel'},{e:'🏥',n:'Hospital',c:'travel'},{e:'🏦',n:'Bank',c:'travel'},
+  {e:'🏨',n:'Hotel',c:'travel'},{e:'🏪',n:'Convenience Store',c:'travel'},{e:'🏫',n:'School',c:'travel'},
+  {e:'🏰',n:'Castle',c:'travel'},{e:'🗼',n:'Tokyo Tower',c:'travel'},{e:'🗽',n:'Statue of Liberty',c:'travel'},
+  {e:'⛩',n:'Shinto Shrine',c:'travel'},{e:'🗾',n:'Japan Map',c:'travel'},
+  {e:'🏔',n:'Snow Mountain',c:'travel'},{e:'⛰',n:'Mountain',c:'travel'},{e:'🌋',n:'Volcano',c:'travel'},
+  {e:'🏕',n:'Camping',c:'travel'},{e:'🏖',n:'Beach Umbrella',c:'travel'},{e:'🏜',n:'Desert',c:'travel'},
+  {e:'🌅',n:'Sunrise',c:'travel'},{e:'🌄',n:'Sunrise Mountains',c:'travel'},{e:'🌃',n:'Night Stars',c:'travel'},
+  {e:'🗺',n:'World Map',c:'travel'},{e:'🧭',n:'Compass',c:'travel'},
+  // Objects
+  {e:'💡',n:'Light Bulb',c:'objects'},{e:'🔦',n:'Flashlight',c:'objects'},{e:'🕯',n:'Candle',c:'objects'},
+  {e:'📱',n:'Mobile Phone',c:'objects'},{e:'💻',n:'Laptop',c:'objects'},{e:'🖥',n:'Desktop Computer',c:'objects'},
+  {e:'⌨️',n:'Keyboard',c:'objects'},{e:'🖨',n:'Printer',c:'objects'},{e:'🖱',n:'Mouse',c:'objects'},
+  {e:'📷',n:'Camera',c:'objects'},{e:'📸',n:'Camera Flash',c:'objects'},{e:'📹',n:'Video Camera',c:'objects'},
+  {e:'📺',n:'Television',c:'objects'},{e:'📻',n:'Radio',c:'objects'},{e:'🎙',n:'Microphone',c:'objects'},
+  {e:'🔋',n:'Battery',c:'objects'},{e:'🔌',n:'Plug',c:'objects'},{e:'💾',n:'Floppy Disk',c:'objects'},
+  {e:'💿',n:'CD',c:'objects'},{e:'📀',n:'DVD',c:'objects'},{e:'📼',n:'Videocassette',c:'objects'},
+  {e:'📞',n:'Telephone',c:'objects'},{e:'☎️',n:'Classic Phone',c:'objects'},
+  {e:'📟',n:'Pager',c:'objects'},{e:'📠',n:'Fax Machine',c:'objects'},
+  {e:'📡',n:'Satellite Antenna',c:'objects'},{e:'🔭',n:'Telescope',c:'objects'},
+  {e:'🔬',n:'Microscope',c:'objects'},{e:'🧪',n:'Test Tube',c:'objects'},
+  {e:'📖',n:'Open Book',c:'objects'},{e:'📚',n:'Books',c:'objects'},{e:'📝',n:'Memo',c:'objects'},
+  {e:'✏️',n:'Pencil',c:'objects'},{e:'🖊',n:'Pen',c:'objects'},{e:'🖋',n:'Fountain Pen',c:'objects'},
+  {e:'📌',n:'Pushpin',c:'objects'},{e:'📍',n:'Round Pushpin',c:'objects'},
+  {e:'📎',n:'Paperclip',c:'objects'},{e:'✂️',n:'Scissors',c:'objects'},
+  {e:'🗑',n:'Wastebasket',c:'objects'},{e:'🔑',n:'Key',c:'objects'},{e:'🗝',n:'Old Key',c:'objects'},
+  {e:'🔒',n:'Locked',c:'objects'},{e:'🔓',n:'Unlocked',c:'objects'},{e:'🔨',n:'Hammer',c:'objects'},
+  {e:'⚙️',n:'Gear',c:'objects'},{e:'🔧',n:'Wrench',c:'objects'},{e:'🔩',n:'Nut and Bolt',c:'objects'},
+  {e:'🧲',n:'Magnet',c:'objects'},{e:'💣',n:'Bomb',c:'objects'},{e:'🧨',n:'Firecracker',c:'objects'},
+  {e:'🎁',n:'Wrapped Gift',c:'objects'},{e:'🎈',n:'Balloon',c:'objects'},
+  {e:'🎉',n:'Party Popper',c:'objects'},{e:'🎊',n:'Confetti Ball',c:'objects'},
+  {e:'🎀',n:'Ribbon',c:'objects'},{e:'🎗',n:'Reminder Ribbon',c:'objects'},
+  {e:'💊',n:'Pill',c:'objects'},{e:'💉',n:'Syringe',c:'objects'},{e:'🩺',n:'Stethoscope',c:'objects'},
+  {e:'🧸',n:'Teddy Bear',c:'objects'},{e:'🪆',n:'Nesting Doll',c:'objects'},
+  // Symbols
+  {e:'❤️',n:'Red Heart',c:'symbols'},{e:'🧡',n:'Orange Heart',c:'symbols'},{e:'💛',n:'Yellow Heart',c:'symbols'},
+  {e:'💚',n:'Green Heart',c:'symbols'},{e:'💙',n:'Blue Heart',c:'symbols'},{e:'💜',n:'Purple Heart',c:'symbols'},
+  {e:'🖤',n:'Black Heart',c:'symbols'},{e:'🤍',n:'White Heart',c:'symbols'},{e:'🤎',n:'Brown Heart',c:'symbols'},
+  {e:'💔',n:'Broken Heart',c:'symbols'},{e:'❣️',n:'Heart Exclamation',c:'symbols'},
+  {e:'💕',n:'Two Hearts',c:'symbols'},{e:'💞',n:'Revolving Hearts',c:'symbols'},
+  {e:'💓',n:'Beating Heart',c:'symbols'},{e:'💗',n:'Growing Heart',c:'symbols'},
+  {e:'💖',n:'Sparkling Heart',c:'symbols'},{e:'💘',n:'Heart Arrow',c:'symbols'},
+  {e:'💝',n:'Heart Ribbon',c:'symbols'},{e:'💟',n:'Heart Decoration',c:'symbols'},
+  {e:'☮️',n:'Peace Symbol',c:'symbols'},{e:'✝️',n:'Cross',c:'symbols'},
+  {e:'☯️',n:'Yin Yang',c:'symbols'},{e:'🕉',n:'Om',c:'symbols'},
+  {e:'♻️',n:'Recycling',c:'symbols'},{e:'⚜️',n:'Fleur de Lis',c:'symbols'},
+  {e:'🔱',n:'Trident',c:'symbols'},{e:'📛',n:'Name Badge',c:'symbols'},
+  {e:'🔰',n:'Japanese Symbol',c:'symbols'},{e:'⭕',n:'Circle',c:'symbols'},
+  {e:'✅',n:'Check Mark',c:'symbols'},{e:'☑️',n:'Check Box',c:'symbols'},
+  {e:'✔️',n:'Heavy Check Mark',c:'symbols'},{e:'❌',n:'Cross Mark',c:'symbols'},
+  {e:'❎',n:'Cross Mark Button',c:'symbols'},{e:'➕',n:'Plus',c:'symbols'},
+  {e:'➖',n:'Minus',c:'symbols'},{e:'➗',n:'Division',c:'symbols'},{e:'✖️',n:'Multiply',c:'symbols'},
+  {e:'💯',n:'Hundred Points',c:'symbols'},{e:'🔞',n:'No Under 18',c:'symbols'},
+  {e:'🚫',n:'Prohibited',c:'symbols'},{e:'⛔',n:'No Entry',c:'symbols'},
+  {e:'📵',n:'No Mobile Phones',c:'symbols'},{e:'🚷',n:'No Pedestrians',c:'symbols'},
+  {e:'⚠️',n:'Warning',c:'symbols'},{e:'🚸',n:'Children Crossing',c:'symbols'},
+  {e:'♿',n:'Wheelchair',c:'symbols'},{e:'🛂',n:'Passport Control',c:'symbols'},
+  {e:'💠',n:'Diamond Blue',c:'symbols'},{e:'🔷',n:'Large Blue Diamond',c:'symbols'},
+  {e:'🔶',n:'Large Orange Diamond',c:'symbols'},{e:'🔹',n:'Small Blue Diamond',c:'symbols'},
+  {e:'🔸',n:'Small Orange Diamond',c:'symbols'},{e:'🔺',n:'Up Triangle',c:'symbols'},
+  {e:'🔻',n:'Down Triangle',c:'symbols'},{e:'💱',n:'Currency Exchange',c:'symbols'},
+  {e:'💲',n:'Dollar Sign',c:'symbols'},{e:'©️',n:'Copyright',c:'symbols'},
+  {e:'®️',n:'Registered',c:'symbols'},{e:'™️',n:'Trade Mark',c:'symbols'},
+  {e:'#️⃣',n:'Hash',c:'symbols'},{e:'*️⃣',n:'Asterisk',c:'symbols'},
+  {e:'0️⃣',n:'Zero',c:'symbols'},{e:'1️⃣',n:'One',c:'symbols'},{e:'2️⃣',n:'Two',c:'symbols'},
+  {e:'3️⃣',n:'Three',c:'symbols'},{e:'4️⃣',n:'Four',c:'symbols'},{e:'5️⃣',n:'Five',c:'symbols'},
+  {e:'🆕',n:'New',c:'symbols'},{e:'🆓',n:'Free',c:'symbols'},{e:'🆙',n:'Up',c:'symbols'},
+  {e:'🆒',n:'Cool',c:'symbols'},{e:'🆗',n:'OK',c:'symbols'},{e:'🆖',n:'NG',c:'symbols'},
+  {e:'🅰️',n:'A Button',c:'symbols'},{e:'🅱️',n:'B Button',c:'symbols'},
+  {e:'🅾️',n:'O Button',c:'symbols'},{e:'🆎',n:'AB Button',c:'symbols'},
+  {e:'🎵',n:'Musical Note',c:'symbols'},{e:'🎶',n:'Musical Notes',c:'symbols'},
+  {e:'🎼',n:'Musical Score',c:'symbols'},{e:'🎤',n:'Microphone',c:'symbols'},
+  {e:'🎧',n:'Headphone',c:'symbols'},{e:'🎷',n:'Saxophone',c:'symbols'},
+  {e:'🎸',n:'Guitar',c:'symbols'},{e:'🎹',n:'Piano',c:'symbols'},
+  {e:'🎺',n:'Trumpet',c:'symbols'},{e:'🎻',n:'Violin',c:'symbols'},
+  {e:'🥁',n:'Drum',c:'symbols'},{e:'🎙',n:'Studio Mic',c:'symbols'},
+  // Shapes
+  {e:'❤',n:'Heart',c:'shapes'},{e:'♥',n:'Heart Suit',c:'shapes'},
+  {e:'◼',n:'Black Medium Square',c:'shapes'},{e:'◻',n:'White Medium Square',c:'shapes'},
+  {e:'◾',n:'Black Medium-Small Square',c:'shapes'},{e:'◽',n:'White Medium-Small Square',c:'shapes'},
+  {e:'▪',n:'Black Small Square',c:'shapes'},{e:'▫',n:'White Small Square',c:'shapes'},
+  {e:'🔲',n:'Black Square Button',c:'shapes'},{e:'🔳',n:'White Square Button',c:'shapes'},
+  {e:'⬛',n:'Black Large Square',c:'shapes'},{e:'⬜',n:'White Large Square',c:'shapes'},
+  {e:'🟥',n:'Red Square',c:'shapes'},{e:'🟧',n:'Orange Square',c:'shapes'},
+  {e:'🟨',n:'Yellow Square',c:'shapes'},{e:'🟩',n:'Green Square',c:'shapes'},
+  {e:'🟦',n:'Blue Square',c:'shapes'},{e:'🟪',n:'Purple Square',c:'shapes'},
+  {e:'🟫',n:'Brown Square',c:'shapes'},{e:'⚫',n:'Black Circle',c:'shapes'},
+  {e:'⚪',n:'White Circle',c:'shapes'},{e:'🔴',n:'Red Circle',c:'shapes'},
+  {e:'🟠',n:'Orange Circle',c:'shapes'},{e:'🟡',n:'Yellow Circle',c:'shapes'},
+  {e:'🟢',n:'Green Circle',c:'shapes'},{e:'🔵',n:'Blue Circle',c:'shapes'},
+  {e:'🟣',n:'Purple Circle',c:'shapes'},{e:'🟤',n:'Brown Circle',c:'shapes'},
+  {e:'🔶',n:'Orange Diamond',c:'shapes'},{e:'🔷',n:'Blue Diamond',c:'shapes'},
+  {e:'🔸',n:'Small Orange Diamond',c:'shapes'},{e:'🔹',n:'Small Blue Diamond',c:'shapes'},
+  {e:'🔺',n:'Red Triangle Up',c:'shapes'},{e:'🔻',n:'Red Triangle Down',c:'shapes'},
+  {e:'💠',n:'Diamond Blue',c:'shapes'},{e:'🔘',n:'Radio Button',c:'shapes'},
+  {e:'🔗',n:'Link',c:'shapes'},{e:'⛓',n:'Chains',c:'shapes'},
+  {e:'➡️',n:'Right Arrow',c:'shapes'},{e:'⬅️',n:'Left Arrow',c:'shapes'},
+  {e:'⬆️',n:'Up Arrow',c:'shapes'},{e:'⬇️',n:'Down Arrow',c:'shapes'},
+  {e:'↗️',n:'Up-Right Arrow',c:'shapes'},{e:'↘️',n:'Down-Right Arrow',c:'shapes'},
+  {e:'↙️',n:'Down-Left Arrow',c:'shapes'},{e:'↖️',n:'Up-Left Arrow',c:'shapes'},
+  {e:'↕️',n:'Up-Down Arrow',c:'shapes'},{e:'↔️',n:'Left-Right Arrow',c:'shapes'},
+  {e:'🔄',n:'Counterclockwise Arrows',c:'shapes'},{e:'🔃',n:'Clockwise Arrows',c:'shapes'},
+  {e:'🔀',n:'Shuffle Tracks',c:'shapes'},{e:'🔁',n:'Repeat',c:'shapes'},
+  {e:'🔂',n:'Repeat Single',c:'shapes'},{e:'▶️',n:'Play',c:'shapes'},
+  {e:'⏸',n:'Pause',c:'shapes'},{e:'⏹',n:'Stop',c:'shapes'},{e:'⏭',n:'Next Track',c:'shapes'},
+];
+
+const RECENT_KEY = 'iconfinder_recents';
+let activeCategory = 'all', searchTerm = '', selectedIcon = null;
+
+function loadRecents() { try { return JSON.parse(localStorage.getItem(RECENT_KEY))||[]; } catch { return []; } }
+function saveRecents(r) { localStorage.setItem(RECENT_KEY, JSON.stringify(r.slice(0,24))); }
+
+function addRecent(icon) {
+  const r = loadRecents().filter(x => x.e !== icon.e);
+  r.unshift(icon);
+  saveRecents(r);
+  renderRecents();
+}
+
+function getFiltered() {
+  let list = EMOJIS;
+  if (activeCategory !== 'all') list = list.filter(e => e.c === activeCategory);
+  if (searchTerm) {
+    const t = searchTerm.toLowerCase();
+    list = list.filter(e => e.n.toLowerCase().includes(t) || e.e.includes(t));
+  }
+  return list;
+}
+
+function renderCats() {
+  const el = document.getElementById('cats');
+  el.innerHTML = CATEGORIES.map(cat => {
+    const count = cat.id === 'all' ? EMOJIS.length : EMOJIS.filter(e => e.c === cat.id).length;
+    return `<button class="cat-btn${activeCategory === cat.id ? ' active' : ''}" onclick="setCategory('${cat.id}')">
+      <span class="cat-icon">${cat.icon}</span>
+      <span>${cat.label}</span>
+      <span class="cat-count">${count}</span>
+    </button>`;
+  }).join('');
+}
+
+function setCategory(id) {
+  activeCategory = id;
+  renderCats();
+  renderGrid();
+}
+
+function renderRecents() {
+  const r = loadRecents();
+  const el = document.getElementById('recents-chips');
+  el.innerHTML = r.map(icon =>
+    `<button class="recent-chip" title="${icon.n}" onclick="selectIcon(${JSON.stringify(icon).replace(/"/g,'&quot;')})">${icon.e}</button>`
+  ).join('') || '<span style="font-size:.72rem;color:var(--muted2);font-style:italic">None yet</span>';
+}
+
+function renderGrid() {
+  const list = getFiltered();
+  const grid = document.getElementById('grid');
+  document.getElementById('result-count').textContent = list.length + ' icons';
+  if (!list.length) {
+    grid.innerHTML = '<div class="no-results">No icons match your search</div>';
+    return;
+  }
+  grid.innerHTML = list.map((icon, i) =>
+    `<button class="icon-btn" id="ib-${i}" title="${icon.n}" onclick='selectIcon(${JSON.stringify(icon)})'>
+      <span class="icon-glyph">${icon.e}</span>
+      <span class="icon-name">${icon.n.split(' ').slice(0,2).join(' ')}</span>
+    </button>`
+  ).join('');
+}
+
+function selectIcon(icon) {
+  selectedIcon = icon;
+  addRecent(icon);
+  const det = document.getElementById('detail');
+  const cp = codePoint(icon.e);
+  det.innerHTML = `
+    <div class="detail-glyph">${icon.e}</div>
+    <div class="detail-info">
+      <div class="detail-name">${icon.n}</div>
+      <div class="detail-meta">Category: ${icon.c} &nbsp;·&nbsp; Code: ${cp}</div>
+      <div class="detail-actions">
+        <button class="copy-btn primary" onclick="copyText('${icon.e.replace(/'/g,"\\'")}', 'Emoji')">⎘ Copy Emoji</button>
+        <button class="copy-btn" onclick="copyText('${cp}', 'Code point')">⎘ Code Point</button>
+        <button class="copy-btn" onclick="copyText('&amp;#${cp.replace('U+','').replace(/^0+/,'').toLowerCase()};', 'HTML entity')">⎘ HTML Entity</button>
+      </div>
+    </div>`;
+}
+
+function codePoint(emoji) {
+  const pts = [];
+  for (const c of emoji) {
+    const code = c.codePointAt(0);
+    if (code !== 0xFE0F) pts.push('U+' + code.toString(16).toUpperCase().padStart(4,'0'));
+  }
+  return pts.join(' ');
+}
+
+function copyText(text, label) {
+  navigator.clipboard?.writeText(text).then(() => toast(`Copied ${label}: ${text}`));
+}
+
+function onSearch(val) {
+  searchTerm = val;
+  if (val) activeCategory = 'all';
+  renderCats();
+  renderGrid();
+}
+
+function toast(msg) {
+  const w = document.getElementById('toast-wrap');
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+  w.appendChild(t); setTimeout(() => t.remove(), 2000);
+}
+
+renderCats(); renderGrid(); renderRecents();
+document.getElementById('search').addEventListener('keydown', e => {
+  if (e.key === 'Escape') { e.target.value = ''; onSearch(''); }
+});
+</script>
+</body>
+</html>
