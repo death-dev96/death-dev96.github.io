@@ -659,7 +659,7 @@ setInterval(updateClock, 10000);
 // ══════════════════════════════════════
 async function loadWikiVerseStats() {
   try {
-    const req = indexedDB.open('WikiVerseDB', 3);
+    const req = indexedDB.open('WikiVerseDB');
     req.onsuccess = e => {
       const db = e.target.result;
       if (!db.objectStoreNames.contains('wikis')) return;
