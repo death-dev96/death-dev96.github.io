@@ -475,8 +475,68 @@ footer{
 .tk-toast.info{border-left:3px solid var(--accent)}
 
 /* ══════════════════════════════════════
-   RESPONSIVE
+   REPORT ISSUE MODAL
 ══════════════════════════════════════ */
+.issue-overlay{
+  position:fixed;inset:0;z-index:9500;
+  background:rgba(0,0,0,.75);backdrop-filter:blur(10px);
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.issue-overlay.open{display:flex}
+.issue-box{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:18px;padding:32px;width:100%;max-width:500px;
+  animation:cardIn .2s ease;
+}
+.issue-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:8px;
+}
+.issue-title{font-family:var(--font-display);font-weight:800;font-size:1.15rem;display:flex;align-items:center;gap:8px}
+.issue-sub{font-family:var(--font-body);font-style:italic;font-size:.88rem;color:var(--muted);margin-bottom:24px}
+.issue-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.2rem;padding:4px;line-height:1;transition:color .15s}
+.issue-close:hover{color:var(--text)}
+.issue-field{margin-bottom:18px}
+.issue-label{
+  display:block;font-family:var(--font-mono);font-size:.68rem;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  margin-bottom:8px;
+}
+.issue-chips{display:flex;gap:7px;flex-wrap:wrap}
+.issue-chip{
+  padding:6px 14px;border-radius:20px;
+  border:1px solid var(--border2);background:transparent;
+  color:var(--muted);font-family:var(--font-display);font-size:.8rem;font-weight:600;
+  cursor:pointer;transition:all .15s;
+}
+.issue-chip:hover{border-color:var(--border2);color:var(--text);background:var(--surface2)}
+.issue-chip.sel-app{background:rgba(124,108,252,.12);border-color:#7c6cfc;color:#a594fd}
+.issue-chip.sel-type-bug{background:rgba(239,68,68,.1);border-color:#ef4444;color:#ef4444}
+.issue-chip.sel-type-feat{background:rgba(34,197,94,.1);border-color:#22c55e;color:#22c55e}
+.issue-chip.sel-type-toolkit{background:rgba(240,192,96,.1);border-color:var(--accent);color:var(--accent)}
+.issue-actions{display:flex;gap:10px;margin-top:24px}
+.issue-submit{
+  flex:1;padding:11px;border-radius:9px;border:none;
+  background:linear-gradient(135deg,#7c6cfc,#a07cfc);color:#fff;
+  font-family:var(--font-display);font-size:.88rem;font-weight:700;
+  cursor:pointer;transition:all .18s;
+}
+.issue-submit:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.issue-submit:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.issue-cancel{
+  padding:11px 20px;border-radius:9px;border:1px solid var(--border2);
+  background:transparent;color:var(--muted);font-family:var(--font-display);
+  font-size:.88rem;cursor:pointer;transition:all .15s;
+}
+.issue-cancel:hover{border-color:var(--accent);color:var(--text)}
+.issue-preview{
+  margin-top:16px;padding:10px 14px;border-radius:8px;
+  background:var(--surface2);border:1px solid var(--border);
+  font-family:var(--font-mono);font-size:.72rem;color:var(--muted);
+  line-height:1.6;display:none;word-break:break-all;
+}
+.issue-preview.visible{display:block}
+
 @media(max-width:900px){
   header,.wrapper,footer{padding-left:20px;padding-right:20px}
   .tool-grid.featured{grid-template-columns:1fr}
@@ -560,20 +620,85 @@ footer{
   <div class="tool-grid">
 
     <!-- ColorStudio -->
-    <div class="tool-card" style="--card-color:#e879f9"
-         onclick="openTool('colorstudio')">
+    <div class="tool-card" style="--card-color:#e879f9" onclick="openTool('colorstudio')">
       <div class="tool-card-header">
         <div class="tool-icon">🎨</div>
-        <span class="tool-badge new">New</span>
+        <span class="tool-badge">Design</span>
       </div>
       <div class="tool-name">ColorStudio</div>
       <div class="tool-desc">Professional color picker with HEX, RGB, HSL & OKLCH readouts, harmony generator, eyedropper, and exportable saved palettes.</div>
       <div class="tool-card-footer">
-        <div class="tool-tags">
-          <span class="tool-tag">color</span>
-          <span class="tool-tag">design</span>
-          <span class="tool-tag">palette</span>
-        </div>
+        <div class="tool-tags"><span class="tool-tag">color</span><span class="tool-tag">design</span><span class="tool-tag">palette</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- MarkPad -->
+    <div class="tool-card" style="--card-color:#38bdf8" onclick="openTool('markpad')">
+      <div class="tool-card-header">
+        <div class="tool-icon">✍️</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">MarkPad</div>
+      <div class="tool-desc">Multi-document Markdown editor with live split preview, formatting toolbar, and export to .md or .html.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">markdown</span><span class="tool-tag">writing</span><span class="tool-tag">editor</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- FocusTimer -->
+    <div class="tool-card" style="--card-color:#f43f5e" onclick="openTool('focustimer')">
+      <div class="tool-card-header">
+        <div class="tool-icon">⏱️</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">FocusTimer</div>
+      <div class="tool-desc">Pomodoro timer with animated ring progress and session log, plus a full stopwatch with lap tracking.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">focus</span><span class="tool-tag">pomodoro</span><span class="tool-tag">stopwatch</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- QuickCalc -->
+    <div class="tool-card" style="--card-color:#f0c060" onclick="openTool('quickcalc')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🧮</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">QuickCalc</div>
+      <div class="tool-desc">Standard and scientific calculator with a scrollable history tape. Full keyboard support, memory functions, and trig modes.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">calculator</span><span class="tool-tag">math</span><span class="tool-tag">scientific</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- DailyLog -->
+    <div class="tool-card" style="--card-color:#22c55e" onclick="openTool('dailylog')">
+      <div class="tool-card-header">
+        <div class="tool-icon">📓</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">DailyLog</div>
+      <div class="tool-desc">Personal journal with one entry per day, mood and weather tags, full-text search across all entries, and Markdown export.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">journal</span><span class="tool-tag">diary</span><span class="tool-tag">daily</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- QuoteWall -->
+    <div class="tool-card" style="--card-color:#a78bfa" onclick="openTool('quotewall')">
+      <div class="tool-card-header">
+        <div class="tool-icon">💬</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">QuoteWall</div>
+      <div class="tool-desc">Collect and browse quotes with author attribution, tags, and starring. Hit Space for a random quote from your collection.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">quotes</span><span class="tool-tag">inspiration</span><span class="tool-tag">collection</span></div>
         <div class="tool-open-hint">Open</div>
       </div>
     </div>
@@ -610,8 +735,58 @@ footer{
 <!-- footer -->
 <footer>
   <div class="footer-brand">⚙️ <span>Personal Toolkit</span> — yours alone</div>
-  <div class="footer-note">Everything runs locally. No data leaves your device.</div>
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <div class="footer-note">Everything runs locally. No data leaves your device.</div>
+    <button class="btn btn-ghost btn-sm" onclick="openIssueModal()" style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+      🐛 Report an Issue
+    </button>
+  </div>
 </footer>
+
+<!-- ══════════════════════════════════════
+     REPORT ISSUE MODAL
+══════════════════════════════════════ -->
+<div class="issue-overlay" id="issue-overlay" onclick="if(event.target===this)closeIssueModal()">
+  <div class="issue-box">
+    <div class="issue-header">
+      <div class="issue-title">🐛 Report an Issue</div>
+      <button class="issue-close" onclick="closeIssueModal()">✕</button>
+    </div>
+    <div class="issue-sub">Opens a pre-filled GitHub issue — you can add more detail before submitting.</div>
+
+    <div class="issue-field">
+      <div class="issue-label">Which app?</div>
+      <div class="issue-chips" id="issue-app-chips">
+        <button class="issue-chip" data-app="Toolkit (Hub)" onclick="selectApp(this)">🗂 Toolkit Hub</button>
+        <button class="issue-chip" data-app="WikiVerse" onclick="selectApp(this)">📖 WikiVerse</button>
+        <button class="issue-chip" data-app="ColorStudio" onclick="selectApp(this)">🎨 ColorStudio</button>
+        <button class="issue-chip" data-app="MarkPad" onclick="selectApp(this)">✍️ MarkPad</button>
+        <button class="issue-chip" data-app="FocusTimer" onclick="selectApp(this)">⏱️ FocusTimer</button>
+        <button class="issue-chip" data-app="QuickCalc" onclick="selectApp(this)">🧮 QuickCalc</button>
+        <button class="issue-chip" data-app="DailyLog" onclick="selectApp(this)">📓 DailyLog</button>
+        <button class="issue-chip" data-app="QuoteWall" onclick="selectApp(this)">💬 QuoteWall</button>
+        <button class="issue-chip" data-app="Run Manager" onclick="selectApp(this)">🎮 Run Manager</button>
+      </div>
+    </div>
+
+    <div class="issue-field">
+      <div class="issue-label">Type of report</div>
+      <div class="issue-chips" id="issue-type-chips">
+        <button class="issue-chip" data-type="bug" onclick="selectType(this)">🐛 Bug Report</button>
+        <button class="issue-chip" data-type="feature" onclick="selectType(this)">✨ Feature Request</button>
+      </div>
+    </div>
+
+    <div class="issue-preview" id="issue-preview"></div>
+
+    <div class="issue-actions">
+      <button class="issue-cancel" onclick="closeIssueModal()">Cancel</button>
+      <button class="issue-submit" id="issue-submit" onclick="submitIssue()" disabled>
+        Open GitHub Issue →
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- ══════════════════════════════════════
      IFRAME TOOL OVERLAY
@@ -660,6 +835,41 @@ const TOOLS = {
     desc: 'Professional color picker with harmonies & palette',
     color: '#e879f9',
     src: 'colorstudio.html',
+  },
+  markpad: {
+    name: 'MarkPad',
+    icon: '✍️',
+    desc: 'Markdown editor with live preview & multi-document',
+    color: '#38bdf8',
+    src: 'markpad.html',
+  },
+  focustimer: {
+    name: 'FocusTimer',
+    icon: '⏱️',
+    desc: 'Pomodoro timer & stopwatch with session history',
+    color: '#f43f5e',
+    src: 'focustimer.html',
+  },
+  quickcalc: {
+    name: 'QuickCalc',
+    icon: '🧮',
+    desc: 'Standard & scientific calculator with history tape',
+    color: '#f0c060',
+    src: 'quickcalc.html',
+  },
+  dailylog: {
+    name: 'DailyLog',
+    icon: '📓',
+    desc: 'Date-stamped personal journal with mood tracking',
+    color: '#22c55e',
+    src: 'dailylog.html',
+  },
+  quotewall: {
+    name: 'QuoteWall',
+    icon: '💬',
+    desc: 'Personal quote collection with tags and random display',
+    color: '#a78bfa',
+    src: 'quotewall.html',
   },
   runmanager: {
     name: 'Run Manager',
@@ -781,13 +991,96 @@ function tkToast(msg, type='info') {
 }
 
 // ══════════════════════════════════════
-//  KEYBOARD: ESC closes overlay
+//  REPORT ISSUE MODAL
 // ══════════════════════════════════════
+const GITHUB_ISSUE_URL = 'https://github.com/death-dev96/death-dev96.github.io/issues/new';
+
+let selectedApp  = null;
+let selectedType = null;
+
+function openIssueModal() {
+  selectedApp  = null;
+  selectedType = null;
+  document.querySelectorAll('.issue-chip').forEach(c => c.classList.remove('sel-app','sel-type-bug','sel-type-feat','sel-type-toolkit'));
+  document.getElementById('issue-submit').disabled = true;
+  document.getElementById('issue-preview').classList.remove('visible');
+  document.getElementById('issue-overlay').classList.add('open');
+}
+
+function closeIssueModal() {
+  document.getElementById('issue-overlay').classList.remove('open');
+}
+
+function selectApp(el) {
+  document.querySelectorAll('#issue-app-chips .issue-chip').forEach(c => c.classList.remove('sel-app','sel-type-toolkit'));
+  el.classList.add(el.dataset.app === 'Toolkit (Hub)' ? 'sel-type-toolkit' : 'sel-app');
+  selectedApp = el.dataset.app;
+  updateIssuePreview();
+}
+
+function selectType(el) {
+  document.querySelectorAll('#issue-type-chips .issue-chip').forEach(c => c.classList.remove('sel-type-bug','sel-type-feat'));
+  el.classList.add(el.dataset.type === 'bug' ? 'sel-type-bug' : 'sel-type-feat');
+  selectedType = el.dataset.type;
+  updateIssuePreview();
+}
+
+function updateIssuePreview() {
+  const submit  = document.getElementById('issue-submit');
+  const preview = document.getElementById('issue-preview');
+  if (!selectedApp || !selectedType) {
+    submit.disabled = true;
+    preview.classList.remove('visible');
+    return;
+  }
+  submit.disabled = false;
+  const label    = selectedType === 'bug' ? 'bug' : 'enhancement';
+  const appLabel = selectedApp === 'Toolkit (Hub)' ? 'toolkit' : selectedApp.toLowerCase().replace(/\s+/g,'-');
+  const title    = selectedType === 'bug'
+    ? `[${selectedApp}] Bug: `
+    : `[${selectedApp}] Feature: `;
+  const body = selectedType === 'bug'
+    ? `**App:** ${selectedApp}\n\n**Describe the bug:**\n\n**Steps to reproduce:**\n1. \n2. \n\n**Expected behaviour:**\n\n**Actual behaviour:**\n`
+    : `**App:** ${selectedApp}\n\n**Describe the feature:**\n\n**Why would this be useful?**\n`;
+  const url = buildIssueUrl(title, body, [label, appLabel]);
+  preview.textContent = `→ ${url.slice(0, 80)}…`;
+  preview.classList.add('visible');
+}
+
+function buildIssueUrl(title, body, labels) {
+  const params = new URLSearchParams({
+    title,
+    body,
+    labels: labels.join(','),
+  });
+  return `${GITHUB_ISSUE_URL}?${params.toString()}`;
+}
+
+function submitIssue() {
+  if (!selectedApp || !selectedType) return;
+  const label    = selectedType === 'bug' ? 'bug' : 'enhancement';
+  const appLabel = selectedApp === 'Toolkit (Hub)' ? 'toolkit' : selectedApp.toLowerCase().replace(/\s+/g,'-');
+  const title    = selectedType === 'bug'
+    ? `[${selectedApp}] Bug: `
+    : `[${selectedApp}] Feature: `;
+  const body = selectedType === 'bug'
+    ? `**App:** ${selectedApp}\n\n**Describe the bug:**\n\n**Steps to reproduce:**\n1. \n2. \n\n**Expected behaviour:**\n\n**Actual behaviour:**\n`
+    : `**App:** ${selectedApp}\n\n**Describe the feature:**\n\n**Why would this be useful?**\n`;
+  const url = buildIssueUrl(title, body, [label, appLabel]);
+  window.open(url, '_blank', 'noopener');
+  closeIssueModal();
+}
+
+// ESC closes whichever overlay is open
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && document.getElementById('tool-overlay').classList.contains('open')) {
+  if (e.key !== 'Escape') return;
+  if (document.getElementById('issue-overlay').classList.contains('open')) {
+    closeIssueModal();
+  } else if (document.getElementById('tool-overlay').classList.contains('open')) {
     closeTool();
   }
 });
+
 </script>
 
 </body>

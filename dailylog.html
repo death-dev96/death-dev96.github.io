@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DailyLog</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080c0a;--surface:#0f1410;--surface2:#161c17;--border:#1e2820;--border2:#263328;
+  --text:#e8f0e8;--muted:#5a7060;--muted2:#2e3c30;
+  --accent:#22c55e;--accent-dim:rgba(34,197,94,.1);
+  --mono:'DM Mono',monospace;--display:'Syne',sans-serif;--body:'Lora',serif;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--body);background:var(--bg);color:var(--text);display:flex;flex-direction:column}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* TOPBAR */
+.topbar{height:52px;background:var(--surface);border-bottom:2px solid var(--accent);
+  padding:0 20px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.topbar-logo{font-family:var(--display);font-weight:800;font-size:.95rem;
+  display:flex;align-items:center;gap:8px}
+.topbar-logo span{color:var(--accent)}
+.topbar-actions{display:flex;gap:6px;margin-left:auto;align-items:center}
+.tb-btn{padding:5px 12px;border-radius:6px;border:1px solid var(--border2);
+  background:transparent;color:var(--muted);font-family:var(--mono);font-size:.72rem;
+  cursor:pointer;transition:all .15s}
+.tb-btn:hover{border-color:var(--accent);color:var(--accent)}
+.search-input{padding:5px 12px;border-radius:6px;border:1px solid var(--border2);
+  background:var(--surface2);color:var(--text);font-family:var(--mono);font-size:.75rem;
+  outline:none;transition:border-color .15s;width:200px}
+.search-input:focus{border-color:var(--accent)}
+.search-input::placeholder{color:var(--muted2)}
+
+/* LAYOUT */
+.app{flex:1;display:flex;overflow:hidden;min-height:0}
+
+/* SIDEBAR */
+.sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+.sidebar-header{padding:12px 14px 8px;font-family:var(--mono);font-size:.62rem;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+  border-bottom:1px solid var(--border)}
+.sidebar-list{flex:1;overflow-y:auto;padding:6px}
+.entry-item{padding:10px 11px;border-radius:7px;cursor:pointer;margin-bottom:3px;
+  border:1px solid transparent;transition:all .12s}
+.entry-item:hover{background:var(--surface2);border-color:var(--border)}
+.entry-item.active{background:var(--accent-dim);border-color:rgba(34,197,94,.2)}
+.entry-date{font-family:var(--mono);font-size:.65rem;color:var(--muted);margin-bottom:3px;letter-spacing:.06em}
+.entry-preview{font-size:.8rem;color:var(--text);overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;line-height:1.4;font-style:italic}
+.entry-item.active .entry-date{color:var(--accent)}
+.entry-count{font-family:var(--mono);font-size:.62rem;color:var(--muted2);margin-top:3px}
+.new-entry-btn{margin:8px;padding:9px;border-radius:7px;background:var(--accent-dim);
+  border:1px solid rgba(34,197,94,.2);color:var(--accent);font-family:var(--mono);
+  font-size:.72rem;cursor:pointer;transition:all .15s;width:calc(100% - 16px)}
+.new-entry-btn:hover{background:rgba(34,197,94,.18)}
+
+/* MAIN EDITOR */
+.editor-main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.editor-header{padding:16px 24px 12px;border-bottom:1px solid var(--border);
+  background:var(--surface);flex-shrink:0}
+.editor-date-display{font-family:var(--mono);font-size:.75rem;color:var(--accent);
+  letter-spacing:.1em;margin-bottom:6px;text-transform:uppercase}
+.editor-mood{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.mood-label{font-family:var(--mono);font-size:.62rem;color:var(--muted);letter-spacing:.08em}
+.mood-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--border2);
+  background:transparent;cursor:pointer;font-size:.9rem;transition:all .12s;
+  display:flex;align-items:center;justify-content:center}
+.mood-btn:hover{border-color:var(--accent);transform:scale(1.1)}
+.mood-btn.selected{border-color:var(--accent);background:var(--accent-dim)}
+.weather-label{font-family:var(--mono);font-size:.62rem;color:var(--muted);letter-spacing:.08em;margin-left:8px}
+
+.entry-textarea{flex:1;border:none;background:var(--bg);color:var(--text);
+  font-family:var(--body);font-size:1.05rem;line-height:1.9;
+  padding:28px 40px;resize:none;outline:none;overflow-y:auto}
+.entry-textarea::placeholder{color:var(--muted2);font-style:italic}
+
+/* FOOTER BAR */
+.editor-footer{padding:8px 24px;border-top:1px solid var(--border);background:var(--surface);
+  font-family:var(--mono);font-size:.68rem;color:var(--muted);
+  display:flex;gap:16px;align-items:center;flex-shrink:0}
+.footer-right{margin-left:auto;display:flex;gap:12px;align-items:center}
+.save-dot{width:7px;height:7px;border-radius:50%;background:var(--muted2);transition:background .3s;flex-shrink:0}
+.save-dot.saved{background:var(--accent)}
+
+/* EMPTY STATE */
+.empty-state{flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:12px;color:var(--muted);padding:40px}
+.empty-icon{font-size:3rem;opacity:.4}
+.empty-title{font-family:var(--display);font-size:1.1rem;font-weight:700}
+.empty-sub{font-size:.88rem;text-align:center;line-height:1.6;font-style:italic;max-width:300px}
+
+/* SEARCH HIGHLIGHT */
+.search-hl{background:rgba(34,197,94,.25);border-radius:2px;color:var(--text)}
+
+/* TOAST */
+.toast-wrap{position:fixed;bottom:16px;right:16px;z-index:999;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.toast{background:var(--surface2);border:1px solid var(--border2);border-radius:8px;
+  padding:8px 14px;font-size:.75rem;color:var(--text);display:flex;align-items:center;
+  gap:8px;box-shadow:0 4px 20px rgba(0,0,0,.5);animation:tIn .2s ease;font-family:var(--mono)}
+.toast.ok{border-left:3px solid var(--accent)}
+@keyframes tIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo">Daily<span>Log</span></div>
+  <div class="topbar-actions">
+    <input class="search-input" id="search-input" type="text" placeholder="🔍 Search entries…" oninput="onSearch(this.value)">
+    <button class="tb-btn" onclick="exportAll()">⬇ Export</button>
+    <button class="tb-btn" onclick="newEntry()">＋ Today</button>
+  </div>
+</div>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header" id="sidebar-header">All Entries</div>
+    <div class="sidebar-list" id="sidebar-list"></div>
+    <button class="new-entry-btn" onclick="newEntry()">＋ New Entry</button>
+  </div>
+
+  <!-- EDITOR -->
+  <div class="editor-main" id="editor-main">
+    <div class="empty-state" id="empty-state">
+      <div class="empty-icon">📓</div>
+      <div class="empty-title">Your Journal</div>
+      <div class="empty-sub">Each entry is stamped with today's date. Write anything — thoughts, plans, what happened.</div>
+      <button class="tb-btn" onclick="newEntry()" style="margin-top:8px;padding:10px 24px">Start writing →</button>
+    </div>
+    <div id="entry-editor" style="display:none;flex:1;flex-direction:column;overflow:hidden">
+      <div class="editor-header">
+        <div class="editor-date-display" id="editor-date"></div>
+        <div class="editor-mood">
+          <span class="mood-label">Mood:</span>
+          <button class="mood-btn" data-mood="😊" onclick="setMood(this)">😊</button>
+          <button class="mood-btn" data-mood="😌" onclick="setMood(this)">😌</button>
+          <button class="mood-btn" data-mood="😐" onclick="setMood(this)">😐</button>
+          <button class="mood-btn" data-mood="😔" onclick="setMood(this)">😔</button>
+          <button class="mood-btn" data-mood="😤" onclick="setMood(this)">😤</button>
+          <button class="mood-btn" data-mood="🤩" onclick="setMood(this)">🤩</button>
+          <span class="weather-label">Weather:</span>
+          <button class="mood-btn" data-weather="☀️" onclick="setWeather(this)">☀️</button>
+          <button class="mood-btn" data-weather="🌤" onclick="setWeather(this)">🌤</button>
+          <button class="mood-btn" data-weather="🌧" onclick="setWeather(this)">🌧</button>
+          <button class="mood-btn" data-weather="❄️" onclick="setWeather(this)">❄️</button>
+          <button class="mood-btn" data-weather="⛈" onclick="setWeather(this)">⛈</button>
+        </div>
+      </div>
+      <textarea class="entry-textarea" id="entry-textarea"
+        placeholder="Write about your day…" oninput="onEntryInput()"></textarea>
+      <div class="editor-footer">
+        <div class="save-dot" id="save-dot"></div>
+        <span id="footer-words">0 words</span>
+        <span id="footer-chars">0 chars</span>
+        <div class="footer-right">
+          <span id="footer-date" style="color:var(--muted2)"></span>
+          <button class="tb-btn" style="font-size:.65rem;padding:3px 8px;color:#ef4444;border-color:rgba(239,68,68,.2)" onclick="deleteEntry()">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+const STORE_KEY = 'dailylog_entries';
+let entries = {}, currentId = null, saveTimer = null, searchTerm = '';
+
+// ── STORAGE ──────────────────────────
+function load() { try { return JSON.parse(localStorage.getItem(STORE_KEY))||{}; } catch { return {}; } }
+function save() { localStorage.setItem(STORE_KEY, JSON.stringify(entries)); }
+
+// ── DATE UTILS ───────────────────────
+function todayId() {
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function fmtId(id) {
+  const [y,m,d] = id.split('-');
+  const date = new Date(parseInt(y),parseInt(m)-1,parseInt(d));
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return `${days[date.getDay()]}, ${months[date.getMonth()]} ${parseInt(d)}, ${y}`;
+}
+function isToday(id) { return id === todayId(); }
+
+// ── INIT ─────────────────────────────
+function init() {
+  entries = load();
+  const ids = getSortedIds();
+  if (ids.length) openEntry(ids[0]);
+  renderSidebar();
+}
+
+function getSortedIds() {
+  return Object.keys(entries).sort((a,b)=>b.localeCompare(a));
+}
+
+// ── ENTRY OPS ────────────────────────
+function newEntry() {
+  const id = todayId();
+  if (!entries[id]) entries[id] = { content:'', mood:'', weather:'', created:Date.now(), updated:Date.now() };
+  save(); renderSidebar(); openEntry(id);
+}
+
+function openEntry(id) {
+  currentId = id;
+  const entry = entries[id];
+  document.getElementById('empty-state').style.display = 'none';
+  const ed = document.getElementById('entry-editor');
+  ed.style.display = 'flex';
+  document.getElementById('editor-date').textContent = fmtId(id) + (isToday(id) ? ' — Today' : '');
+  document.getElementById('entry-textarea').value = entry.content;
+  document.getElementById('footer-date').textContent = 'Updated ' + new Date(entry.updated).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  // Mood/weather buttons
+  document.querySelectorAll('.mood-btn[data-mood]').forEach(b => b.classList.toggle('selected', b.dataset.mood === entry.mood));
+  document.querySelectorAll('.mood-btn[data-weather]').forEach(b => b.classList.toggle('selected', b.dataset.weather === entry.weather));
+  updateWordCount();
+  markSaved();
+  renderSidebar();
+}
+
+function setMood(btn) {
+  if (!currentId) return;
+  const same = btn.classList.contains('selected');
+  document.querySelectorAll('.mood-btn[data-mood]').forEach(b=>b.classList.remove('selected'));
+  if (!same) { btn.classList.add('selected'); entries[currentId].mood = btn.dataset.mood; }
+  else entries[currentId].mood = '';
+  autoSave();
+}
+
+function setWeather(btn) {
+  if (!currentId) return;
+  const same = btn.classList.contains('selected');
+  document.querySelectorAll('.mood-btn[data-weather]').forEach(b=>b.classList.remove('selected'));
+  if (!same) { btn.classList.add('selected'); entries[currentId].weather = btn.dataset.weather; }
+  else entries[currentId].weather = '';
+  autoSave();
+}
+
+function deleteEntry() {
+  if (!currentId) return;
+  if (!confirm('Delete this entry? This cannot be undone.')) return;
+  delete entries[currentId]; save(); currentId = null;
+  document.getElementById('entry-editor').style.display = 'none';
+  document.getElementById('empty-state').style.display = 'flex';
+  renderSidebar();
+  const ids = getSortedIds();
+  if (ids.length) openEntry(ids[0]);
+}
+
+// ── SIDEBAR ───────────────────────────
+function renderSidebar(filter) {
+  const list = document.getElementById('sidebar-list');
+  let ids = getSortedIds();
+  if (filter) {
+    ids = ids.filter(id => entries[id].content.toLowerCase().includes(filter.toLowerCase()));
+  }
+  document.getElementById('sidebar-header').textContent = filter ? `Results (${ids.length})` : `All Entries (${ids.length})`;
+  if (!ids.length) { list.innerHTML = '<div style="padding:16px;color:var(--muted2);font-family:var(--mono);font-size:.75rem;text-align:center;font-style:italic">No entries found</div>'; return; }
+  list.innerHTML = ids.map(id => {
+    const e = entries[id];
+    const preview = e.content.replace(/\n/g,' ').slice(0,60) || '(empty)';
+    const tag = e.mood || e.weather || '';
+    return `<div class="entry-item${id===currentId?' active':''}" onclick="openEntry('${id}')">
+      <div class="entry-date">${fmtId(id)}${isToday(id)?' · Today':''}</div>
+      <div class="entry-preview">${esc(preview)}</div>
+      ${tag?`<div class="entry-count">${tag}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ── INPUT ─────────────────────────────
+function onEntryInput() {
+  if (!currentId) return;
+  entries[currentId].content = document.getElementById('entry-textarea').value;
+  updateWordCount(); markUnsaved();
+  clearTimeout(saveTimer); saveTimer = setTimeout(autoSave, 600);
+}
+
+function updateWordCount() {
+  const val = document.getElementById('entry-textarea').value;
+  const words = val.trim() ? val.trim().split(/\s+/).length : 0;
+  document.getElementById('footer-words').textContent = words+' words';
+  document.getElementById('footer-chars').textContent = val.length+' chars';
+}
+
+function markUnsaved() { document.getElementById('save-dot').className = 'save-dot'; }
+function markSaved() { document.getElementById('save-dot').className = 'save-dot saved'; }
+
+function autoSave() {
+  if (!currentId) return;
+  entries[currentId].updated = Date.now();
+  save(); renderSidebar(searchTerm||undefined); markSaved();
+  document.getElementById('footer-date').textContent = 'Saved just now';
+}
+
+// ── SEARCH ────────────────────────────
+function onSearch(val) { searchTerm = val; renderSidebar(val||undefined); }
+
+// ── EXPORT ────────────────────────────
+function exportAll() {
+  const ids = getSortedIds();
+  if (!ids.length) { toast('No entries to export','info'); return; }
+  const text = ids.map(id => {
+    const e = entries[id];
+    const meta = [e.mood,e.weather].filter(Boolean).join(' ');
+    return `# ${fmtId(id)}${meta?' ('+meta+')':''}\n\n${e.content}`;
+  }).join('\n\n---\n\n');
+  const blob = new Blob([text],{type:'text/markdown'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'dailylog-export.md';
+  a.click(); toast('Exported as .md','ok');
+}
+
+// ── UTILS ─────────────────────────────
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function toast(msg,type='info'){
+  const w=document.getElementById('toast-wrap');
+  const t=document.createElement('div');t.className='toast'+(type==='ok'?' ok':'');
+  t.textContent=msg;w.appendChild(t);setTimeout(()=>t.remove(),2500);
+}
+
+// ── KEYBOARD ──────────────────────────
+document.addEventListener('keydown',e=>{
+  if((e.metaKey||e.ctrlKey)&&e.key==='s'){e.preventDefault();autoSave();toast('Saved','ok')}
+  if((e.metaKey||e.ctrlKey)&&e.key==='n'){e.preventDefault();newEntry()}
+});
+
+init();
+</script>
+</body>
+</html>
