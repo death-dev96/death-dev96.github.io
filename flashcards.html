@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlashCards</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#08080c;--surface:#10101a;--surface2:#181824;--border:#20202e;--border2:#2c2c3e;
+  --text:#eeeef6;--muted:#555570;--muted2:#2c2c40;
+  --accent:#f472b6;--accent-dim:rgba(244,114,182,.1);
+  --know:#22c55e;--dunno:#ef4444;--meh:#f59e0b;
+  --mono:'DM Mono',monospace;--display:'Syne',sans-serif;--body:'DM Sans',sans-serif;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--body);background:var(--bg);color:var(--text);display:flex;flex-direction:column}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+.topbar{height:52px;background:var(--surface);border-bottom:2px solid var(--accent);
+  padding:0 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.logo{font-family:var(--display);font-weight:800;font-size:.95rem;display:flex;align-items:center;gap:8px}
+.logo span{color:var(--accent)}
+.tab-bar{display:flex;gap:2px;background:var(--surface2);padding:3px;border-radius:8px;margin-left:auto}
+.tab{padding:5px 16px;border-radius:6px;cursor:pointer;font-size:.78rem;font-weight:600;
+  color:var(--muted);transition:all .15s;font-family:var(--mono);border:none;background:transparent}
+.tab.active{background:var(--accent);color:#000}
+.tab:hover:not(.active){color:var(--text)}
+
+.view{flex:1;display:none;overflow:hidden;min-height:0}
+.view.active{display:flex}
+
+/* ── DECKS VIEW ── */
+#view-decks{flex-direction:column;overflow:hidden}
+.decks-header{padding:14px 20px;border-bottom:1px solid var(--border);background:var(--surface);
+  display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.decks-title{font-family:var(--display);font-weight:800;font-size:1rem}
+.tb-btn{padding:6px 14px;border-radius:7px;border:1px solid var(--border2);
+  background:transparent;color:var(--muted);font-family:var(--mono);font-size:.72rem;
+  cursor:pointer;transition:all .15s}
+.tb-btn:hover{border-color:var(--accent);color:var(--accent)}
+.tb-btn.primary{background:var(--accent-dim);border-color:var(--accent);color:var(--accent)}
+
+.decks-grid{flex:1;overflow-y:auto;padding:20px;display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;align-content:start}
+.deck-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;
+  padding:18px;cursor:pointer;transition:all .15s;position:relative;
+  border-left:4px solid var(--accent)}
+.deck-card:hover{border-color:var(--accent);transform:translateY(-2px);background:var(--surface2)}
+.deck-name{font-family:var(--display);font-weight:700;font-size:.95rem;margin-bottom:5px}
+.deck-stats{font-family:var(--mono);font-size:.68rem;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+.deck-stat-know{color:var(--know)}.deck-stat-dunno{color:var(--dunno)}.deck-stat-meh{color:var(--meh)}
+.deck-acts{position:absolute;top:10px;right:10px;display:none;gap:4px}
+.deck-card:hover .deck-acts{display:flex}
+.deck-act{padding:3px 7px;border-radius:4px;border:none;background:var(--surface2);
+  color:var(--muted);font-size:.68rem;cursor:pointer;transition:all .12s;font-family:var(--mono)}
+.deck-act:hover{color:var(--text)}.deck-act.del:hover{color:var(--dunno)}
+.new-deck-card{border:1px dashed var(--border2);border-left:4px solid transparent;
+  opacity:.5;display:flex;align-items:center;justify-content:center;gap:8px;
+  font-size:.85rem;color:var(--muted2);cursor:pointer;min-height:100px}
+.new-deck-card:hover{opacity:.8;border-color:var(--accent);color:var(--accent)}
+
+/* ── EDIT VIEW ── */
+#view-edit{flex-direction:column;overflow:hidden}
+.edit-header{padding:12px 16px;border-bottom:1px solid var(--border);background:var(--surface);
+  display:flex;align-items:center;gap:10px;flex-shrink:0}
+.deck-name-input{background:transparent;border:none;color:var(--text);font-family:var(--display);
+  font-size:.95rem;font-weight:700;outline:none;flex:1;padding:4px 8px;
+  border-bottom:1px solid transparent;transition:border-color .15s}
+.deck-name-input:focus{border-bottom-color:var(--accent)}
+.cards-list{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px}
+.card-row{background:var(--surface);border:1px solid var(--border);border-radius:9px;
+  padding:12px 14px;display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:start}
+.card-field{width:100%;background:var(--surface2);border:1px solid var(--border2);
+  color:var(--text);font-family:var(--body);font-size:.88rem;padding:8px 10px;
+  border-radius:6px;resize:none;outline:none;transition:border-color .15s;min-height:60px}
+.card-field:focus{border-color:var(--accent)}
+.card-field::placeholder{color:var(--muted2);font-style:italic}
+.card-del{padding:6px 10px;border-radius:6px;border:none;background:transparent;
+  color:var(--muted2);cursor:pointer;font-size:.85rem;transition:color .12s;align-self:center}
+.card-del:hover{color:var(--dunno)}
+.add-card-row{padding:8px 16px;flex-shrink:0}
+.add-card-btn{width:100%;padding:10px;border-radius:8px;border:1px dashed var(--border2);
+  background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;
+  font-family:var(--body);font-size:.85rem}
+.add-card-btn:hover{border-color:var(--accent);color:var(--accent)}
+.col-label{font-family:var(--mono);font-size:.62rem;color:var(--muted2);
+  letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+
+/* ── STUDY VIEW ── */
+#view-study{flex-direction:column;align-items:center;justify-content:center;
+  padding:24px;gap:20px;position:relative}
+.study-progress{width:100%;max-width:580px;height:4px;background:var(--border);
+  border-radius:2px;overflow:hidden;flex-shrink:0}
+.study-progress-bar{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
+.study-info{display:flex;justify-content:space-between;width:100%;max-width:580px;
+  font-family:var(--mono);font-size:.72rem;color:var(--muted);flex-shrink:0}
+
+/* CARD FLIP */
+.card-scene{width:100%;max-width:580px;height:300px;perspective:1000px;cursor:pointer;flex-shrink:0}
+.card-3d{width:100%;height:100%;position:relative;transform-style:preserve-3d;
+  transition:transform .45s cubic-bezier(.4,0,.2,1)}
+.card-3d.flipped{transform:rotateY(180deg)}
+.card-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:16px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:32px;border:1px solid var(--border2);background:var(--surface)}
+.card-face.back{transform:rotateY(180deg);background:var(--surface2)}
+.face-label{font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted);position:absolute;top:14px;left:16px}
+.face-text{font-family:var(--body);font-size:1.2rem;line-height:1.6;text-align:center;color:var(--text)}
+.face-hint{font-family:var(--mono);font-size:.68rem;color:var(--muted2);position:absolute;bottom:14px}
+
+/* ANSWER BUTTONS */
+.answer-btns{display:flex;gap:12px;width:100%;max-width:580px;flex-shrink:0}
+.ans-btn{flex:1;padding:13px;border-radius:10px;border:none;cursor:pointer;
+  font-family:var(--display);font-size:.9rem;font-weight:700;transition:all .18s}
+.ans-btn.know{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);
+  color:var(--know)}
+.ans-btn.know:hover{background:rgba(34,197,94,.22)}
+.ans-btn.meh{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);
+  color:var(--meh)}
+.ans-btn.meh:hover{background:rgba(245,158,11,.2)}
+.ans-btn.dunno{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);
+  color:var(--dunno)}
+.ans-btn.dunno:hover{background:rgba(239,68,68,.2)}
+.ans-btn:disabled{opacity:.3;cursor:not-allowed;transform:none}
+
+/* RESULTS */
+.results-panel{width:100%;max-width:580px;background:var(--surface);
+  border:1px solid var(--border);border-radius:14px;padding:24px;text-align:center}
+.results-title{font-family:var(--display);font-weight:800;font-size:1.4rem;margin-bottom:16px}
+.results-stats{display:flex;gap:20px;justify-content:center;margin-bottom:20px;flex-wrap:wrap}
+.rs{display:flex;flex-direction:column;gap:4px;align-items:center}
+.rs-num{font-family:var(--mono);font-size:2rem;font-weight:500}
+.rs-label{font-size:.75rem;color:var(--muted)}
+.rs.know .rs-num{color:var(--know)}.rs.meh .rs-num{color:var(--meh)}.rs.dunno .rs-num{color:var(--dunno)}
+.result-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+/* TOAST */
+.toast-wrap{position:fixed;bottom:16px;right:16px;z-index:999;display:flex;flex-direction:column;gap:5px;pointer-events:none}
+.toast{background:var(--surface2);border:1px solid var(--border2);border-radius:8px;
+  padding:7px 14px;font-size:.75rem;color:var(--text);border-left:3px solid var(--accent);
+  animation:tIn .15s ease;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+@keyframes tIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">Flash<span>Cards</span></div>
+  <div class="tab-bar">
+    <button class="tab active" id="tab-decks" onclick="showView('decks')">Decks</button>
+    <button class="tab" id="tab-edit" onclick="showView('edit')" id="tab-edit">Edit</button>
+    <button class="tab" id="tab-study" onclick="startStudy()">Study</button>
+  </div>
+</div>
+
+<!-- DECKS -->
+<div class="view active" id="view-decks">
+  <div class="decks-header">
+    <div class="decks-title">My Decks</div>
+    <button class="tb-btn primary" onclick="createDeck()">＋ New Deck</button>
+  </div>
+  <div class="decks-grid" id="decks-grid"></div>
+</div>
+
+<!-- EDIT -->
+<div class="view" id="view-edit">
+  <div class="edit-header">
+    <span style="color:var(--muted);cursor:pointer;font-size:.82rem" onclick="showView('decks')">← Decks</span>
+    <input class="deck-name-input" id="edit-deck-name" placeholder="Deck name…" oninput="saveDeck()">
+    <button class="tb-btn" onclick="shuffleDeck()">⇄ Shuffle</button>
+    <button class="tb-btn primary" onclick="startStudy()">▶ Study</button>
+  </div>
+  <div class="cards-list" id="cards-list"></div>
+  <div class="add-card-row">
+    <button class="add-card-btn" onclick="addCard()">＋ Add Card</button>
+  </div>
+</div>
+
+<!-- STUDY -->
+<div class="view" id="view-study">
+  <div class="study-progress"><div class="study-progress-bar" id="study-bar"></div></div>
+  <div class="study-info"><span id="study-pos">1 / 1</span><span id="study-deck-name"></span></div>
+  <div class="card-scene" id="card-scene" onclick="flipCard()">
+    <div class="card-3d" id="card-3d">
+      <div class="card-face front">
+        <span class="face-label">Question</span>
+        <div class="face-text" id="face-front-text"></div>
+        <span class="face-hint">Click to reveal</span>
+      </div>
+      <div class="card-face back">
+        <span class="face-label">Answer</span>
+        <div class="face-text" id="face-back-text"></div>
+        <span class="face-hint">How well did you know this?</span>
+      </div>
+    </div>
+  </div>
+  <div class="answer-btns" id="answer-btns">
+    <button class="ans-btn dunno" onclick="answer('dunno')" disabled>✕ No idea</button>
+    <button class="ans-btn meh"   onclick="answer('meh')"   disabled>~ Almost</button>
+    <button class="ans-btn know"  onclick="answer('know')"  disabled>✓ Got it</button>
+  </div>
+  <div id="study-results" style="display:none;width:100%;max-width:580px"></div>
+</div>
+
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+const STORE_KEY = 'flashcards_v1';
+let state = {decks:[]}, currentDeckId = null;
+let studyQueue = [], studyIdx = 0, studyFlipped = false;
+let studyResults = {know:0,meh:0,dunno:0};
+
+function loadState() { try { return JSON.parse(localStorage.getItem(STORE_KEY))||{decks:[]}; } catch { return {decks:[]}; } }
+function saveState() { localStorage.setItem(STORE_KEY,JSON.stringify(state)); }
+function newId() { return 'id'+Date.now()+Math.random().toString(36).slice(2,5); }
+
+function getCurrentDeck() { return state.decks.find(d=>d.id===currentDeckId); }
+
+// ── VIEWS ─────────────────────────────
+function showView(v) {
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+v)?.classList.add('active');
+  if(v==='decks') renderDecks();
+  if(v==='edit') renderEditView();
+}
+
+// ── DECKS ─────────────────────────────
+function renderDecks() {
+  const grid=document.getElementById('decks-grid');
+  const decks=state.decks;
+  grid.innerHTML = decks.map(d=>{
+    const know=d.cards.filter(c=>c.score==='know').length;
+    const dunno=d.cards.filter(c=>c.score==='dunno').length;
+    const meh=d.cards.filter(c=>c.score==='meh').length;
+    return `<div class="deck-card" onclick="openDeck('${d.id}')">
+      <div class="deck-acts">
+        <button class="deck-act" onclick="event.stopPropagation();editDeck('${d.id}')">✏</button>
+        <button class="deck-act del" onclick="event.stopPropagation();deleteDeck('${d.id}')">✕</button>
+      </div>
+      <div class="deck-name">${esc(d.name)}</div>
+      <div class="deck-stats">
+        <span>${d.cards.length} cards</span>
+        ${know?`<span class="deck-stat-know">✓ ${know}</span>`:''}
+        ${meh?`<span class="deck-stat-meh">~ ${meh}</span>`:''}
+        ${dunno?`<span class="deck-stat-dunno">✕ ${dunno}</span>`:''}
+      </div>
+    </div>`;
+  }).join('') + `<div class="new-deck-card" onclick="createDeck()"><span style="font-size:1.2rem">＋</span> New Deck</div>`;
+}
+
+function createDeck() {
+  const name = prompt('Deck name:','New Deck'); if(!name) return;
+  const deck = {id:newId(), name, cards:[]};
+  state.decks.push(deck);
+  saveState();
+  currentDeckId = deck.id;
+  showView('edit');
+}
+
+function openDeck(id) {
+  currentDeckId = id;
+  startStudy();
+}
+
+function editDeck(id) { currentDeckId=id; showView('edit'); }
+
+function deleteDeck(id) {
+  if(!confirm('Delete this deck?')) return;
+  state.decks=state.decks.filter(d=>d.id!==id);
+  saveState(); renderDecks();
+}
+
+// ── EDIT ──────────────────────────────
+function renderEditView() {
+  const deck=getCurrentDeck(); if(!deck) return;
+  document.getElementById('edit-deck-name').value=deck.name;
+  const list=document.getElementById('cards-list');
+  list.innerHTML=deck.cards.map((c,i)=>`
+    <div class="card-row">
+      <div>
+        <div class="col-label">Front (Question)</div>
+        <textarea class="card-field" placeholder="Question, term, prompt…" 
+          oninput="updateCard(${i},'front',this.value)" rows="3">${esc(c.front)}</textarea>
+      </div>
+      <div>
+        <div class="col-label">Back (Answer)</div>
+        <textarea class="card-field" placeholder="Answer, definition, explanation…"
+          oninput="updateCard(${i},'back',this.value)" rows="3">${esc(c.back)}</textarea>
+      </div>
+      <button class="card-del" onclick="deleteCard(${i})">🗑</button>
+    </div>`).join('');
+}
+
+function addCard() {
+  const deck=getCurrentDeck(); if(!deck) return;
+  deck.cards.push({id:newId(),front:'',back:'',score:null});
+  saveState(); renderEditView();
+  setTimeout(()=>{ const fields=document.querySelectorAll('.card-field'); if(fields.length) fields[fields.length-2].focus(); },50);
+}
+
+function updateCard(i,field,val) {
+  const deck=getCurrentDeck(); if(!deck||!deck.cards[i]) return;
+  deck.cards[i][field]=val; saveState();
+}
+
+function deleteCard(i) {
+  const deck=getCurrentDeck(); if(!deck) return;
+  deck.cards.splice(i,1); saveState(); renderEditView();
+}
+
+function saveDeck() {
+  const deck=getCurrentDeck(); if(!deck) return;
+  deck.name=document.getElementById('edit-deck-name').value||'Untitled';
+  saveState();
+}
+
+function shuffleDeck() {
+  const deck=getCurrentDeck(); if(!deck) return;
+  for(let i=deck.cards.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck.cards[i],deck.cards[j]]=[deck.cards[j],deck.cards[i]];}
+  saveState(); renderEditView(); toast('Deck shuffled');
+}
+
+// ── STUDY ─────────────────────────────
+function startStudy() {
+  const deck=getCurrentDeck(); if(!deck||!deck.cards.length){toast('Add some cards first');return;}
+  studyQueue=[...deck.cards].filter(c=>c.front||c.back);
+  if(!studyQueue.length){toast('Cards are empty');return;}
+  studyIdx=0; studyFlipped=false;
+  studyResults={know:0,meh:0,dunno:0};
+  document.getElementById('study-results').style.display='none';
+  document.getElementById('card-scene').style.display='block';
+  document.getElementById('answer-btns').style.display='flex';
+  showView('study');
+  showStudyCard();
+}
+
+function showStudyCard() {
+  const deck=getCurrentDeck();
+  if(studyIdx>=studyQueue.length){showResults();return;}
+  const card=studyQueue[studyIdx];
+  studyFlipped=false;
+  document.getElementById('card-3d').classList.remove('flipped');
+  document.getElementById('face-front-text').textContent=card.front||'(empty)';
+  document.getElementById('face-back-text').textContent=card.back||'(empty)';
+  document.getElementById('study-pos').textContent=`${studyIdx+1} / ${studyQueue.length}`;
+  document.getElementById('study-deck-name').textContent=deck?.name||'';
+  document.getElementById('study-bar').style.width=`${(studyIdx/studyQueue.length)*100}%`;
+  document.querySelectorAll('.ans-btn').forEach(b=>b.disabled=true);
+}
+
+function flipCard() {
+  if(studyIdx>=studyQueue.length) return;
+  studyFlipped=!studyFlipped;
+  document.getElementById('card-3d').classList.toggle('flipped',studyFlipped);
+  if(studyFlipped) document.querySelectorAll('.ans-btn').forEach(b=>b.disabled=false);
+}
+
+function answer(score) {
+  if(!studyFlipped) return;
+  studyResults[score]++;
+  const card=studyQueue[studyIdx];
+  const deck=getCurrentDeck();
+  if(deck){ const dc=deck.cards.find(c=>c.id===card.id); if(dc) dc.score=score; saveState(); }
+  studyIdx++;
+  if(studyIdx>=studyQueue.length) showResults();
+  else showStudyCard();
+}
+
+function showResults() {
+  document.getElementById('study-bar').style.width='100%';
+  document.getElementById('card-scene').style.display='none';
+  document.getElementById('answer-btns').style.display='none';
+  const pct=Math.round((studyResults.know/studyQueue.length)*100);
+  const el=document.getElementById('study-results');
+  el.style.display='block';
+  el.innerHTML=`<div class="results-panel">
+    <div class="results-title">${pct>=80?'🎉 Great job!':pct>=50?'👍 Keep going!':'📚 Keep studying!'}</div>
+    <div class="results-stats">
+      <div class="rs know"><span class="rs-num">${studyResults.know}</span><span class="rs-label">Got it</span></div>
+      <div class="rs meh"><span class="rs-num">${studyResults.meh}</span><span class="rs-label">Almost</span></div>
+      <div class="rs dunno"><span class="rs-num">${studyResults.dunno}</span><span class="rs-label">No idea</span></div>
+    </div>
+    <div class="result-btns">
+      <button class="tb-btn" onclick="retryWrong()">↺ Retry wrong cards</button>
+      <button class="tb-btn" onclick="startStudy()">↺ Restart deck</button>
+      <button class="tb-btn primary" onclick="showView('decks')">← All Decks</button>
+    </div>
+  </div>`;
+}
+
+function retryWrong() {
+  const deck=getCurrentDeck(); if(!deck) return;
+  studyQueue=deck.cards.filter(c=>c.score==='dunno'||c.score==='meh');
+  if(!studyQueue.length){toast('No wrong cards!');return;}
+  studyIdx=0;studyFlipped=false;studyResults={know:0,meh:0,dunno:0};
+  document.getElementById('study-results').style.display='none';
+  document.getElementById('card-scene').style.display='block';
+  document.getElementById('answer-btns').style.display='flex';
+  showStudyCard();
+}
+
+// ── KEYBOARD ──────────────────────────
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT') return;
+  if(e.key===' '){e.preventDefault();flipCard();}
+  if(e.key==='1') answer('dunno');
+  if(e.key==='2') answer('meh');
+  if(e.key==='3'||e.key==='Enter') answer('know');
+});
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function toast(msg){
+  const w=document.getElementById('toast-wrap');
+  const t=document.createElement('div');t.className='toast';t.textContent=msg;
+  w.appendChild(t);setTimeout(()=>t.remove(),2200);
+}
+
+state=loadState();
+if(!state.decks) state.decks=[];
+renderDecks();
+</script>
+</body>
+</html>
