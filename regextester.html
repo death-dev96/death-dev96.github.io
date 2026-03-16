@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RegexTester</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#08080d;--surface:#0f0f16;--surface2:#15151f;--border:#1e1e2c;--border2:#282838;
+  --text:#e8e8f4;--muted:#54547a;--muted2:#2c2c44;
+  --accent:#34d399;--accent-dim:rgba(52,211,153,.1);
+  --match:#fbbf24;--match-dim:rgba(251,191,36,.15);
+  --group1:rgba(167,139,250,.3);--group2:rgba(251,146,60,.3);--group3:rgba(52,211,153,.3);
+  --mono:'DM Mono',monospace;--display:'Syne',sans-serif;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--mono);background:var(--bg);color:var(--text);display:flex;flex-direction:column}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+.topbar{height:52px;background:var(--surface);border-bottom:2px solid var(--accent);
+  padding:0 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.logo{font-family:var(--display);font-weight:800;font-size:.95rem;display:flex;align-items:center;gap:8px}
+.logo span{color:var(--accent)}
+.badge{padding:3px 10px;border-radius:20px;font-size:.65rem;letter-spacing:.08em;font-family:var(--mono)}
+.badge.ok{background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.3);color:var(--accent)}
+.badge.err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#ef4444}
+.badge.none{background:var(--surface2);border:1px solid var(--border2);color:var(--muted)}
+.match-count{font-size:.72rem;color:var(--muted);margin-left:auto}
+
+.app{flex:1;display:grid;grid-template-columns:1fr 280px;grid-template-rows:auto 1fr;
+  overflow:hidden;min-height:0}
+
+/* PATTERN ROW */
+.pattern-row{grid-column:1/-1;padding:14px 16px;background:var(--surface);
+  border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:center;flex-shrink:0}
+.pattern-wrap{flex:1;display:flex;align-items:center;border:1px solid var(--border2);
+  border-radius:8px;background:var(--bg);overflow:hidden;transition:border-color .15s}
+.pattern-wrap:focus-within{border-color:var(--accent)}
+.pattern-slash{padding:0 10px;color:var(--muted);font-size:1.1rem;user-select:none;flex-shrink:0}
+.pattern-input{flex:1;border:none;background:transparent;color:var(--text);
+  font-family:var(--mono);font-size:.95rem;padding:10px 0;outline:none;letter-spacing:.02em}
+.pattern-input::placeholder{color:var(--muted2)}
+.flags-input{width:64px;border:none;background:transparent;color:var(--accent);
+  font-family:var(--mono);font-size:.95rem;padding:10px 8px;outline:none;
+  border-left:1px solid var(--border2)}
+.flags-input::placeholder{color:var(--muted2)}
+.tb-btn{padding:6px 13px;border-radius:6px;border:1px solid var(--border2);
+  background:transparent;color:var(--muted);font-family:var(--mono);font-size:.72rem;
+  cursor:pointer;transition:all .15s;white-space:nowrap}
+.tb-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* TEST INPUT */
+.test-col{grid-column:1;overflow:hidden;display:flex;flex-direction:column;
+  border-right:1px solid var(--border)}
+.pane-label{padding:10px 16px 6px;font-size:.62rem;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;
+  align-items:center;flex-shrink:0}
+.test-textarea{flex:1;border:none;background:var(--bg);color:var(--text);
+  font-family:var(--mono);font-size:.88rem;line-height:1.8;padding:12px 16px;
+  resize:none;outline:none;overflow-y:auto;width:100%}
+.test-textarea::placeholder{color:var(--muted2)}
+.highlighted-output{flex:1;font-family:var(--mono);font-size:.88rem;line-height:1.8;
+  padding:12px 16px;overflow-y:auto;white-space:pre-wrap;word-break:break-all;
+  background:var(--bg);display:none}
+.hl-match{background:var(--match-dim);border-bottom:2px solid var(--match);
+  border-radius:2px;color:var(--text)}
+.hl-g1{background:var(--group1);border-radius:2px}
+.hl-g2{background:var(--group2);border-radius:2px}
+.hl-g3{background:var(--group3);border-radius:2px}
+
+/* RESULTS PANEL */
+.results-col{grid-column:2;overflow:hidden;display:flex;flex-direction:column}
+.matches-list{flex:1;overflow-y:auto;padding:8px}
+.match-item{padding:10px 12px;border-radius:8px;border:1px solid var(--border);
+  background:var(--surface);margin-bottom:6px}
+.match-item-header{display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:5px}
+.match-label{font-size:.62rem;color:var(--match);letter-spacing:.1em;text-transform:uppercase}
+.match-index{font-size:.62rem;color:var(--muted2)}
+.match-value{font-size:.82rem;color:var(--text);word-break:break-all;margin-bottom:4px;
+  background:var(--match-dim);padding:3px 7px;border-radius:4px;border:1px solid rgba(251,191,36,.2)}
+.group-item{font-size:.72rem;color:var(--muted);margin-top:4px;
+  display:flex;align-items:flex-start;gap:6px}
+.group-label{flex-shrink:0;font-size:.62rem;letter-spacing:.06em;color:var(--muted2)}
+.group-value{word-break:break-all;color:var(--text);background:var(--group1);
+  padding:1px 5px;border-radius:3px}
+.no-matches{padding:24px;text-align:center;color:var(--muted2);font-style:italic;font-size:.82rem}
+.match-item.current{border-color:var(--match)}
+
+/* EXPLAIN */
+.explain-section{border-top:1px solid var(--border);padding:12px 14px;flex-shrink:0;
+  background:var(--surface)}
+.explain-label{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:8px}
+.explain-list{display:flex;flex-direction:column;gap:5px;max-height:140px;overflow-y:auto}
+.explain-item{display:flex;gap:8px;font-size:.72rem;padding:5px 8px;border-radius:5px;
+  background:var(--surface2);align-items:flex-start}
+.explain-token{color:var(--accent);font-size:.75rem;flex-shrink:0;min-width:70px}
+.explain-desc{color:var(--muted)}
+.explain-empty{font-size:.75rem;color:var(--muted2);font-style:italic;padding:4px 8px}
+
+/* CHEATSHEET SIDEBAR */
+.cheat-col{display:none}
+
+/* PRESETS */
+.presets-row{padding:6px 16px;border-bottom:1px solid var(--border);
+  display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0;background:var(--surface)}
+.preset-chip{padding:4px 11px;border-radius:20px;border:1px solid var(--border2);
+  background:transparent;color:var(--muted);font-family:var(--mono);font-size:.65rem;
+  cursor:pointer;transition:all .12s}
+.preset-chip:hover{border-color:var(--accent);color:var(--accent)}
+
+/* TOAST */
+.toast-wrap{position:fixed;bottom:16px;right:16px;z-index:999;display:flex;flex-direction:column;gap:5px;pointer-events:none}
+.toast{background:var(--surface2);border:1px solid var(--border2);border-radius:8px;
+  padding:7px 14px;font-size:.75rem;color:var(--text);border-left:3px solid var(--accent);
+  animation:tIn .15s ease;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+@keyframes tIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">Regex<span>Tester</span></div>
+  <span class="badge none" id="status-badge">No pattern</span>
+  <span class="match-count" id="match-count"></span>
+</div>
+
+<div class="app">
+
+  <!-- PATTERN ROW -->
+  <div class="pattern-row">
+    <div class="pattern-wrap">
+      <span class="pattern-slash">/</span>
+      <input class="pattern-input" id="pattern-input" type="text"
+             placeholder="Enter regex pattern…" oninput="runTest()" autocomplete="off" autocorrect="off" spellcheck="false">
+      <span class="pattern-slash">/</span>
+      <input class="flags-input" id="flags-input" type="text" value="gm"
+             placeholder="gm" oninput="runTest()" title="Flags: g=global, m=multiline, i=case insensitive, s=dot-all" maxlength="6">
+    </div>
+    <button class="tb-btn" onclick="copyPattern()">⎘ Copy</button>
+    <button class="tb-btn" onclick="clearAll()">✕ Clear</button>
+  </div>
+
+  <!-- PRESETS -->
+  <div class="presets-row" style="grid-column:1/-1">
+    <span style="font-size:.62rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;flex-shrink:0;margin-right:4px">Presets:</span>
+    <button class="preset-chip" onclick="loadPreset('email')">Email</button>
+    <button class="preset-chip" onclick="loadPreset('url')">URL</button>
+    <button class="preset-chip" onclick="loadPreset('ip')">IP Address</button>
+    <button class="preset-chip" onclick="loadPreset('date')">Date</button>
+    <button class="preset-chip" onclick="loadPreset('hex')">Hex Color</button>
+    <button class="preset-chip" onclick="loadPreset('phone')">Phone</button>
+    <button class="preset-chip" onclick="loadPreset('slug')">Slug</button>
+    <button class="preset-chip" onclick="loadPreset('time')">Time</button>
+    <button class="preset-chip" onclick="loadPreset('word')">Word Boundary</button>
+    <button class="preset-chip" onclick="loadPreset('num')">Number</button>
+  </div>
+
+  <!-- TEST TEXT -->
+  <div class="test-col">
+    <div class="pane-label">
+      <span>Test Text</span>
+      <span id="view-toggle-btn" style="cursor:pointer;color:var(--muted);font-size:.65rem" onclick="toggleView()">Show highlights</span>
+    </div>
+    <textarea class="test-textarea" id="test-input"
+      placeholder="Paste text to test your regex against…&#10;&#10;Matches will be highlighted live."
+      oninput="runTest()" spellcheck="false"></textarea>
+    <div class="highlighted-output" id="highlighted-output"></div>
+  </div>
+
+  <!-- MATCHES + EXPLAIN -->
+  <div class="results-col">
+    <div class="pane-label"><span>Matches</span></div>
+    <div class="matches-list" id="matches-list">
+      <div class="no-matches">Enter a pattern and test text to see matches</div>
+    </div>
+    <div class="explain-section">
+      <div class="explain-label">Pattern Explained</div>
+      <div class="explain-list" id="explain-list">
+        <div class="explain-empty">No pattern to explain</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+const PRESETS = {
+  email:  { pattern: '[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}', flags: 'g', sample: 'Contact us at hello@example.com or support@toolkit.io for help.' },
+  url:    { pattern: 'https?:\\/\\/[^\\s/$.?#].[^\\s]*', flags: 'g', sample: 'Visit https://example.com and http://github.com/user for more info.' },
+  ip:     { pattern: '\\b(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\.(?:25[0-5]|2[0-4]\\d|[01]?\\d\\d?)\\b', flags: 'g', sample: 'Server 192.168.1.1 and 10.0.0.255 are on the local network.' },
+  date:   { pattern: '\\b(\\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])\\b', flags: 'g', sample: 'Meeting on 2024-01-15. Follow-up 2024-03-22. Deadline 2025-12-01.' },
+  hex:    { pattern: '#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})\\b', flags: 'g', sample: 'Color palette: #ff0000 #00ff00 #0000ff #fff #abc and #123456.' },
+  phone:  { pattern: '\\(?\\d{3}\\)?[\\s.\\-]?\\d{3}[\\s.\\-]?\\d{4}', flags: 'g', sample: 'Call (555) 123-4567 or 555.987.6543 or 555-111-2222 anytime.' },
+  slug:   { pattern: '^[a-z0-9]+(?:-[a-z0-9]+)*$', flags: 'm', sample: 'my-page-title\nhello-world\nInvalid Title\nvalid-slug-123\nnot valid' },
+  time:   { pattern: '\\b(0?[1-9]|1[0-2]):([0-5]\\d)\\s?(AM|PM|am|pm)?\\b', flags: 'g', sample: 'Meeting at 9:30 AM, lunch 12:00 PM, call 3:45 pm, standup 10:00.' },
+  word:   { pattern: '\\bcat\\b', flags: 'gi', sample: 'The cat sat on a caterpillar. My cat likes cats. Catch the cat!' },
+  num:    { pattern: '-?\\d+(\\.\\d+)?', flags: 'g', sample: 'Values: 42, -7, 3.14, 0.5, -12.99, 1000 and 0.' },
+};
+
+let showHighlight = false;
+
+function loadPreset(key) {
+  const p = PRESETS[key];
+  document.getElementById('pattern-input').value = p.pattern;
+  document.getElementById('flags-input').value = p.flags;
+  if (!document.getElementById('test-input').value.trim()) {
+    document.getElementById('test-input').value = p.sample;
+  }
+  runTest();
+}
+
+function runTest() {
+  const patStr = document.getElementById('pattern-input').value;
+  const flags  = document.getElementById('flags-input').value.replace(/[^gimsuy]/g,'');
+  const testText = document.getElementById('test-input').value;
+  const badge = document.getElementById('status-badge');
+  const matchCount = document.getElementById('match-count');
+
+  if (!patStr) {
+    badge.textContent = 'No pattern'; badge.className = 'badge none';
+    matchCount.textContent = '';
+    document.getElementById('matches-list').innerHTML = '<div class="no-matches">Enter a pattern and test text to see matches</div>';
+    document.getElementById('explain-list').innerHTML = '<div class="explain-empty">No pattern to explain</div>';
+    renderHighlight(testText, null, []);
+    return;
+  }
+
+  let regex;
+  try {
+    regex = new RegExp(patStr, flags);
+    badge.textContent = '✓ Valid'; badge.className = 'badge ok';
+  } catch(e) {
+    badge.textContent = '✕ ' + e.message.replace('Invalid regular expression: ','').slice(0,40);
+    badge.className = 'badge err';
+    matchCount.textContent = '';
+    document.getElementById('matches-list').innerHTML = `<div class="no-matches" style="color:#ef4444">${esc(e.message)}</div>`;
+    document.getElementById('explain-list').innerHTML = '<div class="explain-empty">Fix the pattern first</div>';
+    renderHighlight(testText, null, []);
+    return;
+  }
+
+  const matches = [];
+  if (testText) {
+    const safeFlags = flags.includes('g') ? flags : flags + 'g';
+    const gRegex = new RegExp(patStr, safeFlags);
+    let m;
+    while ((m = gRegex.exec(testText)) !== null) {
+      matches.push({ value: m[0], index: m.index, end: m.index + m[0].length, groups: m.slice(1) });
+      if (!flags.includes('g')) break;
+    }
+  }
+
+  matchCount.textContent = matches.length ? `${matches.length} match${matches.length===1?'':'es'}` : '';
+  renderMatches(matches);
+  renderHighlight(testText, regex, matches);
+  explainPattern(patStr);
+}
+
+function renderMatches(matches) {
+  const el = document.getElementById('matches-list');
+  if (!matches.length) {
+    el.innerHTML = '<div class="no-matches">No matches found</div>';
+    return;
+  }
+  el.innerHTML = matches.map((m, i) => {
+    const groups = m.groups.filter(g => g !== undefined);
+    return `<div class="match-item" id="mi-${i}">
+      <div class="match-item-header">
+        <span class="match-label">Match ${i+1}</span>
+        <span class="match-index">pos ${m.index}–${m.end}</span>
+      </div>
+      <div class="match-value">${esc(m.value) || '<em>empty string</em>'}</div>
+      ${groups.map((g,gi) => `<div class="group-item"><span class="group-label">Group ${gi+1}</span><span class="group-value">${esc(g)}</span></div>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+function renderHighlight(text, regex, matches) {
+  const out = document.getElementById('highlighted-output');
+  if (!showHighlight || !text || !matches.length) { out.innerHTML = esc(text); return; }
+  let result = '', last = 0;
+  matches.forEach(m => {
+    result += esc(text.slice(last, m.index));
+    result += `<span class="hl-match">${esc(m.value)}</span>`;
+    last = m.end;
+  });
+  result += esc(text.slice(last));
+  out.innerHTML = result;
+}
+
+function toggleView() {
+  showHighlight = !showHighlight;
+  const ta = document.getElementById('test-input');
+  const out = document.getElementById('highlighted-output');
+  const btn = document.getElementById('view-toggle-btn');
+  ta.style.display = showHighlight ? 'none' : 'block';
+  out.style.display = showHighlight ? 'block' : 'none';
+  btn.textContent = showHighlight ? 'Edit text' : 'Show highlights';
+  runTest();
+}
+
+function explainPattern(pat) {
+  const el = document.getElementById('explain-list');
+  const explanations = [];
+  const tokens = [
+    [/\^/g,        '\\^',     'Start of string/line'],
+    [/\$/g,        '\\$',     'End of string/line'],
+    [/\\\./g,      '\\.',     'Literal dot character'],
+    [/\./g,        '.',       'Any character except newline'],
+    [/\\\*/g,      '\\*',     'Literal asterisk'],
+    [/\*\?/g,      '*?',      'Zero or more (lazy)'],
+    [/\*/g,        '*',       'Zero or more (greedy)'],
+    [/\+\?/g,      '+?',      'One or more (lazy)'],
+    [/\+/g,        '+',       'One or more (greedy)'],
+    [/\?\?/g,      '??',      'Zero or one (lazy)'],
+    [/(?<![\\+*])\?/g, '?',   'Zero or one (optional)'],
+    [/\{\d+,\d+\}/g,'{n,m}', 'Between n and m times'],
+    [/\{\d+,\}/g,  '{n,}',   'n or more times'],
+    [/\{\d+\}/g,   '{n}',    'Exactly n times'],
+    [/\[/g,        '[...]',   'Character class — match one of these'],
+    [/\[^/g,       '[^...]',  'Negated class — match none of these'],
+    [/\\\d/g,      '\\d',     'Any digit 0–9'],
+    [/\\D/g,       '\\D',     'Any non-digit'],
+    [/\\\w/g,      '\\w',     'Word character (a-z, A-Z, 0-9, _)'],
+    [/\\W/g,       '\\W',     'Non-word character'],
+    [/\\\s/g,      '\\s',     'Whitespace (space, tab, newline)'],
+    [/\\S/g,       '\\S',     'Non-whitespace'],
+    [/\\b/g,       '\\b',     'Word boundary'],
+    [/\\B/g,       '\\B',     'Non-word boundary'],
+    [/\\n/g,       '\\n',     'Newline character'],
+    [/\\t/g,       '\\t',     'Tab character'],
+    [/\(\?:/g,     '(?:...)', 'Non-capturing group'],
+    [/\(\?=/g,     '(?=...)', 'Positive lookahead'],
+    [/\(\?!/g,     '(?!...)', 'Negative lookahead'],
+    [/\(\?<=/g,    '(?<=...)', 'Positive lookbehind'],
+    [/\(\?<!/g,    '(?<!...)', 'Negative lookbehind'],
+    [/\(/g,        '(...)',    'Capturing group'],
+    [/\|/g,        '|',       'Alternation — OR'],
+  ];
+  const seen = new Set();
+  for (const [rx, token, desc] of tokens) {
+    if (rx.test(pat) && !seen.has(token)) {
+      seen.add(token);
+      explanations.push({ token, desc });
+    }
+  }
+  if (!explanations.length) {
+    el.innerHTML = '<div class="explain-empty">This pattern uses only literal characters</div>';
+    return;
+  }
+  el.innerHTML = explanations.map(x =>
+    `<div class="explain-item"><span class="explain-token">${esc(x.token)}</span><span class="explain-desc">${esc(x.desc)}</span></div>`
+  ).join('');
+}
+
+function copyPattern() {
+  const p = document.getElementById('pattern-input').value;
+  const f = document.getElementById('flags-input').value;
+  if (!p) { toast('No pattern to copy'); return; }
+  navigator.clipboard?.writeText(`/${p}/${f}`).then(() => toast('Copied pattern'));
+}
+
+function clearAll() {
+  document.getElementById('pattern-input').value = '';
+  document.getElementById('flags-input').value = 'gm';
+  document.getElementById('test-input').value = '';
+  if (showHighlight) toggleView();
+  runTest();
+}
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function toast(msg) {
+  const w = document.getElementById('toast-wrap');
+  const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+  w.appendChild(t); setTimeout(() => t.remove(), 2000);
+}
+
+// Ctrl+Enter to test
+document.addEventListener('keydown', e => {
+  if ((e.metaKey||e.ctrlKey) && e.key === 'Enter') runTest();
+});
+</script>
+</body>
+</html>
