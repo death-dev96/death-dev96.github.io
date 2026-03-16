@@ -463,7 +463,7 @@ textarea.input{resize:vertical;line-height:1.6}
   <div class="home-nav">
     <div class="home-logo"><div class="pulse"></div>RUN·MANAGER</div>
     <span style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-left:auto" id="clock2"></span>
-    <a href="https://github.com/death-dev96/death-dev96.github.io/issues/new" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:10px;color:var(--text3);text-decoration:none;padding:3px 8px;border:1px solid var(--border);margin-left:10px;transition:color 0.15s,border-color 0.15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accentd)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border)'">⚑ REPORT ISSUE</a>
+    <button onclick="openReportIssueModal()" style="font-family:var(--mono);font-size:10px;color:var(--text3);background:none;border:1px solid var(--border);padding:3px 8px;cursor:pointer;margin-left:10px;transition:color 0.15s,border-color 0.15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accentd)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border)'">⚑ REPORT ISSUE</button>
     <button onclick="openCreditsModal()" style="font-family:var(--mono);font-size:10px;color:var(--text3);background:none;border:1px solid var(--border);padding:3px 8px;cursor:pointer;margin-left:6px;transition:color 0.15s,border-color 0.15s" onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accentd)'" onmouseout="this.style.color='var(--text3)';this.style.borderColor='var(--border)'">✦ CREDITS</button>
   </div>
   <div class="home-content">
@@ -990,6 +990,113 @@ function openCreditsModal(){
     </div>`,
     `<button class="btn" onclick="closeModal()">CLOSE</button>`
   );
+}
+
+// ════════════════════════════════════════
+// REPORT ISSUE MODAL
+// ════════════════════════════════════════
+function openReportIssueModal(){
+  openModal('⚑ REPORT ISSUE',
+    `<div style="display:flex;flex-direction:column;gap:12px">
+
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text3);line-height:1.6">
+        Fill in the details below. Clicking <b style="color:var(--accent)">OPEN ON GITHUB</b> will open a pre-filled issue form in a new tab — you'll need a GitHub account to submit it.
+      </div>
+
+      <!-- Type -->
+      <div>
+        <div class="label" style="margin-bottom:6px">ISSUE TYPE</div>
+        <div style="display:flex;gap:6px">
+          <button id="ri-type-bug" onclick="setRiType('bug')"
+            style="font-family:var(--mono);font-size:10px;padding:4px 12px;border:1px solid var(--red);background:var(--bg3);color:var(--red);cursor:pointer;transition:all 0.12s;flex:1"
+            onmouseover="this.style.background='var(--red)';this.style.color='#000'"
+            onmouseout="document.getElementById('ri-type-bug').dataset.active==='1'?(this.style.background='var(--red)',this.style.color='#000'):(this.style.background='var(--bg3)',this.style.color='var(--red)')">
+            🐛 BUG REPORT
+          </button>
+          <button id="ri-type-feature" onclick="setRiType('feature')"
+            style="font-family:var(--mono);font-size:10px;padding:4px 12px;border:1px solid var(--blue);background:var(--bg3);color:var(--blue);cursor:pointer;transition:all 0.12s;flex:1"
+            onmouseover="this.style.background='var(--blue)';this.style.color='#000'"
+            onmouseout="document.getElementById('ri-type-feature').dataset.active==='1'?(this.style.background='var(--blue)',this.style.color='#000'):(this.style.background='var(--bg3)',this.style.color='var(--blue)')">
+            ✦ FEATURE REQUEST
+          </button>
+        </div>
+      </div>
+
+      <!-- Title -->
+      <div>
+        <div class="label" style="margin-bottom:4px">TITLE <span style="color:var(--red)">*</span></div>
+        <input class="input" id="ri-title" placeholder="Brief summary of the issue…" style="width:100%">
+      </div>
+
+      <!-- Description -->
+      <div>
+        <div class="label" style="margin-bottom:4px">DESCRIPTION</div>
+        <textarea class="input" id="ri-body" rows="5"
+          placeholder="Describe the issue in detail…&#10;&#10;Steps to reproduce:&#10;1. &#10;2. &#10;&#10;Expected behaviour:&#10;Actual behaviour:"
+          style="width:100%;resize:vertical;font-family:var(--mono);font-size:11px;line-height:1.6"></textarea>
+      </div>
+
+      <!-- Steps / screenshot note -->
+      <div style="font-family:var(--mono);font-size:9px;color:var(--text3);line-height:1.6;padding:8px 10px;background:var(--bg3);border:1px solid var(--border)">
+        💡 You can attach screenshots directly on GitHub after the form opens. Include browser, OS, and the run name if relevant.
+      </div>
+
+      <div id="ri-error" style="display:none;font-family:var(--mono);font-size:10px;color:var(--red);padding:6px 10px;background:var(--bg3);border:1px solid var(--red)"></div>
+
+    </div>`,
+    `<button class="btn" onclick="closeModal()">CANCEL</button>
+     <button class="btn primary" onclick="submitReportIssue()">⚑ OPEN ON GITHUB</button>`
+  );
+  // Default to bug
+  setRiType('bug');
+}
+
+function setRiType(type){
+  const bugBtn     = document.getElementById('ri-type-bug');
+  const featBtn    = document.getElementById('ri-type-feature');
+  if(!bugBtn||!featBtn) return;
+  // Reset both
+  bugBtn.dataset.active  = '0';
+  featBtn.dataset.active = '0';
+  bugBtn.style.background  = 'var(--bg3)'; bugBtn.style.color  = 'var(--red)';
+  featBtn.style.background = 'var(--bg3)'; featBtn.style.color = 'var(--blue)';
+  // Activate chosen
+  if(type==='bug'){
+    bugBtn.dataset.active = '1';
+    bugBtn.style.background = 'var(--red)'; bugBtn.style.color = '#000';
+  } else {
+    featBtn.dataset.active = '1';
+    featBtn.style.background = 'var(--blue)'; featBtn.style.color = '#000';
+  }
+}
+
+function submitReportIssue(){
+  const titleEl = document.getElementById('ri-title');
+  const bodyEl  = document.getElementById('ri-body');
+  const errEl   = document.getElementById('ri-error');
+  const title   = (titleEl ? titleEl.value : '').trim();
+  const body    = (bodyEl  ? bodyEl.value  : '').trim();
+
+  const isBug = document.getElementById('ri-type-bug')?.dataset.active === '1';
+  const label = isBug ? 'bug' : 'enhancement';
+
+  if(!title){
+    if(errEl){ errEl.style.display='block'; errEl.textContent='⚠ Please enter a title before opening the issue.'; }
+    if(titleEl) titleEl.focus();
+    return;
+  }
+  if(errEl) errEl.style.display='none';
+
+  const base   = 'https://github.com/death-dev96/death-dev96.github.io/issues/new';
+  const params = new URLSearchParams({
+    title,
+    body: body || '',
+    labels: label
+  });
+
+  window.open(base+'?'+params.toString(), '_blank', 'noopener');
+  closeModal();
+  toast('Issue form opened in a new tab','var(--green)');
 }
 
 // ════════════════════════════════════════
