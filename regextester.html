@@ -251,9 +251,14 @@ function runTest() {
     const safeFlags = flags.includes('g') ? flags : flags + 'g';
     const gRegex = new RegExp(patStr, safeFlags);
     let m;
+    let lastIndex = -1;
     while ((m = gRegex.exec(testText)) !== null) {
+      // Guard against infinite loops on zero-width matches
+      if (m.index === lastIndex) { gRegex.lastIndex++; continue; }
+      lastIndex = m.index;
       matches.push({ value: m[0], index: m.index, end: m.index + m[0].length, groups: m.slice(1) });
       if (!flags.includes('g')) break;
+      if (matches.length > 500) break; // safety cap
     }
   }
 
@@ -297,12 +302,18 @@ function renderHighlight(text, regex, matches) {
 
 function toggleView() {
   showHighlight = !showHighlight;
-  const ta = document.getElementById('test-input');
+  const ta  = document.getElementById('test-input');
   const out = document.getElementById('highlighted-output');
   const btn = document.getElementById('view-toggle-btn');
-  ta.style.display = showHighlight ? 'none' : 'block';
-  out.style.display = showHighlight ? 'block' : 'none';
-  btn.textContent = showHighlight ? 'Edit text' : 'Show highlights';
+  if (showHighlight) {
+    ta.style.display  = 'none';
+    out.style.display = 'flex';
+    btn.textContent   = 'Edit text';
+  } else {
+    ta.style.display  = 'flex';
+    out.style.display = 'none';
+    btn.textContent   = 'Show highlights';
+  }
   runTest();
 }
 

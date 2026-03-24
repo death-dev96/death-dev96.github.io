@@ -152,7 +152,7 @@ body{font-family:var(--body);background:var(--bg);color:var(--text);display:flex
   <div class="logo">Flash<span>Cards</span></div>
   <div class="tab-bar">
     <button class="tab active" id="tab-decks" onclick="showView('decks')">Decks</button>
-    <button class="tab" id="tab-edit" onclick="showView('edit')" id="tab-edit">Edit</button>
+    <button class="tab" id="tab-edit" onclick="showView('edit')">Edit</button>
     <button class="tab" id="tab-study" onclick="startStudy()">Study</button>
   </div>
 </div>
@@ -328,9 +328,11 @@ function shuffleDeck() {
 
 // ── STUDY ─────────────────────────────
 function startStudy() {
-  const deck=getCurrentDeck(); if(!deck||!deck.cards.length){toast('Add some cards first');return;}
+  const deck=getCurrentDeck();
+  if(!deck){toast('Select a deck first');return;}
+  if(!deck.cards.length){toast('Add some cards to this deck first');return;}
   studyQueue=[...deck.cards].filter(c=>c.front||c.back);
-  if(!studyQueue.length){toast('Cards are empty');return;}
+  if(!studyQueue.length){toast('Fill in card content before studying');return;}
   studyIdx=0; studyFlipped=false;
   studyResults={know:0,meh:0,dunno:0};
   document.getElementById('study-results').style.display='none';

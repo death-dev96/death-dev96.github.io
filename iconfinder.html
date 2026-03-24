@@ -438,13 +438,18 @@ function setCategory(id) {
 function renderRecents() {
   const r = loadRecents();
   const el = document.getElementById('recents-chips');
-  el.innerHTML = r.map(icon =>
-    `<button class="recent-chip" title="${icon.n}" onclick="selectIcon(${JSON.stringify(icon).replace(/"/g,'&quot;')})">${icon.e}</button>`
+  // Store recents on a hidden map so clicks can look up by index
+  el.innerHTML = r.map((icon, i) =>
+    `<button class="recent-chip" title="${icon.n}" data-recent="${i}">${icon.e}</button>`
   ).join('') || '<span style="font-size:.72rem;color:var(--muted2);font-style:italic">None yet</span>';
 }
 
+// Filtered list used by the current grid render — kept in module scope for click lookup
+let _gridList = [];
+
 function renderGrid() {
   const list = getFiltered();
+  _gridList = list;
   const grid = document.getElementById('grid');
   document.getElementById('result-count').textContent = list.length + ' icons';
   if (!list.length) {
@@ -452,7 +457,7 @@ function renderGrid() {
     return;
   }
   grid.innerHTML = list.map((icon, i) =>
-    `<button class="icon-btn" id="ib-${i}" title="${icon.n}" onclick='selectIcon(${JSON.stringify(icon)})'>
+    `<button class="icon-btn" data-idx="${i}" title="${icon.n}">
       <span class="icon-glyph">${icon.e}</span>
       <span class="icon-name">${icon.n.split(' ').slice(0,2).join(' ')}</span>
     </button>`
@@ -470,11 +475,15 @@ function selectIcon(icon) {
       <div class="detail-name">${icon.n}</div>
       <div class="detail-meta">Category: ${icon.c} &nbsp;·&nbsp; Code: ${cp}</div>
       <div class="detail-actions">
-        <button class="copy-btn primary" onclick="copyText('${icon.e.replace(/'/g,"\\'")}', 'Emoji')">⎘ Copy Emoji</button>
-        <button class="copy-btn" onclick="copyText('${cp}', 'Code point')">⎘ Code Point</button>
-        <button class="copy-btn" onclick="copyText('&amp;#${cp.replace('U+','').replace(/^0+/,'').toLowerCase()};', 'HTML entity')">⎘ HTML Entity</button>
+        <button class="copy-btn primary" data-copy="emoji">⎘ Copy Emoji</button>
+        <button class="copy-btn" data-copy="cp">⎘ Code Point</button>
+        <button class="copy-btn" data-copy="html">⎘ HTML Entity</button>
       </div>
     </div>`;
+  // Store on the detail element for click handler
+  det.dataset.emoji = icon.e;
+  det.dataset.cp = cp;
+  det.dataset.html = '&#' + cp.split(' ')[0].replace('U+','').replace(/^0+/,'').toLowerCase() + ';';
 }
 
 function codePoint(emoji) {
@@ -506,6 +515,29 @@ function toast(msg) {
 renderCats(); renderGrid(); renderRecents();
 document.getElementById('search').addEventListener('keydown', e => {
   if (e.key === 'Escape') { e.target.value = ''; onSearch(''); }
+});
+
+// Grid click delegation
+document.getElementById('grid').addEventListener('click', e => {
+  const btn = e.target.closest('[data-idx]');
+  if (btn) selectIcon(_gridList[parseInt(btn.dataset.idx)]);
+});
+
+// Recents click delegation
+document.getElementById('recents-chips').addEventListener('click', e => {
+  const btn = e.target.closest('[data-recent]');
+  if (btn) selectIcon(loadRecents()[parseInt(btn.dataset.recent)]);
+});
+
+// Detail copy button delegation
+document.getElementById('detail').addEventListener('click', e => {
+  const btn = e.target.closest('[data-copy]');
+  if (!btn) return;
+  const det = document.getElementById('detail');
+  const type = btn.dataset.copy;
+  if (type === 'emoji') copyText(det.dataset.emoji, 'Emoji');
+  if (type === 'cp')    copyText(det.dataset.cp, 'Code point');
+  if (type === 'html')  copyText(det.dataset.html, 'HTML entity');
 });
 </script>
 </body>

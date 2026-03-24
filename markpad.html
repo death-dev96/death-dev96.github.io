@@ -46,13 +46,13 @@ body{font-family:var(--body);background:var(--bg);color:var(--text);display:flex
 .fmt-sep{width:1px;height:16px;background:var(--border2);margin:0 2px}
 
 /* PANES */
-.panes{flex:1;display:flex;overflow:hidden;min-height:0}
-.editor-pane{flex:1;display:flex;flex-direction:column;border-right:1px solid var(--border);min-width:0}
+.panes{flex:1;display:flex;overflow:hidden;min-height:0;width:100%}
+.editor-pane{flex:1;display:flex;flex-direction:column;border-right:1px solid var(--border);min-width:0;overflow:hidden}
 .preview-pane{flex:1;overflow-y:auto;padding:32px 40px;background:var(--bg);min-width:0}
 .editor-pane.full,.preview-pane.full{flex:2}
 .editor-textarea{flex:1;border:none;background:transparent;color:var(--text);
   font-family:var(--mono);font-size:.87rem;line-height:1.85;
-  padding:24px 28px;resize:none;outline:none;tab-size:2}
+  padding:24px 28px;resize:none;outline:none;tab-size:2;overflow-y:auto;width:100%;height:100%}
 
 /* STATUSBAR */
 .statusbar{background:var(--surface);border-top:1px solid var(--border);
@@ -269,11 +269,16 @@ function setMode(m) {
   document.getElementById('btn-'+m).classList.add('active');
   document.getElementById('sb-mode').textContent = m.toUpperCase();
   if (m === 'edit') {
-    ep.style.display='flex'; ep.className='editor-pane full'; pp.style.display='none'; tb.style.display='flex';
+    ep.style.display='flex'; ep.className='editor-pane full';
+    pp.style.display='none'; tb.style.display='flex';
   } else if (m === 'preview') {
-    ep.style.display='none'; pp.style.display='block'; pp.className='preview-pane full'; tb.style.display='none'; renderPreview();
-  } else {
-    ep.style.display='flex'; ep.className='editor-pane'; pp.style.display='block'; pp.className='preview-pane'; tb.style.display='flex'; renderPreview();
+    ep.style.display='none';
+    pp.style.display='flex'; pp.className='preview-pane full';
+    tb.style.display='none'; renderPreview();
+  } else { // split
+    ep.style.display='flex'; ep.className='editor-pane';
+    pp.style.display='flex'; pp.className='preview-pane';
+    tb.style.display='flex'; renderPreview();
   }
 }
 

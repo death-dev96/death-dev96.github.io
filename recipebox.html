@@ -369,8 +369,9 @@ function renderIngRows(ings){
 function addIngRow(data){
   const el=document.getElementById('e-ings');
   const row=document.createElement('div');row.className='ing-edit-row';
+  const nameVal = data?.name || '';
   row.innerHTML=`<input class="field-input ing-amount-in" type="text" placeholder="Amount" value="${esc(data?.amount||'')}">
-    <input class="field-input ing-name-in" type="text" placeholder="Ingredient name" value="${esc((data?.name||'')+(data?.unit?' ('+data.unit+')':''))}">
+    <input class="field-input ing-name-in" type="text" placeholder="Ingredient name" value="${esc(nameVal)}">
     <button class="row-del" onclick="this.parentElement.remove()">✕</button>`;
   el.appendChild(row);
 }
@@ -438,6 +439,7 @@ function deleteRecipe(){
   recipes=recipes.filter(r=>r.id!==currentId);currentId=null;
   save();renderSidebar();
   document.getElementById('view-panel').classList.remove('active');
+  document.getElementById('edit-panel').classList.remove('active');
   document.getElementById('empty-state').style.display='flex';
 }
 

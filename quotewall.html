@@ -305,11 +305,11 @@ function renderGrid() {
     return;
   }
   grid.innerHTML = list.map(q => `
-    <div class="quote-card${q.starred?' featured-card':''}" onclick="setFeatured(getQuote('${q.id}'))">
+    <div class="quote-card${q.starred?' featured-card':''}" data-id="${q.id}">
       <div class="qc-actions">
-        <button class="qc-btn star" onclick="event.stopPropagation();toggleStar('${q.id}')" title="${q.starred?'Unstar':'Star'}">${q.starred?'★':'☆'}</button>
-        <button class="qc-btn" onclick="event.stopPropagation();copyQuote('${q.id}')" title="Copy">⎘</button>
-        <button class="qc-btn del" onclick="event.stopPropagation();deleteQuote('${q.id}')" title="Delete">✕</button>
+        <button class="qc-btn star" data-action="star" data-id="${q.id}" title="${q.starred?'Unstar':'Star'}">${q.starred?'★':'☆'}</button>
+        <button class="qc-btn" data-action="copy" data-id="${q.id}" title="Copy">⎘</button>
+        <button class="qc-btn del" data-action="del" data-id="${q.id}" title="Delete">✕</button>
       </div>
       <div class="qc-text">${esc(q.text)}</div>
       <div class="qc-meta">
@@ -406,6 +406,22 @@ function toast(msg,type='info'){
 document.addEventListener('keydown',e=>{
   if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
   if(e.key===' '||e.key==='r'){e.preventDefault();randomQuote();}
+});
+
+// Grid click delegation — handles quote cards and action buttons safely
+document.getElementById('quote-grid').addEventListener('click', e => {
+  const actionBtn = e.target.closest('[data-action]');
+  if (actionBtn) {
+    e.stopPropagation();
+    const id = actionBtn.dataset.id;
+    const action = actionBtn.dataset.action;
+    if (action === 'star')  toggleStar(id);
+    if (action === 'copy')  copyQuote(id);
+    if (action === 'del')   deleteQuote(id);
+    return;
+  }
+  const card = e.target.closest('.quote-card[data-id]');
+  if (card) setFeatured(getQuote(card.dataset.id));
 });
 
 init();

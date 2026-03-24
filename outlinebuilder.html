@@ -40,7 +40,7 @@ body{font-family:var(--body);background:var(--bg);color:var(--text);display:flex
 .outline-toolbar{padding:10px 16px;border-bottom:1px solid var(--border);background:var(--surface);
   display:flex;gap:6px;flex-shrink:0;align-items:center;flex-wrap:wrap}
 .hint{font-size:.68rem;color:var(--muted2);font-family:var(--mono);margin-left:auto}
-.outline-wrap{flex:1;overflow-y:auto;padding:16px 20px}
+.outline-wrap{flex:1;overflow-y:auto;padding:16px 20px;min-height:0}
 
 /* NODES */
 .node{position:relative;margin:2px 0}
@@ -129,10 +129,9 @@ body{font-family:var(--body);background:var(--bg);color:var(--text);display:flex
       <button class="tb-btn" onclick="focusFirst()">▶ Focus First</button>
       <span class="hint">Tab=indent · Shift+Tab=outdent · Enter=new item · Ctrl+↑↓=move</span>
     </div>
-    <div class="outline-wrap" id="outline-wrap">
-      <div style="color:var(--muted2);font-size:.85rem;font-style:italic;padding:20px 0;text-align:center" id="empty-hint">
-        Click "+ Add Item" or press Enter to start your outline
-      </div>
+    <div class="outline-wrap" id="outline-wrap"></div>
+    <div style="color:var(--muted2);font-size:.85rem;font-style:italic;padding:20px 0;text-align:center;display:none" id="empty-hint">
+      Click "+ Add Item" or press Enter to start your outline
     </div>
   </div>
 
@@ -190,12 +189,10 @@ function render() {
   const hint = document.getElementById('empty-hint');
   if (!outline.nodes.length) {
     wrap.innerHTML = '';
-    wrap.appendChild(hint);
-    hint.style.display='block';
+    hint.style.display = 'block';
     renderPreview(); return;
   }
-  hint.style.display='none';
-  const existingIds = new Set(wrap.querySelectorAll('.node').map ? [] : []);
+  hint.style.display = 'none';
   wrap.innerHTML = '';
   outline.nodes.forEach(n => wrap.appendChild(buildNodeEl(n, 0)));
   renderPreview();

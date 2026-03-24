@@ -198,7 +198,7 @@ function init() {
   entries = load();
   const ids = getSortedIds();
   if (ids.length) openEntry(ids[0]);
-  renderSidebar();
+  renderSidebar(searchTerm);
 }
 
 function getSortedIds() {
@@ -209,7 +209,7 @@ function getSortedIds() {
 function newEntry() {
   const id = todayId();
   if (!entries[id]) entries[id] = { content:'', mood:'', weather:'', created:Date.now(), updated:Date.now() };
-  save(); renderSidebar(); openEntry(id);
+  save(); renderSidebar(searchTerm); openEntry(id);
 }
 
 function openEntry(id) {
@@ -226,7 +226,7 @@ function openEntry(id) {
   document.querySelectorAll('.mood-btn[data-weather]').forEach(b => b.classList.toggle('selected', b.dataset.weather === entry.weather));
   updateWordCount();
   markSaved();
-  renderSidebar();
+  renderSidebar(searchTerm);
 }
 
 function setMood(btn) {
@@ -253,7 +253,7 @@ function deleteEntry() {
   delete entries[currentId]; save(); currentId = null;
   document.getElementById('entry-editor').style.display = 'none';
   document.getElementById('empty-state').style.display = 'flex';
-  renderSidebar();
+  renderSidebar(searchTerm);
   const ids = getSortedIds();
   if (ids.length) openEntry(ids[0]);
 }
@@ -265,7 +265,8 @@ function renderSidebar(filter) {
   if (filter) {
     ids = ids.filter(id => entries[id].content.toLowerCase().includes(filter.toLowerCase()));
   }
-  document.getElementById('sidebar-header').textContent = filter ? `Results (${ids.length})` : `All Entries (${ids.length})`;
+  const hasFilter = filter && filter.length > 0;
+  document.getElementById('sidebar-header').textContent = hasFilter ? `Results (${ids.length})` : `All Entries (${ids.length})`;
   if (!ids.length) { list.innerHTML = '<div style="padding:16px;color:var(--muted2);font-family:var(--mono);font-size:.75rem;text-align:center;font-style:italic">No entries found</div>'; return; }
   list.innerHTML = ids.map(id => {
     const e = entries[id];
@@ -300,12 +301,12 @@ function markSaved() { document.getElementById('save-dot').className = 'save-dot
 function autoSave() {
   if (!currentId) return;
   entries[currentId].updated = Date.now();
-  save(); renderSidebar(searchTerm||undefined); markSaved();
+  save(); renderSidebar(searchTerm); markSaved();
   document.getElementById('footer-date').textContent = 'Saved just now';
 }
 
 // ── SEARCH ────────────────────────────
-function onSearch(val) { searchTerm = val; renderSidebar(val||undefined); }
+function onSearch(val) { searchTerm = val; renderSidebar(val); }
 
 // ── EXPORT ────────────────────────────
 function exportAll() {

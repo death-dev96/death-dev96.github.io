@@ -238,7 +238,7 @@ function completePhase() {
     setPhase('work');
   }
   updateMainBtn();
-  try { new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAA==').play(); } catch(e){}
+  playBeep();
 }
 
 function skipPhase() {
@@ -392,12 +392,38 @@ function renderLaps() {
   ).join('');
 }
 
+// ── AUDIO ─────────────────────────────
+function playBeep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.setValueAtTime(660, ctx.currentTime + 0.15);
+    gain.gain.setValueAtTime(0.4, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.6);
+  } catch(e) {}
+}
+
 // ── TABS ──────────────────────────────
 function switchTab(t) {
-  document.getElementById('pomo-view').style.display = t==='pomo' ? 'flex' : 'none';
-  document.getElementById('sw-view').style.display = t==='sw' ? 'flex' : 'none';
-  document.getElementById('tab-pomo').classList.toggle('active', t==='pomo');
-  document.getElementById('tab-sw').classList.toggle('active', t==='sw');
+  // Pause stopwatch if leaving its tab while it's running
+  if (t === 'pomo' && swRunning) {
+    swElapsed += Date.now() - swStart;
+    clearInterval(swInterval); swInterval = null; swRunning = false;
+    document.getElementById('sw-btn').textContent = '▶ Start';
+  }
+  const pomoView = document.getElementById('pomo-view');
+  const swView   = document.getElementById('sw-view');
+  pomoView.style.display = t === 'pomo' ? 'flex' : 'none';
+  swView.style.display   = t === 'sw'   ? 'flex' : 'none';
+  document.getElementById('tab-pomo').classList.toggle('active', t === 'pomo');
+  document.getElementById('tab-sw').classList.toggle('active', t === 'sw');
 }
 
 // ── INIT ─────────────────────────────

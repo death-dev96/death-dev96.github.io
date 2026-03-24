@@ -227,17 +227,19 @@ function renderAll(){
     document.getElementById('count-'+shelf).textContent=list.length;
     const el=document.getElementById('shelf-'+shelf);
     if(!list.length){el.innerHTML=`<div class="empty-shelf">No items here yet</div>`;return;}
+    const nextShelfMap={want:'reading',reading:'read',read:'want'};
+    const nextLabelMap={want:'→ Reading',reading:'→ Finished',read:'→ Want'};
     el.innerHTML=list.map(item=>{
-      const stars='★★★★★'.split('').map((s,i)=>
-        `<button class="star-btn" onclick="event.stopPropagation();setRating('${item.id}',${i+1})" title="${i+1} star">${i<(item.rating||0)?'★':'☆'}</button>`
+      const stars='★★★★★'.split('').map((s,si)=>
+        `<button class="star-btn" data-action="star" data-id="${item.id}" data-rating="${si+1}" title="${si+1} star">${si<(item.rating||0)?'★':'☆'}</button>`
       ).join('');
       const typeCls={book:'badge-book',article:'badge-article',video:'badge-video',other:'badge-other'}[item.type]||'badge-other';
       const typeLabel={book:'📚 Book',article:'📰 Article',video:'🎬 Video',other:'📌 Other'}[item.type]||'Other';
-      const nextShelf={want:'reading',reading:'read',read:'want'}[shelf];
-      const nextLabel={want:'→ Reading',reading:'→ Finished',read:'→ Want'}[shelf];
-      return`<div class="book-card" onclick="editItem('${item.id}')">
+      const nextShelf=nextShelfMap[shelf];
+      const nextLabel=nextLabelMap[shelf];
+      return`<div class="book-card" data-action="edit" data-id="${item.id}">
         <div class="book-acts">
-          <button class="ba-btn del" onclick="event.stopPropagation();deleteItem('${item.id}')">✕</button>
+          <button class="ba-btn del" data-action="del" data-id="${item.id}">✕</button>
         </div>
         <span class="book-type-badge ${typeCls}">${typeLabel}</span>
         <div class="book-title">${esc(item.title)}</div>
@@ -246,7 +248,7 @@ function renderAll(){
         ${item.notes?`<div class="book-notes">${esc(item.notes)}</div>`:''}
         <div class="book-footer">
           <div class="book-rating">${stars}</div>
-          <button class="move-btn" onclick="event.stopPropagation();moveItem('${item.id}','${nextShelf}')">${nextLabel} →</button>
+          <button class="move-btn" data-action="move" data-id="${item.id}" data-shelf="${nextShelf}">${nextLabel} →</button>
         </div>
       </div>`;
     }).join('');
@@ -312,6 +314,20 @@ function setRating(id,r){const item=items.find(i=>i.id===id);if(item){item.ratin
 function closeModal(){document.getElementById('modal').classList.remove('open');}
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+// Delegation handler for all three shelves
+['shelf-want','shelf-reading','shelf-read'].forEach(shelfId=>{
+  document.getElementById(shelfId).addEventListener('click',e=>{
+    const btn=e.target.closest('[data-action]');
+    if(!btn)return;
+    const action=btn.dataset.action;
+    const id=btn.dataset.id;
+    if(action==='del'){e.stopPropagation();deleteItem(id);}
+    else if(action==='move'){e.stopPropagation();moveItem(id,btn.dataset.shelf);}
+    else if(action==='star'){e.stopPropagation();setRating(id,parseInt(btn.dataset.rating));}
+    else if(action==='edit'){editItem(id);}
+  });
+});
 
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function toast(msg){const w=document.getElementById('toast-wrap');const t=document.createElement('div');t.className='toast';t.textContent=msg;w.appendChild(t);setTimeout(()=>t.remove(),2200);}
