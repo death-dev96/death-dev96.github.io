@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PackList</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--surface:#1a1d27;--surface2:#22263a;--border:#2e3347;
+  --text:#e8eaf6;--muted:#8891b5;--accent:#06b6d4;
+  --green:#34d399;--yellow:#fbbf24;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+header h1{font-size:1.2rem;font-weight:700}header span{font-size:1.5rem}
+.hdr-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.btn{padding:7px 16px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:.82rem;font-weight:600;transition:all .15s}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn-primary{background:var(--accent);color:#0f1117;border-color:var(--accent)}.btn-primary:hover{opacity:.85}
+.progress-bar{height:4px;background:var(--surface2);width:100%;flex-shrink:0}
+.progress-fill{height:100%;background:var(--green);transition:width .3s}
+.layout{display:flex;flex:1;overflow:hidden}
+.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);padding:16px;overflow-y:auto;flex-shrink:0}
+.sidebar h3{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:10px}
+.trip-btn{width:100%;text-align:left;padding:8px 12px;background:none;border:1px solid transparent;border-radius:8px;color:var(--muted);cursor:pointer;font-size:.85rem;transition:all .15s;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.trip-btn.active,.trip-btn:hover{background:var(--surface2);border-color:var(--border);color:var(--text)}
+.trip-btn.active{border-color:var(--accent);color:var(--accent)}
+.add-trip{width:100%;margin-top:8px;padding:7px;border:1px dashed var(--border);border-radius:8px;background:none;color:var(--muted);cursor:pointer;font-size:.82rem;transition:all .15s}
+.add-trip:hover{border-color:var(--accent);color:var(--accent)}
+.main{flex:1;overflow-y:auto;padding:20px}
+.trip-title-row{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.trip-name-input{background:none;border:none;border-bottom:2px solid var(--border);color:var(--text);font-size:1.3rem;font-weight:700;padding:4px 0;outline:none;flex:1;transition:border-color .15s}
+.trip-name-input:focus{border-color:var(--accent)}
+.stats-row{display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.stat-chip{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-size:.82rem;color:var(--muted)}
+.stat-chip strong{color:var(--accent)}
+.templates-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.tpl-btn{padding:5px 12px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;font-size:.8rem;transition:all .15s}
+.tpl-btn:hover{border-color:var(--accent);color:var(--accent)}
+.cat-block{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:14px;overflow:hidden}
+.cat-header{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;user-select:none;border-bottom:1px solid var(--border)}
+.cat-header:hover{background:var(--surface2)}
+.cat-icon{font-size:1.1rem;width:26px;text-align:center}
+.cat-name{font-weight:600;font-size:.9rem;flex:1}
+.cat-count{font-size:.78rem;color:var(--muted)}
+.cat-toggle{color:var(--muted);font-size:.8rem;transition:transform .2s}
+.cat-toggle.open{transform:rotate(90deg)}
+.cat-items{padding:8px 0}
+.item-row{display:flex;align-items:center;gap:10px;padding:6px 16px;transition:background .12s}
+.item-row:hover{background:var(--surface2)}
+.item-row input[type=checkbox]{accent-color:var(--accent);width:16px;height:16px;cursor:pointer}
+.item-label{flex:1;font-size:.88rem;cursor:pointer}
+.item-label.done{text-decoration:line-through;color:var(--muted)}
+.qty-input{width:48px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:3px 6px;font-size:.8rem;text-align:center;outline:none}
+.del-item{background:none;border:none;color:var(--border);cursor:pointer;padding:2px 6px;border-radius:4px;font-size:.85rem;transition:color .12s;opacity:0}
+.item-row:hover .del-item{opacity:1}
+.del-item:hover{color:#f87171}
+.add-item-row{display:flex;gap:8px;padding:8px 16px;border-top:1px solid var(--border)}
+.add-item-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:6px 10px;font-size:.85rem;outline:none}
+.add-item-input:focus{border-color:var(--accent)}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted);font-size:.9rem}
+</style>
+</head>
+<body>
+<header>
+  <span>🧳</span>
+  <h1>PackList</h1>
+  <div class="hdr-actions">
+    <span id="prog-label" style="font-size:.82rem;color:var(--muted)"></span>
+    <button class="btn" onclick="checkAll()">Check All</button>
+    <button class="btn" onclick="clearChecked()">Clear Done</button>
+  </div>
+</header>
+<div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+<div class="layout">
+  <div class="sidebar">
+    <h3>Trips</h3>
+    <div id="trip-list"></div>
+    <button class="add-trip" onclick="newTrip()">+ New Trip</button>
+    <div style="margin-top:24px">
+      <h3>Quick Stats</h3>
+      <div id="sidebar-stats" style="font-size:.8rem;color:var(--muted);margin-top:8px;line-height:1.8"></div>
+    </div>
+  </div>
+  <div class="main" id="main-area">
+    <div class="empty-state">Select or create a trip to get started 🧳</div>
+  </div>
+</div>
+<script>
+const STORAGE_KEY='packlist_v1';
+const TEMPLATES={
+  'Beach Trip':{'Clothing':['Swimsuit x2','Cover-up','Sunhat','Flip flops','Casual outfits x3'],'Toiletries':['Sunscreen SPF50','After-sun lotion','Shampoo','Toothbrush','Toothpaste'],'Beach Gear':['Towel','Beach bag','Sunglasses','Book/Kindle'],'Documents':['Passport/ID','Travel insurance','Hotel booking']},
+  'Winter Trip':{'Clothing':['Heavy coat','Thermal base layer','Wool socks x5','Gloves','Scarf','Beanie','Boots'],'Toiletries':['Lip balm','Moisturizer','Toothbrush','Toothpaste'],'Gear':['Hand warmers','Umbrella'],'Documents':['Passport/ID','Hotel booking']},
+  'Business Trip':{'Clothing':['Dress shirts x3','Suit/Blazer','Dress shoes','Casual outfit x1','Tie'],'Tech':['Laptop','Charger','USB-C hub','Headphones','Phone charger'],'Toiletries':['Toothbrush','Toothpaste','Deodorant','Razor'],'Documents':['Passport/ID','Business cards','Presentation USB']},
+  'Backpacking':{'Clothing':['Merino t-shirts x3','Hiking pants x2','Rain jacket','Hiking boots','Wool socks x4'],'Gear':['Backpack','Sleeping bag','First aid kit','Headlamp','Water bottle'],'Toiletries':['Biodegradable soap','Toothbrush','Sunscreen'],'Documents':['Passport/ID','Travel insurance','Maps']},
+};
+const CAT_ICONS={'Clothing':'👗','Toiletries':'🧴','Tech':'💻','Gear':'🎒','Documents':'📄','Beach Gear':'🏖️','Winter Gear':'❄️','Food':'🍎','Health':'💊','Entertainment':'🎮','Other':'📦'};
+
+let data=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{"trips":[],"active":null}');
+if(!data.trips) data.trips=[];
+
+function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(data))}
+
+function newTrip(){
+  const trip={id:Date.now(),name:'New Trip',cats:{}};
+  data.trips.push(trip);
+  data.active=trip.id;
+  save();renderAll();
+}
+function selectTrip(id){data.active=id;renderAll();}
+
+function renderSidebar(){
+  const el=document.getElementById('trip-list');
+  el.innerHTML=data.trips.map(t=>{
+    const {total,done}=tripStats(t);
+    return `<button class="trip-btn ${t.id===data.active?'active':''}" onclick="selectTrip(${t.id})">
+      <span>🧳</span><span style="flex:1">${esc(t.name)}</span>
+      <span style="font-size:.75rem;opacity:.6">${done}/${total}</span>
+    </button>`;
+  }).join('');
+  // sidebar stats
+  const active=getActive();
+  const ss=document.getElementById('sidebar-stats');
+  if(active){
+    const {total,done}=tripStats(active);
+    ss.innerHTML=`${done} of ${total} packed<br>${total-done} remaining`;
+  }
+}
+function tripStats(t){
+  let total=0,done=0;
+  Object.values(t.cats||{}).forEach(items=>items.forEach(i=>{total++;if(i.done)done++;}));
+  return{total,done};
+}
+function getActive(){return data.trips.find(t=>t.id===data.active)}
+
+function renderMain(){
+  const ma=document.getElementById('main-area');
+  const trip=getActive();
+  if(!trip){ma.innerHTML='<div class="empty-state">Select or create a trip to get started 🧳</div>';return;}
+
+  const {total,done}=tripStats(trip);
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-label').textContent=total?`${pct}% packed (${done}/${total})`:'';
+
+  let html=`<div class="trip-title-row">
+    <input class="trip-name-input" value="${esc(trip.name)}" onchange="renameTrip(${trip.id},this.value)" placeholder="Trip name">
+    <button class="btn btn-primary" onclick="deleteTrip(${trip.id})" style="background:#f871711a;border-color:#f87171;color:#f87171">🗑 Delete</button>
+  </div>
+  <div class="stats-row">
+    <div class="stat-chip">Total: <strong>${total}</strong></div>
+    <div class="stat-chip">Packed: <strong>${done}</strong></div>
+    <div class="stat-chip">Remaining: <strong>${total-done}</strong></div>
+    <div class="stat-chip">Progress: <strong>${pct}%</strong></div>
+  </div>
+  <div class="templates-bar">
+    <span style="font-size:.8rem;color:var(--muted);align-self:center">Templates:</span>
+    ${Object.keys(TEMPLATES).map(n=>`<button class="tpl-btn" onclick="applyTemplate('${n}')">${n}</button>`).join('')}
+    <button class="tpl-btn" style="border-color:var(--accent);color:var(--accent)" onclick="addCategory()">+ Category</button>
+  </div>`;
+
+  const cats=trip.cats||{};
+  Object.entries(cats).forEach(([cat,items])=>{
+    const icon=CAT_ICONS[cat]||'📦';
+    const catDone=items.filter(i=>i.done).length;
+    html+=`<div class="cat-block">
+      <div class="cat-header" onclick="toggleCat('${esc(cat)}')">
+        <span class="cat-icon">${icon}</span>
+        <span class="cat-name">${esc(cat)}</span>
+        <span class="cat-count">${catDone}/${items.length}</span>
+        <button onclick="event.stopPropagation();deleteCategory('${esc(cat)}')" style="background:none;border:none;color:var(--muted);cursor:pointer;padding:2px 6px;font-size:.8rem" title="Delete category">✕</button>
+        <span class="cat-toggle open">▶</span>
+      </div>
+      <div class="cat-items" id="catbody-${CSS.escape(cat)}">
+        ${items.map((item,idx)=>`<div class="item-row">
+          <input type="checkbox" ${item.done?'checked':''} onchange="toggleItem('${esc(cat)}',${idx},this.checked)">
+          <label class="item-label ${item.done?'done':''}">${esc(item.name)}</label>
+          <button class="del-item" onclick="deleteItem('${esc(cat)}',${idx})">✕</button>
+        </div>`).join('')}
+        <div class="add-item-row">
+          <input class="add-item-input" placeholder="Add item…" onkeydown="if(event.key==='Enter')addItem('${esc(cat)}',this)">
+          <button class="btn" onclick="addItem('${esc(cat)}',this.previousElementSibling)">Add</button>
+        </div>
+      </div>
+    </div>`;
+  });
+  ma.innerHTML=html;
+}
+
+function renderAll(){renderSidebar();renderMain();}
+
+function renameTrip(id,name){
+  const t=data.trips.find(t=>t.id===id);
+  if(t){t.name=name;save();renderSidebar();}
+}
+function deleteTrip(id){
+  data.trips=data.trips.filter(t=>t.id!==id);
+  if(data.active===id) data.active=data.trips[0]?.id||null;
+  save();renderAll();
+}
+function applyTemplate(name){
+  const trip=getActive();
+  if(!trip) return;
+  const tpl=TEMPLATES[name];
+  if(!trip.cats) trip.cats={};
+  Object.entries(tpl).forEach(([cat,items])=>{
+    if(!trip.cats[cat]) trip.cats[cat]=[];
+    items.forEach(name=>{
+      if(!trip.cats[cat].find(i=>i.name===name))
+        trip.cats[cat].push({name,done:false});
+    });
+  });
+  save();renderMain();
+}
+function addCategory(){
+  const name=prompt('Category name:');
+  if(!name) return;
+  const trip=getActive();
+  if(!trip.cats) trip.cats={};
+  if(!trip.cats[name]) trip.cats[name]=[];
+  save();renderMain();
+}
+function deleteCategory(cat){
+  const trip=getActive();
+  if(trip&&trip.cats) {delete trip.cats[cat];save();renderMain();}
+}
+function addItem(cat,inp){
+  const name=inp.value.trim();
+  if(!name) return;
+  const trip=getActive();
+  if(!trip.cats[cat]) trip.cats[cat]=[];
+  trip.cats[cat].push({name,done:false});
+  inp.value='';
+  save();renderMain();
+}
+function deleteItem(cat,idx){
+  const trip=getActive();
+  trip.cats[cat].splice(idx,1);
+  save();renderMain();
+}
+function toggleItem(cat,idx,checked){
+  const trip=getActive();
+  trip.cats[cat][idx].done=checked;
+  save();renderMain();
+}
+function toggleCat(cat){
+  const el=document.getElementById('catbody-'+CSS.escape(cat));
+  if(el) el.style.display=el.style.display==='none'?'block':'none';
+}
+function checkAll(){
+  const trip=getActive();
+  if(!trip) return;
+  Object.values(trip.cats||{}).forEach(items=>items.forEach(i=>i.done=true));
+  save();renderMain();
+}
+function clearChecked(){
+  const trip=getActive();
+  if(!trip) return;
+  Object.keys(trip.cats||{}).forEach(cat=>{trip.cats[cat]=trip.cats[cat].filter(i=>!i.done);});
+  save();renderMain();
+}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+renderAll();
+</script>
+</body>
+</html>

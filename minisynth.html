@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MiniSynth</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--surface:#1a1d27;--surface2:#22263a;--border:#2e3347;
+  --text:#e8eaf6;--muted:#8891b5;--accent:#f472b6;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;gap:12px}
+header h1{font-size:1.1rem;font-weight:700}header span{font-size:1.4rem}
+.sub{color:var(--muted);font-size:.78rem;margin-left:auto}
+main{flex:1;padding:20px;max-width:900px;margin:0 auto;width:100%}
+/* Controls Panel */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:20px}
+.panel-title{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:14px;font-weight:700}
+.knob-row{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end}
+.knob-group{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:70px}
+.knob-group label{font-size:.7rem;color:var(--muted);text-align:center}
+.knob-group input[type=range]{writing-mode:horizontal-tb;width:80px;accent-color:var(--accent)}
+.knob-val{font-size:.75rem;color:var(--accent);font-weight:700;min-width:36px;text-align:center}
+.waveform-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.wave-btn{padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);cursor:pointer;font-size:.85rem;font-weight:700;transition:all .12s;font-family:monospace}
+.wave-btn.active{background:var(--accent);color:#0f1117;border-color:var(--accent)}
+.wave-btn:hover:not(.active){border-color:var(--accent);color:var(--accent)}
+/* Octave */
+.oct-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.oct-btn{padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:.85rem;font-weight:700;transition:all .12s}
+.oct-btn:hover{border-color:var(--accent);color:var(--accent)}
+.oct-label{font-size:.85rem;color:var(--muted)}
+.oct-val{font-size:1rem;font-weight:700;color:var(--accent);min-width:24px;text-align:center}
+/* Keyboard */
+.kbd-wrap{overflow-x:auto;padding-bottom:8px;margin-bottom:16px}
+.keyboard{display:flex;position:relative;height:130px;user-select:none;width:fit-content}
+.key{cursor:pointer;transition:background .06s;outline:none}
+.key.white{width:40px;height:130px;background:#e8e8e8;border:1px solid #888;border-radius:0 0 6px 6px;z-index:1;margin-right:1px;position:relative}
+.key.black{width:26px;height:82px;background:#181818;border-radius:0 0 5px 5px;position:absolute;z-index:2;top:0}
+.key.white:hover,.key.white.pressed{background:var(--accent)!important;border-color:var(--accent)}
+.key.black:hover,.key.black.pressed{background:var(--accent)!important}
+.key .klabel{position:absolute;bottom:5px;left:50%;transform:translateX(-50%);font-size:.55rem;color:#999;pointer-events:none;white-space:nowrap}
+.key.white:hover .klabel,.key.white.pressed .klabel,.key.black:hover .klabel,.key.black.pressed .klabel{color:#0f1117}
+/* Computer keyboard map */
+.kb-hint{font-size:.75rem;color:var(--muted);margin-top:8px;text-align:center}
+/* Visualizer */
+canvas{width:100%;height:70px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);display:block}
+</style>
+</head>
+<body>
+<header>
+  <span>🎹</span>
+  <h1>MiniSynth</h1>
+  <div class="sub">Web Audio Synthesizer — click keys or use keyboard</div>
+</header>
+<main>
+  <div class="panel">
+    <div class="panel-title">Oscillator</div>
+    <div class="waveform-row">
+      <span style="font-size:.8rem;color:var(--muted);margin-right:4px">Wave:</span>
+      <button class="wave-btn active" data-w="sine" onclick="setWave('sine',this)">∿ Sine</button>
+      <button class="wave-btn" data-w="square" onclick="setWave('square',this)">⊓ Square</button>
+      <button class="wave-btn" data-w="sawtooth" onclick="setWave('sawtooth',this)">/ Saw</button>
+      <button class="wave-btn" data-w="triangle" onclick="setWave('triangle',this)">△ Tri</button>
+    </div>
+    <div class="knob-row">
+      <div class="knob-group">
+        <label>Attack</label>
+        <input type="range" id="attack" min="0.001" max="2" step="0.01" value="0.01" oninput="updateKnob('attack',this.value,'s')">
+        <span class="knob-val" id="v-attack">0.01s</span>
+      </div>
+      <div class="knob-group">
+        <label>Decay</label>
+        <input type="range" id="decay" min="0.01" max="3" step="0.01" value="0.1" oninput="updateKnob('decay',this.value,'s')">
+        <span class="knob-val" id="v-decay">0.1s</span>
+      </div>
+      <div class="knob-group">
+        <label>Sustain</label>
+        <input type="range" id="sustain" min="0" max="1" step="0.01" value="0.7" oninput="updateKnob('sustain',this.value,'')">
+        <span class="knob-val" id="v-sustain">0.7</span>
+      </div>
+      <div class="knob-group">
+        <label>Release</label>
+        <input type="range" id="release" min="0.01" max="5" step="0.01" value="0.3" oninput="updateKnob('release',this.value,'s')">
+        <span class="knob-val" id="v-release">0.3s</span>
+      </div>
+      <div class="knob-group">
+        <label>Volume</label>
+        <input type="range" id="volume" min="0" max="1" step="0.01" value="0.5" oninput="updateKnob('volume',this.value,'')">
+        <span class="knob-val" id="v-volume">0.5</span>
+      </div>
+      <div class="knob-group">
+        <label>Reverb</label>
+        <input type="range" id="reverb" min="0" max="1" step="0.01" value="0.2" oninput="updateKnob('reverb',this.value,'')">
+        <span class="knob-val" id="v-reverb">0.2</span>
+      </div>
+      <div class="knob-group">
+        <label>Detune</label>
+        <input type="range" id="detune" min="-50" max="50" step="1" value="0" oninput="updateKnob('detune',this.value,'c')">
+        <span class="knob-val" id="v-detune">0c</span>
+      </div>
+    </div>
+  </div>
+  <div class="oct-row">
+    <button class="oct-btn" onclick="changeOctave(-1)">▼ Oct</button>
+    <span class="oct-label">Octave:</span>
+    <span class="oct-val" id="oct-val">4</span>
+    <button class="oct-btn" onclick="changeOctave(1)">▲ Oct</button>
+    <span style="font-size:.78rem;color:var(--muted);margin-left:12px">Hold multiple keys to play chords</span>
+  </div>
+  <div class="kbd-wrap"><div class="keyboard" id="keyboard"></div></div>
+  <div class="kb-hint">Keyboard: A S D F G H J K (white) | W E T Y U (black) &nbsp;·&nbsp; Z/X = octave down/up</div>
+  <canvas id="visualizer"></canvas>
+</main>
+<script>
+let actx=null, masterGain, analyser, reverbGain, dryGain;
+let waveform='sine', octave=4;
+const activeOscs={};
+
+const NOTE_NAMES=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+function noteFreq(n,oct){return 440*Math.pow(2,(n-9)/12+oct-4);}
+
+function initAudio(){
+  if(actx) return;
+  actx=new(window.AudioContext||window.webkitAudioContext)();
+  masterGain=actx.createGain();
+  masterGain.gain.value=0.5;
+  analyser=actx.createAnalyser();
+  analyser.fftSize=512;
+  masterGain.connect(analyser);
+  analyser.connect(actx.destination);
+  drawViz();
+}
+
+function getParams(){
+  return{
+    attack:parseFloat(document.getElementById('attack').value),
+    decay:parseFloat(document.getElementById('decay').value),
+    sustain:parseFloat(document.getElementById('sustain').value),
+    release:parseFloat(document.getElementById('release').value),
+    volume:parseFloat(document.getElementById('volume').value),
+    reverb:parseFloat(document.getElementById('reverb').value),
+    detune:parseFloat(document.getElementById('detune').value),
+  };
+}
+
+function noteOn(noteId, freq){
+  if(activeOscs[noteId]) return;
+  initAudio();
+  const p=getParams();
+  const now=actx.currentTime;
+  const osc=actx.createOscillator();
+  const gain=actx.createGain();
+  osc.type=waveform;
+  osc.frequency.value=freq;
+  osc.detune.value=p.detune;
+  gain.gain.setValueAtTime(0,now);
+  gain.gain.linearRampToValueAtTime(p.volume,now+p.attack);
+  gain.gain.linearRampToValueAtTime(p.volume*p.sustain,now+p.attack+p.decay);
+  osc.connect(gain);
+  gain.connect(masterGain);
+  osc.start();
+  activeOscs[noteId]={osc,gain};
+}
+function noteOff(noteId){
+  const entry=activeOscs[noteId];
+  if(!entry) return;
+  const p=getParams();
+  const now=actx.currentTime;
+  entry.gain.gain.cancelScheduledValues(now);
+  entry.gain.gain.setValueAtTime(entry.gain.gain.value,now);
+  entry.gain.gain.linearRampToValueAtTime(0,now+p.release);
+  entry.osc.stop(now+p.release+0.05);
+  delete activeOscs[noteId];
+}
+
+function setWave(w,el){
+  waveform=w;
+  document.querySelectorAll('.wave-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+function changeOctave(d){octave=Math.max(1,Math.min(7,octave+d));document.getElementById('oct-val').textContent=octave;}
+function updateKnob(id,val,unit){document.getElementById('v-'+id).textContent=parseFloat(val).toFixed(2).replace(/\.?0+$/,'')+unit;if(id==='volume'&&masterGain) masterGain.gain.value=parseFloat(val);}
+
+// Build keyboard (2 octaves)
+const WHITE_NOTES=[0,2,4,5,7,9,11]; // C D E F G A B
+const BLACK_MAP={0:null,2:1,4:3,5:null,7:6,9:8,11:10}; // black key indices
+function buildKeyboard(){
+  const kb=document.getElementById('keyboard');
+  kb.innerHTML='';
+  const octs=[0,1];
+  let wPos=0;
+  octs.forEach(oe=>{
+    WHITE_NOTES.forEach((n,wi)=>{
+      const noteNum=n;
+      const freq=noteFreq(noteNum,octave+oe);
+      const nid=`${noteNum}_${octave+oe}`;
+      const div=document.createElement('div');
+      div.className='key white';
+      div.dataset.nid=nid;
+      div.dataset.freq=freq;
+      const lbl=document.createElement('div');
+      lbl.className='klabel';
+      lbl.textContent=NOTE_NAMES[n]+(n===0?(octave+oe):'');
+      div.appendChild(lbl);
+      div.addEventListener('pointerdown',e=>{e.preventDefault();noteOn(nid,freq);div.classList.add('pressed');});
+      div.addEventListener('pointerup',()=>{noteOff(nid);div.classList.remove('pressed');});
+      div.addEventListener('pointerleave',()=>{noteOff(nid);div.classList.remove('pressed');});
+      kb.appendChild(div);
+      wPos++;
+    });
+  });
+  // Black keys
+  let wIdx=0;
+  octs.forEach(oe=>{
+    const blackDefs=[{wi:1,n:1},{wi:2,n:3},{wi:4,n:6},{wi:5,n:8},{wi:6,n:10}];
+    blackDefs.forEach(({wi,n})=>{
+      const freq=noteFreq(n,octave+oe);
+      const nid=`${n}_${octave+oe}`;
+      const x=(oe*7+wi)*41-14;
+      const div=document.createElement('div');
+      div.className='key black';
+      div.dataset.nid=nid;
+      div.dataset.freq=freq;
+      div.style.left=x+'px';
+      div.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();noteOn(nid,freq);div.classList.add('pressed');});
+      div.addEventListener('pointerup',()=>{noteOff(nid);div.classList.remove('pressed');});
+      div.addEventListener('pointerleave',()=>{noteOff(nid);div.classList.remove('pressed');});
+      kb.appendChild(div);
+    });
+  });
+}
+
+// Computer keyboard mapping
+const KB_WHITE='asdfjhk;'.split('');  // simpler map
+const KB_MAP={
+  'a':{n:0},'w':{n:1},'s':{n:2},'e':{n:3},'d':{n:4},'f':{n:5},'t':{n:6},'g':{n:7},'y':{n:8},'h':{n:9},'u':{n:10},'j':{n:11},
+  'k':{n:12},'o':{n:13},'l':{n:14},';':{n:15},'p':{n:17}
+};
+const heldKeys=new Set();
+document.addEventListener('keydown',e=>{
+  if(e.repeat) return;
+  if(e.key==='z'){changeOctave(-1);return;}
+  if(e.key==='x'){changeOctave(1);return;}
+  const k=e.key.toLowerCase();
+  if(KB_MAP[k]!==undefined && !heldKeys.has(k)){
+    heldKeys.add(k);
+    const {n}=KB_MAP[k];
+    const oe=n>=12?1:0;
+    const noteNum=n%12;
+    const freq=noteFreq(noteNum,octave+oe);
+    const nid=`${noteNum}_${octave+oe}_kb_${k}`;
+    noteOn(nid,freq);
+    // Visual feedback
+    document.querySelectorAll(`.key`).forEach(div=>{
+      if(parseFloat(div.dataset.freq)===Math.round(freq*100)/100) div.classList.add('pressed');
+    });
+  }
+});
+document.addEventListener('keyup',e=>{
+  const k=e.key.toLowerCase();
+  if(heldKeys.has(k)){
+    heldKeys.delete(k);
+    const {n}=KB_MAP[k]||{};
+    if(n!==undefined){
+      const oe=n>=12?1:0;
+      const noteNum=n%12;
+      const nid=`${noteNum}_${octave+oe}_kb_${k}`;
+      noteOff(nid);
+      const freq=noteFreq(noteNum,octave+oe);
+      document.querySelectorAll('.key').forEach(div=>{
+        if(parseFloat(div.dataset.freq)===Math.round(freq*100)/100) div.classList.remove('pressed');
+      });
+    }
+  }
+});
+
+// Visualizer
+function drawViz(){
+  const canvas=document.getElementById('visualizer');
+  const ctx=canvas.getContext('2d');
+  canvas.width=canvas.offsetWidth;
+  canvas.height=canvas.offsetHeight;
+  function frame(){
+    requestAnimationFrame(frame);
+    if(!analyser){ctx.clearRect(0,0,canvas.width,canvas.height);return;}
+    const buf=new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteTimeDomainData(buf);
+    ctx.fillStyle='#22263a';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.strokeStyle='#f472b6';
+    ctx.lineWidth=2;
+    ctx.beginPath();
+    const sliceW=canvas.width/buf.length;
+    buf.forEach((v,i)=>{
+      const y=(v/128-1)*canvas.height/2+canvas.height/2;
+      i===0?ctx.moveTo(0,y):ctx.lineTo(i*sliceW,y);
+    });
+    ctx.stroke();
+  }
+  frame();
+}
+
+buildKeyboard();
+</script>
+</body>
+</html>

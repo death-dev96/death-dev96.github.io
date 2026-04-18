@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CipherBox</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--surface:#1a1d27;--surface2:#22263a;--border:#2e3347;
+  --text:#e8eaf6;--muted:#8891b5;--accent:#7c6cfc;
+  --green:#34d399;--red:#f87171;--yellow:#fbbf24;--cyan:#22d3ee;
+  --orange:#fb923c;--pink:#f472b6;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:1.2rem;font-weight:700}header span{font-size:1.5rem}
+.sub{color:var(--muted);font-size:.8rem;margin-left:auto}
+main{flex:1;padding:24px;max-width:960px;margin:0 auto;width:100%}
+.cipher-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+.ctab{padding:7px 16px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;font-size:.85rem;transition:all .15s}
+.ctab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.cipher-panel{display:none}.cipher-panel.active{display:block}
+.io-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+@media(max-width:600px){.io-row{grid-template-columns:1fr}}
+label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+textarea{width:100%;height:140px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:12px;font-family:monospace;font-size:.9rem;resize:vertical;outline:none;transition:border-color .15s}
+textarea:focus{border-color:var(--accent)}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.btn{padding:8px 18px;border-radius:8px;border:none;cursor:pointer;font-size:.85rem;font-weight:600;transition:all .15s}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{opacity:.85}
+.btn-sec{background:var(--surface2);color:var(--text);border:1px solid var(--border)}.btn-sec:hover{border-color:var(--accent)}
+.btn-swap{background:var(--surface2);border:1px solid var(--border);color:var(--cyan)}.btn-swap:hover{border-color:var(--cyan)}
+input[type=number],input[type=text]{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:7px 12px;font-size:.9rem;outline:none;width:90px}
+input:focus{border-color:var(--accent)}
+.param-group{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted)}
+.copy-btn{margin-left:auto;padding:6px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;color:var(--cyan);cursor:pointer;font-size:.8rem}
+.copy-btn:hover{border-color:var(--cyan)}
+.ref-box{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:8px;font-size:.82rem;line-height:1.8;color:var(--muted);font-family:monospace}
+.ref-box strong{color:var(--text)}
+.morse-table{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:4px;margin-top:10px;max-height:160px;overflow-y:auto}
+.mt-cell{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:.78rem;display:flex;gap:6px}
+.mt-char{color:var(--accent);font-weight:700;width:16px}
+.mt-code{color:var(--text)}
+</style>
+</head>
+<body>
+<header>
+  <span>🔐</span>
+  <h1>CipherBox</h1>
+  <div class="sub">Encode &amp; decode classic ciphers</div>
+</header>
+<main>
+  <div class="cipher-tabs">
+    <button class="ctab active" onclick="setTab('caesar')">Caesar</button>
+    <button class="ctab" onclick="setTab('rot13')">ROT-13</button>
+    <button class="ctab" onclick="setTab('atbash')">Atbash</button>
+    <button class="ctab" onclick="setTab('vigenere')">Vigenère</button>
+    <button class="ctab" onclick="setTab('morse')">Morse Code</button>
+    <button class="ctab" onclick="setTab('binary')">Binary</button>
+  </div>
+
+  <!-- CAESAR -->
+  <div class="cipher-panel active" id="panel-caesar">
+    <div class="controls">
+      <div class="param-group">Shift: <input type="number" id="caesar-shift" value="3" min="1" max="25" style="width:70px"></div>
+      <button class="btn btn-primary" onclick="run('caesar','enc')">Encode →</button>
+      <button class="btn btn-primary" onclick="run('caesar','dec')">← Decode</button>
+      <button class="btn btn-swap" onclick="swapIO()">⇅ Swap</button>
+    </div>
+    <div class="io-row">
+      <div><label>Input</label><textarea id="cipher-in" placeholder="Type your text here…"></textarea></div>
+      <div><label>Output <button class="copy-btn" onclick="copyOut()">Copy</button></label><textarea id="cipher-out" readonly placeholder="Result appears here…"></textarea></div>
+    </div>
+    <div class="ref-box"><strong>Caesar cipher</strong> shifts each letter by N positions in the alphabet. ROT-3 by default.<br>A→D, B→E … Z→C (wraps around). Non-letters are unchanged.</div>
+  </div>
+
+  <!-- ROT13 -->
+  <div class="cipher-panel" id="panel-rot13">
+    <div class="controls">
+      <button class="btn btn-primary" onclick="run('rot13','enc')">Apply ROT-13</button>
+      <button class="btn btn-swap" onclick="swapIO()">⇅ Swap</button>
+    </div>
+    <div class="io-row">
+      <div><label>Input</label><textarea id="cipher-in" placeholder="Type your text here…"></textarea></div>
+      <div><label>Output <button class="copy-btn" onclick="copyOut()">Copy</button></label><textarea id="cipher-out" readonly placeholder="Result appears here…"></textarea></div>
+    </div>
+    <div class="ref-box"><strong>ROT-13</strong> is a Caesar cipher with a shift of 13. Applying it twice gives the original text (encode = decode).<br>Common in online forums to hide spoilers.</div>
+  </div>
+
+  <!-- ATBASH -->
+  <div class="cipher-panel" id="panel-atbash">
+    <div class="controls">
+      <button class="btn btn-primary" onclick="run('atbash','enc')">Apply Atbash</button>
+      <button class="btn btn-swap" onclick="swapIO()">⇅ Swap</button>
+    </div>
+    <div class="io-row">
+      <div><label>Input</label><textarea id="cipher-in" placeholder="Type your text here…"></textarea></div>
+      <div><label>Output <button class="copy-btn" onclick="copyOut()">Copy</button></label><textarea id="cipher-out" readonly placeholder="Result appears here…"></textarea></div>
+    </div>
+    <div class="ref-box"><strong>Atbash</strong> reverses the alphabet: A↔Z, B↔Y, C↔X…<br>Originally used for Hebrew, it is self-reciprocal — encode and decode are the same operation.</div>
+  </div>
+
+  <!-- VIGENÈRE -->
+  <div class="cipher-panel" id="panel-vigenere">
+    <div class="controls">
+      <div class="param-group">Key: <input type="text" id="vig-key" value="SECRET" placeholder="keyword" style="width:120px;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()"></div>
+      <button class="btn btn-primary" onclick="run('vigenere','enc')">Encode →</button>
+      <button class="btn btn-primary" onclick="run('vigenere','dec')">← Decode</button>
+      <button class="btn btn-swap" onclick="swapIO()">⇅ Swap</button>
+    </div>
+    <div class="io-row">
+      <div><label>Input</label><textarea id="cipher-in" placeholder="Type your text here…"></textarea></div>
+      <div><label>Output <button class="copy-btn" onclick="copyOut()">Copy</button></label><textarea id="cipher-out" readonly placeholder="Result appears here…"></textarea></div>
+    </div>
+    <div class="ref-box"><strong>Vigenère cipher</strong> uses a keyword to vary the Caesar shift for each letter. The key repeats to match the message length. Much stronger than simple Caesar.</div>
+  </div>
+
+  <!-- MORSE -->
+  <div class="cipher-panel" id="panel-morse">
+    <div class="controls">
+      <button class="btn btn-primary" onclick="run('morse','enc')">Text → Morse</button>
+      <button class="btn btn-primary" onclick="run('morse','dec')">Morse → Text</button>
+      <button class="btn btn-swap" onclick="swapIO()">⇅ Swap</button>
+    </div>
+    <div class="io-row">
+      <div><label>Input</label><textarea id="cipher-in" placeholder="Text or morse (dots/dashes separated by spaces)…"></textarea></div>
+      <div><label>Output <button class="copy-btn" onclick="copyOut()">Copy</button></label><textarea id="cipher-out" readonly placeholder="Result appears here…"></textarea></div>
+    </div>
+    <div class="ref-box"><strong>Morse code</strong> reference (word separator = /):
+      <div class="morse-table" id="morse-table"></div>
+    </div>
+  </div>
+
+  <!-- BINARY -->
+  <div class="cipher-panel" id="panel-binary">
+    <div class="controls">
+      <button class="btn btn-primary" onclick="run('binary','enc')">Text → Binary</button>
+      <button class="btn btn-primary" onclick="run('binary','dec')">Binary → Text</button>
+      <button class="btn btn-swap" onclick="swapIO()">⇅ Swap</button>
+    </div>
+    <div class="io-row">
+      <div><label>Input</label><textarea id="cipher-in" placeholder="Text or 8-bit binary groups…"></textarea></div>
+      <div><label>Output <button class="copy-btn" onclick="copyOut()">Copy</button></label><textarea id="cipher-out" readonly placeholder="Result appears here…"></textarea></div>
+    </div>
+    <div class="ref-box"><strong>Binary encoding</strong> converts each character to its 8-bit ASCII representation.<br>Example: "A" → 01000001 &nbsp; "a" → 01100001</div>
+  </div>
+</main>
+<script>
+const MORSE_MAP = {A:'.-',B:'-...',C:'-.-.',D:'-..',E:'.',F:'..-.',G:'--.',H:'....',I:'..',J:'.---',K:'-.-',L:'.-..',M:'--',N:'-.',O:'---',P:'.--.',Q:'--.-',R:'.-.',S:'...',T:'-',U:'..-',V:'...-',W:'.--',X:'-..-',Y:'-.--',Z:'--..',0:'-----',1:'.----',2:'..---',3:'...--',4:'....-',5:'.....',6:'-....',7:'--...',8:'---..',9:'----.'};
+const MORSE_REV = Object.fromEntries(Object.entries(MORSE_MAP).map(([k,v])=>[v,k]));
+
+let curTab='caesar';
+function setTab(t){
+  curTab=t;
+  document.querySelectorAll('.ctab').forEach((b,i)=>b.classList.toggle('active',b.textContent.toLowerCase().replace('-','').includes(t.replace('-',''))));
+  document.querySelectorAll('.cipher-panel').forEach(p=>p.classList.toggle('active',p.id==='panel-'+t));
+}
+function getIn(){return document.querySelector('.cipher-panel.active textarea:not([readonly])').value}
+function setOut(v){document.querySelector('.cipher-panel.active textarea[readonly]').value=v}
+function swapIO(){
+  const panels=document.querySelectorAll('.cipher-panel.active');
+  panels.forEach(p=>{
+    const inp=p.querySelector('textarea:not([readonly])');
+    const out=p.querySelector('textarea[readonly]');
+    const tmp=inp.value;inp.value=out.value;out.value=tmp;
+  });
+}
+function copyOut(){
+  const v=document.querySelector('.cipher-panel.active textarea[readonly]').value;
+  navigator.clipboard.writeText(v).catch(()=>{});
+}
+
+function caesar(text,shift,dec){
+  shift=((shift%26)+26)%26;
+  if(dec) shift=(26-shift)%26;
+  return text.replace(/[a-zA-Z]/g,c=>{
+    const base=c<='Z'?65:97;
+    return String.fromCharCode((c.charCodeAt(0)-base+shift)%26+base);
+  });
+}
+function rot13(text){return caesar(text,13,false)}
+function atbash(text){
+  return text.replace(/[a-zA-Z]/g,c=>{
+    const base=c<='Z'?65:97;
+    return String.fromCharCode(base+25-(c.charCodeAt(0)-base));
+  });
+}
+function vigenere(text,key,dec){
+  key=key.toUpperCase().replace(/[^A-Z]/g,'');
+  if(!key) return text;
+  let ki=0;
+  return text.replace(/[a-zA-Z]/g,c=>{
+    const base=c<='Z'?65:97;
+    const shift=key.charCodeAt(ki%key.length)-65;
+    ki++;
+    const s=dec?(26-shift)%26:shift;
+    return String.fromCharCode((c.charCodeAt(0)-base+s)%26+base);
+  });
+}
+function toMorse(text){
+  return text.toUpperCase().split('').map(c=>{
+    if(c===' ') return '/';
+    return MORSE_MAP[c]||'?';
+  }).join(' ');
+}
+function fromMorse(morse){
+  return morse.trim().split(' / ').map(word=>
+    word.split(' ').map(code=>MORSE_REV[code]||'?').join('')
+  ).join(' ');
+}
+function toBinary(text){return text.split('').map(c=>c.charCodeAt(0).toString(2).padStart(8,'0')).join(' ')}
+function fromBinary(bin){
+  return bin.trim().split(/\s+/).map(b=>{
+    const n=parseInt(b,2);
+    return isNaN(n)?'?':String.fromCharCode(n);
+  }).join('');
+}
+
+function run(cipher,dir){
+  const inp=getIn();
+  let out='';
+  if(cipher==='caesar'){
+    const shift=parseInt(document.getElementById('caesar-shift').value)||3;
+    out=caesar(inp,shift,dir==='dec');
+  } else if(cipher==='rot13'){
+    out=rot13(inp);
+  } else if(cipher==='atbash'){
+    out=atbash(inp);
+  } else if(cipher==='vigenere'){
+    const key=document.getElementById('vig-key').value||'A';
+    out=vigenere(inp,key,dir==='dec');
+  } else if(cipher==='morse'){
+    out=dir==='enc'?toMorse(inp):fromMorse(inp);
+  } else if(cipher==='binary'){
+    out=dir==='enc'?toBinary(inp):fromBinary(inp);
+  }
+  setOut(out);
+}
+
+// Build morse table
+const mt=document.getElementById('morse-table');
+Object.entries(MORSE_MAP).forEach(([k,v])=>{
+  const d=document.createElement('div');d.className='mt-cell';
+  d.innerHTML=`<span class="mt-char">${k}</span><span class="mt-code">${v}</span>`;
+  mt.appendChild(d);
+});
+</script>
+</body>
+</html>

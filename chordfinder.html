@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ChordFinder</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--surface:#1a1d27;--surface2:#22263a;--border:#2e3347;
+  --text:#e8eaf6;--muted:#8891b5;--accent:#a855f7;--green:#34d399;--yellow:#fbbf24;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:1.2rem;font-weight:700}header span{font-size:1.5rem}
+.sub{color:var(--muted);font-size:.8rem;margin-left:auto}
+main{flex:1;padding:20px;max-width:900px;margin:0 auto;width:100%}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:center}
+label{font-size:.82rem;color:var(--muted)}
+select{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:7px 12px;font-size:.88rem;outline:none}
+select:focus{border-color:var(--accent)}
+.btn{padding:7px 16px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;font-size:.85rem;font-weight:600;transition:all .15s}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}.btn-primary:hover{opacity:.85}
+/* Piano */
+.piano-wrap{overflow-x:auto;padding-bottom:8px;margin-bottom:20px}
+.piano{display:flex;position:relative;height:140px;user-select:none;width:fit-content}
+.key{position:relative;cursor:pointer;transition:background .08s}
+.key.white{width:38px;height:140px;background:#f0f0f0;border:1px solid #999;border-radius:0 0 6px 6px;z-index:1;margin-right:1px}
+.key.black{width:24px;height:88px;background:#1a1a1a;border-radius:0 0 5px 5px;position:absolute;z-index:2;top:0}
+.key.white:hover{background:#e8e8e8}
+.key.black:hover{background:#333}
+.key.white.active,.key.white.on{background:var(--accent)!important}
+.key.black.active,.key.black.on{background:var(--accent)!important}
+.key.white.scale{background:#d4a8fc}
+.key.black.scale{background:#9333ea}
+.key-label{position:absolute;bottom:6px;left:50%;transform:translateX(-50%);font-size:.55rem;color:#888;pointer-events:none;white-space:nowrap}
+.key.active .key-label,.key.on .key-label{color:#fff}
+.info-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+@media(max-width:600px){.info-row{grid-template-columns:1fr}}
+.info-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px}
+.info-box h3{font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:10px}
+.chord-name{font-size:1.5rem;font-weight:700;color:var(--accent);margin-bottom:4px}
+.note-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.note-chip{padding:4px 10px;border-radius:16px;background:var(--surface2);border:1px solid var(--border);font-size:.82rem;font-weight:600}
+.note-chip.root{border-color:var(--accent);color:var(--accent)}
+.tab-row{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.tab{padding:5px 12px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;font-size:.8rem;transition:all .15s}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.scale-list{display:flex;flex-wrap:wrap;gap:6px}
+.scale-chip{padding:4px 10px;border-radius:16px;background:var(--surface2);border:1px solid var(--border);font-size:.8rem;cursor:pointer;transition:all .15s}
+.scale-chip:hover,.scale-chip.active{border-color:var(--accent);color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <span>🎹</span>
+  <h1>ChordFinder</h1>
+  <div class="sub">Chord &amp; scale visualizer with audio</div>
+</header>
+<main>
+  <div class="controls">
+    <label>Root:</label>
+    <select id="root-sel" onchange="updateDisplay()">
+      <option>C</option><option>C#</option><option>D</option><option>D#</option>
+      <option>E</option><option>F</option><option>F#</option><option>G</option>
+      <option>G#</option><option>A</option><option>A#</option><option>B</option>
+    </select>
+    <div class="tab-row" id="mode-tabs">
+      <button class="tab active" onclick="setMode('chord',this)">Chords</button>
+      <button class="tab" onclick="setMode('scale',this)">Scales</button>
+    </div>
+    <select id="type-sel" onchange="updateDisplay()"></select>
+    <button class="btn btn-primary" onclick="playChord()">▶ Play</button>
+    <button class="btn" onclick="stopAll()">■ Stop</button>
+  </div>
+  <div class="piano-wrap"><div class="piano" id="piano"></div></div>
+  <div class="info-row">
+    <div class="info-box">
+      <h3>Selected</h3>
+      <div class="chord-name" id="chord-name">C Major</div>
+      <div style="font-size:.82rem;color:var(--muted)" id="chord-intervals"></div>
+      <div class="note-chips" id="note-chips"></div>
+    </div>
+    <div class="info-box">
+      <h3>About</h3>
+      <div style="font-size:.85rem;line-height:1.7;color:var(--muted)" id="about-text"></div>
+    </div>
+  </div>
+</main>
+<script>
+const NOTES=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const OCTAVES=3; // C3 to B5
+
+const CHORD_TYPES={
+  'Major':{intervals:[0,4,7],about:'Bright, happy sound. Foundation of Western harmony.'},
+  'Minor':{intervals:[0,3,7],about:'Darker, sadder quality. Widely used in emotional music.'},
+  'Dominant 7th':{intervals:[0,4,7,10],about:'Jazzy, bluesy tension. Wants to resolve to the root.'},
+  'Major 7th':{intervals:[0,4,7,11],about:'Smooth, sophisticated. Common in jazz and bossa nova.'},
+  'Minor 7th':{intervals:[0,3,7,10],about:'Warm and mellow. Cornerstone of jazz and R&B.'},
+  'Diminished':{intervals:[0,3,6],about:'Tense and unstable. Creates strong pull to resolve.'},
+  'Augmented':{intervals:[0,4,8],about:'Mysterious, unsettling. Used for dramatic effect.'},
+  'Sus2':{intervals:[0,2,7],about:'Open, floating quality. 3rd replaced by 2nd.'},
+  'Sus4':{intervals:[0,5,7],about:'Unresolved anticipation. 3rd replaced by 4th.'},
+  'Add9':{intervals:[0,4,7,14],about:'Major triad with an added 9th. Fuller sound.'},
+  'Minor 9th':{intervals:[0,3,7,10,14],about:'Rich, complex. Five-note chord used in jazz/neo-soul.'},
+  '6th':{intervals:[0,4,7,9],about:'Major triad with added 6th. Bright and complete.'},
+};
+const SCALE_TYPES={
+  'Major (Ionian)':{intervals:[0,2,4,5,7,9,11],about:'The "happy" scale. Do-Re-Mi. Foundation of Western music.'},
+  'Natural Minor':{intervals:[0,2,3,5,7,8,10],about:'The standard minor scale. Darker and more emotive.'},
+  'Harmonic Minor':{intervals:[0,2,3,5,7,8,11],about:'Minor with raised 7th. Creates exotic, Middle-Eastern feel.'},
+  'Pentatonic Major':{intervals:[0,2,4,7,9],about:'5-note scale. Used in folk, country, and rock solos.'},
+  'Pentatonic Minor':{intervals:[0,3,5,7,10],about:'The blues/rock go-to. Sounds great over almost anything.'},
+  'Blues':{intervals:[0,3,5,6,7,10],about:'Minor pentatonic + blue note (b5). Quintessential blues sound.'},
+  'Dorian':{intervals:[0,2,3,5,7,9,10],about:'Minor with raised 6th. Used in jazz, funk, and rock.'},
+  'Phrygian':{intervals:[0,1,3,5,7,8,10],about:'Dark, Spanish/flamenco quality with the b2 interval.'},
+  'Lydian':{intervals:[0,2,4,6,7,9,11],about:'Major with raised 4th. Dreamy, ethereal quality.'},
+  'Mixolydian':{intervals:[0,2,4,5,7,9,10],about:'Major with flat 7th. Perfect for rock and blues.'},
+  'Whole Tone':{intervals:[0,2,4,6,8,10],about:'All whole steps. Ambiguous, dreamlike quality.'},
+  'Chromatic':{intervals:[0,1,2,3,4,5,6,7,8,9,10,11],about:'All 12 semitones. Used for passing notes and atonal effects.'},
+};
+
+let mode='chord', ctx=null, active=[];
+
+function getAudioCtx(){if(!ctx) ctx=new(window.AudioContext||window.webkitAudioContext)();return ctx;}
+
+function noteFreq(semitones){
+  // A4=440, semitone from A4
+  return 440*Math.pow(2,semitones/12);
+}
+function midiToFreq(midi){return 440*Math.pow(2,(midi-69)/12);}
+
+// Build piano
+function buildPiano(){
+  const p=document.getElementById('piano');
+  p.innerHTML='';
+  const BLACK_OFFSETS={1:23,3:61,6:137,8:175,10:213}; // offsets within octave (px)
+  const whiteOrder=[0,2,4,5,7,9,11]; // white key note indices per octave
+  let wIdx=0;
+  const startOctave=3;
+  const endOctave=5;
+
+  for(let oct=startOctave;oct<=endOctave;oct++){
+    whiteOrder.forEach(n=>{
+      const noteIdx=n;
+      const midi=(oct+1)*12+noteIdx;
+      const noteName=NOTES[noteIdx];
+      const d=document.createElement('div');
+      d.className='key white';
+      d.dataset.midi=midi;
+      d.dataset.note=noteName;
+      const lbl=document.createElement('div');
+      lbl.className='key-label';
+      lbl.textContent=noteName+(noteIdx===0?oct:'');
+      d.appendChild(lbl);
+      d.onmousedown=()=>playNote(midi,d);
+      p.appendChild(d);
+    });
+  }
+  // Black keys — positioned absolutely
+  let wPos=0;
+  for(let oct=startOctave;oct<=endOctave;oct++){
+    for(let n=0;n<12;n++){
+      if([1,3,6,8,10].includes(n)){
+        const midi=(oct+1)*12+n;
+        // find x: count white keys before this
+        const whiteBefore=whiteOrder.filter(w=>w<n).length;
+        const octWhites=7*(oct-startOctave);
+        const x=(octWhites+whiteBefore)*39-12+1;
+        const d=document.createElement('div');
+        d.className='key black';
+        d.dataset.midi=midi;
+        d.dataset.note=NOTES[n];
+        d.style.left=x+'px';
+        d.onmousedown=e=>{e.stopPropagation();playNote(midi,d);}
+        p.appendChild(d);
+      }
+    }
+  }
+}
+
+function setMode(m,el){
+  mode=m;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  populateTypeSelect();
+  updateDisplay();
+}
+function populateTypeSelect(){
+  const sel=document.getElementById('type-sel');
+  const types=mode==='chord'?CHORD_TYPES:SCALE_TYPES;
+  sel.innerHTML=Object.keys(types).map(k=>`<option value="${k}">${k}</option>`).join('');
+}
+
+function getCurrentNotes(){
+  const root=document.getElementById('root-sel').value;
+  const type=document.getElementById('type-sel').value;
+  const rootIdx=NOTES.indexOf(root);
+  const types=mode==='chord'?CHORD_TYPES:SCALE_TYPES;
+  const def=types[type];
+  if(!def) return[];
+  // Use octave 4 as base
+  return def.intervals.map(i=>{
+    const noteIdx=(rootIdx+i)%12;
+    const octShift=Math.floor((rootIdx+i)/12);
+    const midi=48+rootIdx+i; // C4=60, we want C3=48
+    return{note:NOTES[noteIdx],midi:48+rootIdx+i,semitone:rootIdx+i};
+  });
+}
+
+function updateDisplay(){
+  const root=document.getElementById('root-sel').value;
+  const type=document.getElementById('type-sel').value;
+  const types=mode==='chord'?CHORD_TYPES:SCALE_TYPES;
+  const def=types[type]||{intervals:[],about:''};
+  const notes=getCurrentNotes();
+  const noteMidis=new Set(notes.map(n=>n.midi%12+(n.midi<60?48:60)));
+  
+  // Highlight piano
+  document.querySelectorAll('.key').forEach(k=>{
+    k.classList.remove('on','scale');
+    const midi=parseInt(k.dataset.midi);
+    const noteClass=midi%12;
+    const rootIdx=NOTES.indexOf(root);
+    if(def.intervals.includes((noteClass-rootIdx+12)%12)){
+      k.classList.add(mode==='chord'?'on':'scale');
+    }
+  });
+
+  document.getElementById('chord-name').textContent=root+' '+type;
+  document.getElementById('chord-intervals').textContent='Intervals: '+def.intervals.join(' - ');
+  document.getElementById('about-text').textContent=def.about||'';
+  
+  const chips=document.getElementById('note-chips');
+  chips.innerHTML=notes.map((n,i)=>`<span class="note-chip ${i===0?'root':''}">${n.note}</span>`).join('');
+}
+
+let playing=[];
+function playNote(midi,el){
+  const ac=getAudioCtx();
+  const osc=ac.createOscillator();
+  const gain=ac.createGain();
+  osc.connect(gain);gain.connect(ac.destination);
+  osc.type='triangle';
+  osc.frequency.value=midiToFreq(midi);
+  gain.gain.setValueAtTime(.4,ac.currentTime);
+  gain.gain.exponentialRampToValueAtTime(.001,ac.currentTime+1.5);
+  osc.start();osc.stop(ac.currentTime+1.5);
+  if(el){el.classList.add('active');setTimeout(()=>el.classList.remove('active'),400);}
+}
+function playChord(){
+  const notes=getCurrentNotes();
+  notes.forEach((n,i)=>setTimeout(()=>{
+    const el=document.querySelector(`.key[data-midi="${n.midi}"]`);
+    playNote(n.midi,el);
+  },mode==='scale'?i*120:0));
+}
+function stopAll(){}
+
+buildPiano();
+populateTypeSelect();
+updateDisplay();
+</script>
+</body>
+</html>

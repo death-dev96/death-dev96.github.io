@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BodyMetrics</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--surface:#1a1d27;--surface2:#22263a;--border:#2e3347;
+  --text:#e8eaf6;--muted:#8891b5;--accent:#34d399;
+  --green:#34d399;--yellow:#fbbf24;--red:#f87171;--orange:#fb923c;--blue:#38bdf8;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:1.2rem;font-weight:700}header span{font-size:1.5rem}
+.sub{color:var(--muted);font-size:.8rem;margin-left:auto}
+main{padding:24px;max-width:800px;margin:0 auto}
+.unit-toggle{display:flex;gap:0;margin-bottom:24px;border:1px solid var(--border);border-radius:10px;overflow:hidden;width:fit-content}
+.ut{padding:8px 20px;background:var(--surface);color:var(--muted);cursor:pointer;font-size:.85rem;font-weight:600;transition:all .15s;border:none}
+.ut.active{background:var(--accent);color:#0f1117}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
+.field{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px}
+.field label{display:block;font-size:.8rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.field input,.field select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:8px 12px;font-size:.95rem;outline:none;transition:border-color .15s}
+.field input:focus,.field select:focus{border-color:var(--accent)}
+.field select option{background:var(--surface2)}
+.seg{display:flex;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.seg-btn{flex:1;padding:7px;background:var(--surface2);color:var(--muted);cursor:pointer;font-size:.85rem;text-align:center;border:none;transition:all .15s}
+.seg-btn.active{background:var(--accent);color:#0f1117;font-weight:700}
+.calc-btn{width:100%;padding:12px;background:var(--accent);border:none;border-radius:12px;color:#0f1117;font-size:1rem;font-weight:700;cursor:pointer;margin-bottom:24px;transition:opacity .15s}
+.calc-btn:hover{opacity:.85}
+.results{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:24px}
+.result-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center;transition:border-color .2s}
+.result-card.highlight{border-color:var(--accent)}
+.rc-label{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.rc-value{font-size:1.8rem;font-weight:700;color:var(--accent)}
+.rc-unit{font-size:.8rem;color:var(--muted);margin-top:2px}
+.rc-sub{font-size:.78rem;margin-top:4px}
+.bmi-bar-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:24px}
+.bmi-bar-wrap h3{font-size:.9rem;margin-bottom:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.bmi-track{height:12px;border-radius:6px;background:linear-gradient(to right,#38bdf8 0%,#34d399 25%,#fbbf24 50%,#fb923c 75%,#f87171 100%);position:relative;margin-bottom:8px}
+.bmi-needle{position:absolute;top:-4px;transform:translateX(-50%);width:4px;height:20px;background:white;border-radius:2px;transition:left .4s ease}
+.bmi-labels{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted)}
+.tdee-rows{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px}
+.tdee-rows h3{font-size:.9rem;margin-bottom:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.tdee-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:.88rem}
+.tdee-row:last-child{border-bottom:none}
+.tdee-row .goal{color:var(--muted);font-size:.8rem}
+.tdee-val{font-weight:700;color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <span>💪</span>
+  <h1>BodyMetrics</h1>
+  <div class="sub">BMI · BMR · TDEE</div>
+</header>
+<main>
+  <div class="unit-toggle">
+    <button class="ut active" onclick="setUnits('metric',this)">Metric (kg/cm)</button>
+    <button class="ut" onclick="setUnits('imperial',this)">Imperial (lb/in)</button>
+  </div>
+  <div class="form-grid">
+    <div class="field">
+      <label>Age (years)</label>
+      <input type="number" id="age" value="25" min="10" max="100">
+    </div>
+    <div class="field">
+      <label>Gender</label>
+      <div class="seg">
+        <button class="seg-btn active" id="g-male" onclick="setGender('male',this)">Male</button>
+        <button class="seg-btn" id="g-female" onclick="setGender('female',this)">Female</button>
+      </div>
+    </div>
+    <div class="field">
+      <label id="weight-label">Weight (kg)</label>
+      <input type="number" id="weight" value="70" min="1">
+    </div>
+    <div class="field" id="height-field">
+      <label id="height-label">Height (cm)</label>
+      <input type="number" id="height" value="170" min="50">
+    </div>
+    <div class="field" style="grid-column:1/-1">
+      <label>Activity Level</label>
+      <select id="activity">
+        <option value="1.2">Sedentary (little or no exercise)</option>
+        <option value="1.375">Lightly active (1–3 days/week)</option>
+        <option value="1.55" selected>Moderately active (3–5 days/week)</option>
+        <option value="1.725">Very active (6–7 days/week)</option>
+        <option value="1.9">Extra active (physical job or 2x training)</option>
+      </select>
+    </div>
+  </div>
+  <button class="calc-btn" onclick="calculate()">Calculate ▶</button>
+  <div class="results" id="results" style="display:none">
+    <div class="result-card highlight"><div class="rc-label">BMI</div><div class="rc-value" id="r-bmi">—</div><div class="rc-sub" id="r-bmi-cat">—</div></div>
+    <div class="result-card"><div class="rc-label">BMR</div><div class="rc-value" id="r-bmr">—</div><div class="rc-unit">kcal/day (at rest)</div></div>
+    <div class="result-card"><div class="rc-label">TDEE</div><div class="rc-value" id="r-tdee">—</div><div class="rc-unit">kcal/day (your activity)</div></div>
+    <div class="result-card"><div class="rc-label">Ideal Weight</div><div class="rc-value" id="r-ideal">—</div><div class="rc-unit" id="r-ideal-unit">kg</div></div>
+  </div>
+  <div class="bmi-bar-wrap" id="bmi-bar-wrap" style="display:none">
+    <h3>BMI Scale</h3>
+    <div class="bmi-track"><div class="bmi-needle" id="bmi-needle" style="left:0"></div></div>
+    <div class="bmi-labels"><span>Underweight<br>&lt;18.5</span><span>Normal<br>18.5–25</span><span>Overweight<br>25–30</span><span>Obese<br>&gt;30</span></div>
+  </div>
+  <div class="tdee-rows" id="tdee-rows" style="display:none">
+    <h3>Daily Calorie Goals</h3>
+    <div class="tdee-row"><span>Extreme loss (−1000)</span><span class="tdee-val" id="tg-1">—</span></div>
+    <div class="tdee-row"><span>Weight loss (−500)</span><span class="tdee-val" id="tg-2">—</span></div>
+    <div class="tdee-row"><span>Mild loss (−250)</span><span class="tdee-val" id="tg-3">—</span></div>
+    <div class="tdee-row"><span>⭐ Maintain weight</span><span class="tdee-val" id="tg-4">—</span></div>
+    <div class="tdee-row"><span>Mild gain (+250)</span><span class="tdee-val" id="tg-5">—</span></div>
+    <div class="tdee-row"><span>Weight gain (+500)</span><span class="tdee-val" id="tg-6">—</span></div>
+  </div>
+</main>
+<script>
+let units='metric', gender='male';
+function setUnits(u,el){
+  units=u;
+  document.querySelectorAll('.ut').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  const wl=document.getElementById('weight-label');
+  const hl=document.getElementById('height-label');
+  const wi=document.getElementById('weight');
+  const hi=document.getElementById('height');
+  if(u==='metric'){wl.textContent='Weight (kg)';hl.textContent='Height (cm)';wi.value=70;hi.value=170;}
+  else{wl.textContent='Weight (lbs)';hl.textContent='Height (inches)';wi.value=154;hi.value=67;}
+}
+function setGender(g,el){
+  gender=g;
+  document.querySelectorAll('.seg-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+function calculate(){
+  let age=parseInt(document.getElementById('age').value)||25;
+  let w=parseFloat(document.getElementById('weight').value)||70;
+  let h=parseFloat(document.getElementById('height').value)||170;
+  const act=parseFloat(document.getElementById('activity').value);
+
+  let wkg=w, hcm=h;
+  if(units==='imperial'){wkg=w*0.453592; hcm=h*2.54;}
+
+  // BMI
+  const bmi=wkg/((hcm/100)**2);
+  const bmiCat=bmi<18.5?'Underweight':bmi<25?'Normal weight':bmi<30?'Overweight':'Obese';
+  const bmiColor=bmi<18.5?'#38bdf8':bmi<25?'#34d399':bmi<30?'#fbbf24':'#f87171';
+
+  // BMR (Mifflin-St Jeor)
+  let bmr;
+  if(gender==='male') bmr=10*wkg+6.25*hcm-5*age+5;
+  else bmr=10*wkg+6.25*hcm-5*age-161;
+
+  const tdee=bmr*act;
+
+  // Ideal weight (Devine formula)
+  let ideal;
+  if(gender==='male') ideal=50+2.3*((hcm/2.54)-60);
+  else ideal=45.5+2.3*((hcm/2.54)-60);
+  if(units==='imperial') ideal=ideal/0.453592;
+
+  document.getElementById('r-bmi').textContent=bmi.toFixed(1);
+  document.getElementById('r-bmi').style.color=bmiColor;
+  document.getElementById('r-bmi-cat').textContent=bmiCat;
+  document.getElementById('r-bmi-cat').style.color=bmiColor;
+  document.getElementById('r-bmr').textContent=Math.round(bmr);
+  document.getElementById('r-tdee').textContent=Math.round(tdee);
+  document.getElementById('r-ideal').textContent=units==='metric'?ideal.toFixed(1)+'kg':Math.round(ideal)+'lbs';
+  document.getElementById('r-ideal-unit').textContent='Devine formula';
+
+  // BMI needle (0–40 scale)
+  const pct=Math.min(Math.max((bmi-10)/30,0),1)*100;
+  document.getElementById('bmi-needle').style.left=pct+'%';
+
+  // TDEE goals
+  [tg1,tg2,tg3,tg4,tg5,tg6]=[tdee-1000,tdee-500,tdee-250,tdee,tdee+250,tdee+500];
+  [1,2,3,4,5,6].forEach(n=>{document.getElementById('tg-'+n).textContent=Math.round(eval('tg'+n))+' kcal';});
+
+  document.getElementById('results').style.display='grid';
+  document.getElementById('bmi-bar-wrap').style.display='block';
+  document.getElementById('tdee-rows').style.display='block';
+}
+</script>
+</body>
+</html>

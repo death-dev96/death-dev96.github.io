@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trivia</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--surface:#1a1d27;--surface2:#22263a;--border:#2e3347;
+  --text:#e8eaf6;--muted:#8891b5;--accent:#fbbf24;
+  --green:#34d399;--red:#f87171;--blue:#38bdf8;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:1.2rem;font-weight:700}header span{font-size:1.5rem}
+.hdr-score{margin-left:auto;display:flex;gap:16px;font-size:.85rem}
+.score-chip{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:4px 12px}
+.score-chip strong{color:var(--accent)}
+main{flex:1;padding:24px;max-width:700px;margin:0 auto;width:100%}
+/* Home screen */
+#home-screen{}
+.home-title{text-align:center;font-size:2rem;font-weight:800;margin-bottom:8px}
+.home-sub{text-align:center;color:var(--muted);margin-bottom:32px}
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:28px}
+.cat-card{background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:18px;text-align:center;cursor:pointer;transition:all .15s}
+.cat-card:hover,.cat-card.active{border-color:var(--accent);background:var(--surface2)}
+.cat-card.active{background:#fbbf2415}
+.cat-icon{font-size:2rem;margin-bottom:8px}
+.cat-name{font-weight:700;font-size:.95rem}
+.cat-count{font-size:.75rem;color:var(--muted);margin-top:2px}
+.diff-row{display:flex;gap:8px;justify-content:center;margin-bottom:24px}
+.diff-btn{padding:8px 20px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;font-size:.85rem;font-weight:600;transition:all .15s}
+.diff-btn.active{background:var(--accent);color:#0f1117;border-color:var(--accent)}
+.start-btn{display:block;width:200px;margin:0 auto;padding:14px;background:var(--accent);border:none;border-radius:14px;color:#0f1117;font-size:1.1rem;font-weight:800;cursor:pointer;transition:opacity .15s}
+.start-btn:hover{opacity:.85}
+/* Game screen */
+#game-screen{display:none}
+.progress-row{display:flex;justify-content:space-between;font-size:.82rem;color:var(--muted);margin-bottom:8px}
+.progress-bar{height:6px;background:var(--surface2);border-radius:3px;margin-bottom:24px;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent);border-radius:3px;transition:width .4s}
+.q-category{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;padding:4px 10px;background:var(--surface2);border-radius:12px;display:inline-block}
+.q-text{font-size:1.2rem;font-weight:700;line-height:1.5;margin-bottom:24px}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+@media(max-width:480px){.answers{grid-template-columns:1fr}}
+.ans-btn{padding:14px 16px;border-radius:12px;border:2px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;font-size:.92rem;text-align:left;transition:all .15s;line-height:1.4}
+.ans-btn:hover:not(:disabled){border-color:var(--accent);background:var(--surface2)}
+.ans-btn.correct{border-color:var(--green);background:#34d39922;color:var(--green)}
+.ans-btn.wrong{border-color:var(--red);background:#f871711a;color:var(--red)}
+.ans-btn.reveal{border-color:var(--green);background:#34d39910}
+.ans-btn:disabled{cursor:default}
+.explanation{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px;font-size:.88rem;color:var(--muted);line-height:1.6;display:none}
+.explanation.show{display:block}
+.next-btn{width:100%;padding:12px;background:var(--accent);border:none;border-radius:12px;color:#0f1117;font-size:1rem;font-weight:700;cursor:pointer;display:none;transition:opacity .15s}
+.next-btn:hover{opacity:.85}
+/* Result screen */
+#result-screen{display:none;text-align:center;padding:40px 20px}
+.result-big{font-size:4rem;margin-bottom:12px}
+.result-score{font-size:2.5rem;font-weight:800;color:var(--accent);margin-bottom:8px}
+.result-msg{color:var(--muted);font-size:1rem;margin-bottom:24px}
+.result-stats{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:28px}
+.rs-chip{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 18px;text-align:center}
+.rs-val{font-size:1.3rem;font-weight:700;color:var(--accent)}
+.rs-lbl{font-size:.72rem;color:var(--muted);margin-top:2px}
+.play-again{padding:12px 32px;background:var(--accent);border:none;border-radius:12px;color:#0f1117;font-size:1rem;font-weight:700;cursor:pointer;margin-right:10px}
+.back-btn{padding:12px 24px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-size:1rem;cursor:pointer}
+</style>
+</head>
+<body>
+<header>
+  <span>🧩</span>
+  <h1>Trivia</h1>
+  <div class="hdr-score">
+    <div class="score-chip">Streak: <strong id="hdr-streak">0</strong></div>
+    <div class="score-chip">Best: <strong id="hdr-best">0</strong></div>
+  </div>
+</header>
+<main>
+  <!-- HOME -->
+  <div id="home-screen">
+    <div class="home-title">🎯 Trivia Time!</div>
+    <div class="home-sub">Choose a category and test your knowledge</div>
+    <div class="cat-grid" id="cat-grid"></div>
+    <div class="diff-row">
+      <button class="diff-btn active" data-d="easy" onclick="setDiff('easy',this)">😊 Easy</button>
+      <button class="diff-btn" data-d="medium" onclick="setDiff('medium',this)">🤔 Medium</button>
+      <button class="diff-btn" data-d="hard" onclick="setDiff('hard',this)">💀 Hard</button>
+      <button class="diff-btn" data-d="all" onclick="setDiff('all',this)">🎲 Mixed</button>
+    </div>
+    <button class="start-btn" onclick="startGame()">Start Quiz →</button>
+  </div>
+  <!-- GAME -->
+  <div id="game-screen">
+    <div class="progress-row">
+      <span id="q-num">Question 1 of 10</span>
+      <span id="q-score">Score: 0</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="q-prog" style="width:10%"></div></div>
+    <div class="q-category" id="q-cat"></div>
+    <div class="q-text" id="q-text"></div>
+    <div class="answers" id="answers"></div>
+    <div class="explanation" id="explanation"></div>
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">Next Question →</button>
+  </div>
+  <!-- RESULT -->
+  <div id="result-screen">
+    <div class="result-big" id="r-emoji">🎉</div>
+    <div class="result-score" id="r-score"></div>
+    <div class="result-msg" id="r-msg"></div>
+    <div class="result-stats">
+      <div class="rs-chip"><div class="rs-val" id="r-correct"></div><div class="rs-lbl">Correct</div></div>
+      <div class="rs-chip"><div class="rs-val" id="r-time"></div><div class="rs-lbl">Avg Time</div></div>
+      <div class="rs-chip"><div class="rs-val" id="r-streak"></div><div class="rs-lbl">Best Streak</div></div>
+    </div>
+    <button class="play-again" onclick="playAgain()">Play Again</button>
+    <button class="back-btn" onclick="goHome()">Change Category</button>
+  </div>
+</main>
+<script>
+const QUESTIONS = {
+  'Science 🔬': [
+    {q:'What is the chemical symbol for gold?',a:'Au',choices:['Ag','Au','Fe','Gd'],diff:'easy',exp:'Au comes from the Latin "Aurum." Silver is Ag, Iron is Fe.'},
+    {q:'How many bones are in the adult human body?',a:'206',choices:['186','206','213','226'],diff:'easy',exp:'Babies are born with ~270 bones; many fuse as we grow, leaving 206 in adults.'},
+    {q:'What planet is known as the Red Planet?',a:'Mars',choices:['Venus','Jupiter','Mars','Saturn'],diff:'easy',exp:'Mars gets its red color from iron oxide (rust) on its surface.'},
+    {q:'What is the powerhouse of the cell?',a:'Mitochondria',choices:['Nucleus','Ribosome','Mitochondria','Golgi body'],diff:'easy',exp:'The mitochondria produce ATP, the cell\'s energy currency.'},
+    {q:'At what temperature do Celsius and Fahrenheit scales agree?',a:'-40°',choices:['0°','-40°','100°','32°'],diff:'medium',exp:'At -40°, both scales converge: -40°C = -40°F.'},
+    {q:'What is the speed of light in a vacuum?',a:'~300,000 km/s',choices:['~3,000 km/s','~30,000 km/s','~300,000 km/s','~3,000,000 km/s'],diff:'medium',exp:'Light travels approximately 299,792 km/s in a vacuum.'},
+    {q:'Which element has atomic number 79?',a:'Gold',choices:['Platinum','Silver','Lead','Gold'],diff:'medium',exp:'Gold (Au) has atomic number 79, meaning it has 79 protons.'},
+    {q:'What is the most abundant element in Earth\'s crust?',a:'Oxygen',choices:['Silicon','Oxygen','Iron','Aluminum'],diff:'medium',exp:'Oxygen makes up ~46% of Earth\'s crust by mass, mostly bound in silicates.'},
+    {q:'What type of bond involves the sharing of electrons?',a:'Covalent',choices:['Ionic','Metallic','Covalent','Hydrogen'],diff:'hard',exp:'Covalent bonds share electrons between atoms, unlike ionic bonds which transfer them.'},
+    {q:'What is the half-life of Carbon-14?',a:'~5,730 years',choices:['~570 years','~5,730 years','~57,300 years','~573 years'],diff:'hard',exp:'C-14\'s half-life of 5,730 years makes it ideal for dating organic material up to ~50,000 years old.'},
+  ],
+  'History 📜': [
+    {q:'In what year did World War II end?',a:'1945',choices:['1943','1944','1945','1946'],diff:'easy',exp:'WWII ended in 1945 — May 8 in Europe (V-E Day) and Sept 2 in the Pacific (V-J Day).'},
+    {q:'Who was the first President of the United States?',a:'George Washington',choices:['John Adams','Thomas Jefferson','George Washington','Benjamin Franklin'],diff:'easy',exp:'George Washington served as the 1st President from 1789 to 1797.'},
+    {q:'Which ancient wonder still stands today?',a:'Great Pyramid of Giza',choices:['Hanging Gardens','Colossus of Rhodes','Great Pyramid of Giza','Lighthouse of Alexandria'],diff:'easy',exp:'The Great Pyramid of Giza is the only ancient wonder still substantially intact.'},
+    {q:'The Berlin Wall fell in which year?',a:'1989',choices:['1987','1989','1991','1993'],diff:'easy',exp:'The Berlin Wall fell on November 9, 1989, symbolizing the end of the Cold War.'},
+    {q:'Which empire was ruled by Genghis Khan?',a:'Mongol Empire',choices:['Ottoman Empire','Roman Empire','Mongol Empire','Han Dynasty'],diff:'medium',exp:'Genghis Khan founded the Mongol Empire in 1206, which became the largest contiguous land empire.'},
+    {q:'What year did the French Revolution begin?',a:'1789',choices:['1776','1783','1789','1799'],diff:'medium',exp:'The French Revolution began in 1789 with the storming of the Bastille on July 14.'},
+    {q:'Who wrote the Communist Manifesto?',a:'Marx and Engels',choices:['Lenin and Stalin','Marx and Engels','Rousseau and Voltaire','Trotsky and Bukharin'],diff:'medium',exp:'Karl Marx and Friedrich Engels co-authored the Communist Manifesto, published in 1848.'},
+    {q:'The Meiji Restoration occurred in which country?',a:'Japan',choices:['China','Korea','Japan','Vietnam'],diff:'hard',exp:'The Meiji Restoration (1868) modernized Japan, ending the samurai era and opening to Western influence.'},
+    {q:'What was the name of the first artificial satellite?',a:'Sputnik 1',choices:['Explorer 1','Vostok 1','Sputnik 1','Luna 1'],diff:'hard',exp:'Sputnik 1 was launched by the Soviet Union on October 4, 1957.'},
+    {q:'Which pharaoh built the Great Sphinx of Giza?',a:'Khafra',choices:['Khufu','Khafra','Tutankhamun','Ramesses II'],diff:'hard',exp:'Most Egyptologists believe Pharaoh Khafra built the Sphinx around 2500 BCE.'},
+  ],
+  'Geography 🌍': [
+    {q:'What is the capital of Australia?',a:'Canberra',choices:['Sydney','Melbourne','Brisbane','Canberra'],diff:'easy',exp:'Canberra is the capital, chosen as a compromise between Sydney and Melbourne.'},
+    {q:'Which is the longest river in the world?',a:'Nile',choices:['Amazon','Mississippi','Nile','Yangtze'],diff:'easy',exp:'The Nile (6,650 km) edges out the Amazon for the title of world\'s longest river.'},
+    {q:'Mount Everest is in which mountain range?',a:'Himalayas',choices:['Andes','Alps','Rockies','Himalayas'],diff:'easy',exp:'Mount Everest (8,849m) sits in the Himalayas on the Nepal-Tibet border.'},
+    {q:'What is the smallest country in the world by area?',a:'Vatican City',choices:['Monaco','San Marino','Liechtenstein','Vatican City'],diff:'easy',exp:'Vatican City covers just 0.44 km², making it the smallest country by area.'},
+    {q:'Which country has the most natural lakes?',a:'Canada',choices:['Russia','USA','Finland','Canada'],diff:'medium',exp:'Canada has over 2 million lakes, containing roughly 20% of the world\'s fresh surface water.'},
+    {q:'The Sahara desert is primarily in which continent?',a:'Africa',choices:['Asia','Australia','South America','Africa'],diff:'easy',exp:'The Sahara stretches across 11 African countries, covering ~9.2 million km².'},
+    {q:'What is the deepest lake in the world?',a:'Lake Baikal',choices:['Lake Tanganyika','Caspian Sea','Lake Superior','Lake Baikal'],diff:'medium',exp:'Lake Baikal in Siberia reaches 1,642m depth and holds ~20% of the world\'s unfrozen fresh water.'},
+    {q:'Which two continents does the Ural Mountains separate?',a:'Europe and Asia',choices:['Asia and Africa','Europe and Africa','Europe and Asia','North America and Europe'],diff:'medium',exp:'The Ural Mountains form part of the conventional boundary between Europe and Asia.'},
+    {q:'What is the capital of Kazakhstan?',a:'Astana',choices:['Almaty','Astana','Nur-Sultan','Bishkek'],diff:'hard',exp:'Astana (also known as Nur-Sultan) has been Kazakhstan\'s capital since 1997, replacing Almaty.'},
+    {q:'Which strait connects the Atlantic and Pacific Oceans?',a:'Strait of Magellan',choices:['Strait of Gibraltar','Drake Passage','Strait of Magellan','Bering Strait'],diff:'hard',exp:'The Strait of Magellan, at South America\'s tip, connects both oceans. Drake Passage is wider but south of Cape Horn.'},
+  ],
+  'Pop Culture 🎬': [
+    {q:'How many Harry Potter main books are there?',a:'7',choices:['5','6','7','8'],diff:'easy',exp:'J.K. Rowling wrote 7 Harry Potter books, from Sorcerer\'s Stone to Deathly Hallows.'},
+    {q:'Which band performed "Bohemian Rhapsody"?',a:'Queen',choices:['The Beatles','Rolling Stones','Queen','Led Zeppelin'],diff:'easy',exp:'Bohemian Rhapsody was released by Queen in 1975 on the album A Night at the Opera.'},
+    {q:'What is the highest-grossing film of all time (unadjusted)?',a:'Avatar',choices:['Avengers: Endgame','Titanic','Avatar','The Force Awakens'],diff:'medium',exp:'Avatar (2009, rereleased 2022) holds the all-time box office record with ~$2.9 billion.'},
+    {q:'In which city is the TV show "Friends" set?',a:'New York City',choices:['Los Angeles','Chicago','Boston','New York City'],diff:'easy',exp:'Friends is set in Manhattan, New York City, primarily around Central Park West.'},
+    {q:'Which video game features a plumber named Mario?',a:'Super Mario Bros',choices:['Donkey Kong','Super Mario Bros','Pac-Man','Sonic the Hedgehog'],diff:'easy',exp:'Super Mario Bros (1985) made Mario a household name. He first appeared in Donkey Kong (1981).'},
+    {q:'Who painted the Mona Lisa?',a:'Leonardo da Vinci',choices:['Michelangelo','Raphael','Leonardo da Vinci','Caravaggio'],diff:'easy',exp:'Leonardo da Vinci painted the Mona Lisa between 1503–1519. It now hangs in the Louvre, Paris.'},
+    {q:'What year was the first iPhone released?',a:'2007',choices:['2005','2006','2007','2008'],diff:'medium',exp:'Apple released the first iPhone on June 29, 2007, revolutionizing the smartphone market.'},
+    {q:'Which streaming service produced "Stranger Things"?',a:'Netflix',choices:['HBO','Amazon Prime','Netflix','Disney+'],diff:'easy',exp:'Stranger Things premiered on Netflix in July 2016.'},
+    {q:'In "The Matrix," what color pill does Neo take?',a:'Red',choices:['Blue','Green','Red','White'],diff:'medium',exp:'Neo takes the red pill to see the truth. The blue pill would let him remain in the simulated reality.'},
+    {q:'What is the name of Batman\'s butler?',a:'Alfred',choices:['James','Alfred','Arthur','Edwin'],diff:'easy',exp:'Alfred Pennyworth is Bruce Wayne\'s trusted butler who knows his secret identity as Batman.'},
+  ],
+  'Math 🔢': [
+    {q:'What is the value of π to two decimal places?',a:'3.14',choices:['3.12','3.14','3.16','3.18'],diff:'easy',exp:'Pi (π) ≈ 3.14159265… The first digits are 3.14.'},
+    {q:'What is 12² (12 squared)?',a:'144',choices:['124','132','144','156'],diff:'easy',exp:'12 × 12 = 144. Perfect squares up to 12 are: 1,4,9,16,25,36,49,64,81,100,121,144.'},
+    {q:'How many sides does a heptagon have?',a:'7',choices:['5','6','7','8'],diff:'easy',exp:'Heptagon = 7 sides. Penta=5, Hexa=6, Hepta=7, Octa=8, Nona=9, Deca=10.'},
+    {q:'What is the next prime number after 13?',a:'17',choices:['15','16','17','19'],diff:'medium',exp:'14=2×7, 15=3×5, 16=2⁴, so the next prime after 13 is 17.'},
+    {q:'What is the sum of interior angles of a hexagon?',a:'720°',choices:['540°','720°','900°','1080°'],diff:'medium',exp:'Formula: (n-2)×180°. For hexagon: (6-2)×180 = 4×180 = 720°.'},
+    {q:'What is log₁₀(1000)?',a:'3',choices:['2','3','4','100'],diff:'medium',exp:'log₁₀(1000) = 3, because 10³ = 1000.'},
+    {q:'In a right triangle, if a=3 and b=4, what is c?',a:'5',choices:['5','6','7','8'],diff:'easy',exp:'By Pythagoras: c² = 3² + 4² = 9 + 16 = 25, so c = 5. This is a 3-4-5 Pythagorean triple.'},
+    {q:'What is the derivative of sin(x)?',a:'cos(x)',choices:['cos(x)','-cos(x)','sin(x)','-sin(x)'],diff:'hard',exp:'d/dx[sin(x)] = cos(x). The derivative of cos(x) = -sin(x).'},
+    {q:'Fibonacci: what comes after 34?',a:'55',choices:['51','53','55','57'],diff:'medium',exp:'Fibonacci sequence: 0,1,1,2,3,5,8,13,21,34,55… Each term = sum of two preceding.'},
+    {q:'What is Euler\'s identity? eⁱᵖ + ?',a:'1 = 0',choices:['e = 0','1 = 0','π = 0','i = 0'],diff:'hard',exp:'Euler\'s identity: eⁱᵖ + 1 = 0, linking e, i, π, 1, and 0 — often called the most beautiful equation.'},
+  ],
+};
+
+const CATEGORIES=Object.keys(QUESTIONS);
+const BEST_KEY='trivia_best';
+let selectedCats=new Set(CATEGORIES), difficulty='easy', currentQ=0, score=0, correct=0, questionsLeft=[], sessionStreak=0, bestStreak=0, currentStreak=0, qStartTime=0, totalTime=0;
+
+// Load best
+let storedBest=parseInt(localStorage.getItem(BEST_KEY)||'0');
+document.getElementById('hdr-best').textContent=storedBest;
+
+// Build category grid
+const catGrid=document.getElementById('cat-grid');
+CATEGORIES.forEach(cat=>{
+  const count=QUESTIONS[cat].length;
+  const card=document.createElement('div');
+  card.className='cat-card active';
+  card.innerHTML=`<div class="cat-icon">${cat.split(' ').pop()}</div><div class="cat-name">${cat.split(' ')[0]}</div><div class="cat-count">${count} questions</div>`;
+  card.onclick=()=>{
+    if(selectedCats.has(cat)) selectedCats.delete(cat); else selectedCats.add(cat);
+    card.classList.toggle('active',selectedCats.has(cat));
+  };
+  catGrid.appendChild(card);
+});
+
+function setDiff(d,el){
+  difficulty=d;
+  document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function startGame(){
+  if(!selectedCats.size){alert('Select at least one category!');return;}
+  let pool=[];
+  selectedCats.forEach(cat=>{
+    let qs=QUESTIONS[cat];
+    if(difficulty!=='all') qs=qs.filter(q=>q.diff===difficulty);
+    if(!qs.length) qs=QUESTIONS[cat]; // fallback
+    qs.forEach(q=>pool.push({...q,cat}));
+  });
+  // Shuffle
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  questionsLeft=pool.slice(0,10);
+  currentQ=0; score=0; correct=0; currentStreak=0; bestStreak=0; totalTime=0;
+  document.getElementById('hdr-streak').textContent=0;
+  document.getElementById('home-screen').style.display='none';
+  document.getElementById('game-screen').style.display='block';
+  showQuestion();
+}
+
+function showQuestion(){
+  const q=questionsLeft[currentQ];
+  qStartTime=Date.now();
+  document.getElementById('q-num').textContent=`Question ${currentQ+1} of ${questionsLeft.length}`;
+  document.getElementById('q-score').textContent=`Score: ${score}`;
+  document.getElementById('q-prog').style.width=((currentQ+1)/questionsLeft.length*100)+'%';
+  document.getElementById('q-cat').textContent=q.cat;
+  document.getElementById('q-text').textContent=q.q;
+  document.getElementById('explanation').className='explanation';
+  document.getElementById('explanation').textContent='';
+  document.getElementById('next-btn').style.display='none';
+
+  // Shuffle choices
+  const choices=[...q.choices];
+  for(let i=choices.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[choices[i],choices[j]]=[choices[j],choices[i]];}
+
+  const ans=document.getElementById('answers');
+  ans.innerHTML=choices.map(c=>`<button class="ans-btn" onclick="answer('${esc(c)}','${esc(q.a)}')">${esc(c)}</button>`).join('');
+}
+
+function answer(chosen, correct){
+  const elapsed=(Date.now()-qStartTime)/1000;
+  totalTime+=elapsed;
+  const q=questionsLeft[currentQ];
+  const btns=document.querySelectorAll('.ans-btn');
+  btns.forEach(b=>{
+    b.disabled=true;
+    if(b.textContent===correct) b.classList.add('reveal');
+    if(b.textContent===chosen && chosen!==correct) b.classList.add('wrong');
+    if(b.textContent===chosen && chosen===correct) b.classList.add('correct');
+  });
+  if(chosen===correct){
+    const pts=Math.max(100,Math.round(500/elapsed));
+    score+=pts;
+    document.getElementById('q-score').textContent=`Score: ${score}`;
+    currentStreak++;
+    bestStreak=Math.max(bestStreak,currentStreak);
+    document.getElementById('hdr-streak').textContent=currentStreak;
+  } else {
+    currentStreak=0;
+    document.getElementById('hdr-streak').textContent=0;
+  }
+  if(q.exp){
+    const ex=document.getElementById('explanation');
+    ex.textContent=q.exp;
+    ex.classList.add('show');
+  }
+  document.getElementById('next-btn').style.display='block';
+  document.getElementById('next-btn').textContent=currentQ<questionsLeft.length-1?'Next Question →':'See Results →';
+}
+
+function nextQuestion(){
+  currentQ++;
+  if(currentQ>=questionsLeft.length) showResults();
+  else showQuestion();
+}
+
+function showResults(){
+  document.getElementById('game-screen').style.display='none';
+  document.getElementById('result-screen').style.display='block';
+  const total=questionsLeft.length;
+  const pct=Math.round(correct/total*100);
+  const avgTime=(totalTime/total).toFixed(1);
+  const emojis={90:'🏆',70:'🎉',50:'👍',0:'📚'};
+  const emoji=Object.entries(emojis).reverse().find(([p])=>score>=total*parseInt(p)*5)?.[1]||'📚';
+  const msgs={90:'Brilliant! You\'re a trivia master!',70:'Great job! Well done!',50:'Not bad! Keep practicing!',0:'Keep learning — you\'ll get there!'};
+  const msg=Object.entries(msgs).reverse().find(([p])=>score>=total*parseInt(p)*5)?.[1]||msgs[0];
+
+  document.getElementById('r-emoji').textContent=emoji;
+  document.getElementById('r-score').textContent=score+' pts';
+  document.getElementById('r-msg').textContent=msg;
+  document.getElementById('r-correct').textContent=`${questionsLeft.filter((_,i)=>i<total).length}/${total}`;
+  document.getElementById('r-time').textContent=avgTime+'s';
+  document.getElementById('r-streak').textContent=bestStreak;
+
+  if(score>storedBest){storedBest=score;localStorage.setItem(BEST_KEY,score);document.getElementById('hdr-best').textContent=score;}
+}
+
+function playAgain(){
+  document.getElementById('result-screen').style.display='none';
+  document.getElementById('game-screen').style.display='block';
+  startGame();
+}
+function goHome(){
+  document.getElementById('result-screen').style.display='none';
+  document.getElementById('home-screen').style.display='block';
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+</script>
+</body>
+</html>

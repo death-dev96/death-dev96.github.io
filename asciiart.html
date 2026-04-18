@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AsciiArt</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--surface:#1a1d27;--surface2:#22263a;--border:#2e3347;
+  --text:#e8eaf6;--muted:#8891b5;--accent:#f59e0b;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+header{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:12px}
+header h1{font-size:1.2rem;font-weight:700}header span{font-size:1.5rem}
+.sub{color:var(--muted);font-size:.8rem;margin-left:auto}
+main{flex:1;padding:24px;max-width:860px;margin:0 auto;width:100%}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+input[type=text]{flex:1;min-width:200px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;color:var(--text);padding:10px 14px;font-size:1rem;outline:none;transition:border-color .15s}
+input[type=text]:focus{border-color:var(--accent)}
+.btn{padding:8px 18px;border-radius:8px;border:none;cursor:pointer;font-size:.88rem;font-weight:600;transition:all .15s}
+.btn-primary{background:var(--accent);color:#0f1117}.btn-primary:hover{opacity:.85}
+.btn-sec{background:var(--surface2);border:1px solid var(--border);color:var(--text)}.btn-sec:hover{border-color:var(--accent)}
+.font-grid{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.font-btn{padding:6px 14px;border-radius:16px;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;font-size:.82rem;transition:all .15s}
+.font-btn.active{background:var(--accent);color:#0f1117;border-color:var(--accent)}
+.font-btn:hover:not(.active){border-color:var(--accent);color:var(--accent)}
+.options{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:16px;align-items:center;font-size:.85rem;color:var(--muted)}
+.options label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.options input{accent-color:var(--accent)}
+select{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);padding:6px 10px;font-size:.85rem;outline:none}
+select:focus{border-color:var(--accent)}
+.output-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.output-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);font-size:.82rem;color:var(--muted)}
+#ascii-out{width:100%;padding:16px;background:transparent;border:none;color:var(--accent);font-family:'Courier New',monospace;font-size:.78rem;line-height:1.2;white-space:pre;overflow:auto;min-height:200px;resize:vertical;outline:none}
+</style>
+</head>
+<body>
+<header>
+  <span>🖋️</span>
+  <h1>AsciiArt</h1>
+  <div class="sub">Text to ASCII art generator</div>
+</header>
+<main>
+  <div class="controls">
+    <input type="text" id="txt-in" value="Hello" placeholder="Type text here…" oninput="generate()">
+    <button class="btn btn-primary" onclick="generate()">Generate</button>
+    <button class="btn btn-sec" onclick="copyOut()">Copy</button>
+  </div>
+  <div class="font-grid" id="font-grid"></div>
+  <div class="options">
+    <label>Color: <select id="color-sel" onchange="applyColor()">
+      <option value="#f59e0b">Amber</option>
+      <option value="#34d399">Green</option>
+      <option value="#38bdf8">Cyan</option>
+      <option value="#a855f7">Purple</option>
+      <option value="#f472b6">Pink</option>
+      <option value="#e8eaf6">White</option>
+      <option value="#fb923c">Orange</option>
+    </select></label>
+    <label>Size: <select id="size-sel" onchange="applyColor()">
+      <option value=".65rem">Tiny</option>
+      <option value=".78rem" selected>Small</option>
+      <option value=".95rem">Medium</option>
+      <option value="1.1rem">Large</option>
+    </select></label>
+  </div>
+  <div class="output-wrap">
+    <div class="output-header">
+      <span id="out-info">ASCII Art</span>
+      <button class="btn btn-sec" style="padding:4px 12px;font-size:.78rem" onclick="copyOut()">📋 Copy</button>
+    </div>
+    <textarea id="ascii-out" readonly></textarea>
+  </div>
+</main>
+<script>
+// Big ASCII font maps — hand-crafted 5-row letters
+const FONTS = {};
+
+// BLOCK font (7-row standard)
+FONTS['Block'] = {h:7, chars:{
+  'A':['  ██  ','  ██  ',' ████ ','██  ██','██████','██  ██','██  ██'],
+  'B':['█████ ','██  ██','██  ██','█████ ','██  ██','██  ██','█████ '],
+  'C':[' █████','██    ','██    ','██    ','██    ','██    ',' █████'],
+  'D':['████  ','██ ██ ','██  ██','██  ██','██  ██','██ ██ ','████  '],
+  'E':['██████','██    ','██    ','█████ ','██    ','██    ','██████'],
+  'F':['██████','██    ','██    ','█████ ','██    ','██    ','██    '],
+  'G':[' ████ ','██  ██','██    ','██ ███','██  ██','██  ██',' ████ '],
+  'H':['██  ██','██  ██','██  ██','██████','██  ██','██  ██','██  ██'],
+  'I':['██████','  ██  ','  ██  ','  ██  ','  ██  ','  ██  ','██████'],
+  'J':['██████','   ██ ','   ██ ','   ██ ','   ██ ','██ ██ ',' ████ '],
+  'K':['██  ██','██ ██ ','████  ','███   ','████  ','██ ██ ','██  ██'],
+  'L':['██    ','██    ','██    ','██    ','██    ','██    ','██████'],
+  'M':['██  ██','███ ██','██████','██ ███','██  ██','██  ██','██  ██'],
+  'N':['██  ██','███ ██','██████','██████','██ ███','██  ██','██  ██'],
+  'O':[' ████ ','██  ██','██  ██','██  ██','██  ██','██  ██',' ████ '],
+  'P':['█████ ','██  ██','██  ██','█████ ','██    ','██    ','██    '],
+  'Q':[' ████ ','██  ██','██  ██','██  ██','██ ███','██  ██',' █████'],
+  'R':['█████ ','██  ██','██  ██','█████ ','████  ','██ ██ ','██  ██'],
+  'S':[' █████','██    ','██    ',' ████ ','    ██','    ██','█████ '],
+  'T':['██████','  ██  ','  ██  ','  ██  ','  ██  ','  ██  ','  ██  '],
+  'U':['██  ██','██  ██','██  ██','██  ██','██  ██','██  ██',' ████ '],
+  'V':['██  ██','██  ██','██  ██','██  ██',' ████ ',' ████ ','  ██  '],
+  'W':['██  ██','██  ██','██  ██','██ ███','██████','███ ██','██  ██'],
+  'X':['██  ██',' ████ ','  ██  ','  ██  ','  ██  ',' ████ ','██  ██'],
+  'Y':['██  ██','██  ██',' ████ ','  ██  ','  ██  ','  ██  ','  ██  '],
+  'Z':['██████','   ██ ','  ██  ',' ██   ','██    ','██    ','██████'],
+  '0':[' ████ ','██  ██','██ ███','██████','███ ██','██  ██',' ████ '],
+  '1':['  ██  ',' ███  ','  ██  ','  ██  ','  ██  ','  ██  ','██████'],
+  '2':[' ████ ','██  ██','    ██','   ██ ','  ██  ',' ██   ','██████'],
+  '3':['█████ ','    ██','    ██','  ███ ','    ██','    ██','█████ '],
+  '4':['██  ██','██  ██','██  ██','██████','    ██','    ██','    ██'],
+  '5':['██████','██    ','█████ ','    ██','    ██','██  ██',' ████ '],
+  '6':[' ████ ','██  ██','██    ','█████ ','██  ██','██  ██',' ████ '],
+  '7':['██████','    ██','   ██ ','  ██  ',' ██   ','██    ','██    '],
+  '8':[' ████ ','██  ██','██  ██',' ████ ','██  ██','██  ██',' ████ '],
+  '9':[' ████ ','██  ██','██  ██',' █████','    ██','██  ██',' ████ '],
+  ' ':['      ','      ','      ','      ','      ','      ','      '],
+  '!':['  ██  ','  ██  ','  ██  ','  ██  ','  ██  ','      ','  ██  '],
+  '?':[' ████ ','██  ██','    ██','   ██ ','  ██  ','      ','  ██  '],
+  '.':['      ','      ','      ','      ','      ',' ██   ',' ██   '],
+  ',':['      ','      ','      ','      ','  ██  ','  ██  ',' ██   '],
+}};
+
+// THIN (slim style)
+FONTS['Thin'] = {h:5, chars:{
+  'A':['  /\\  ',' /  \\ ','/ /\\ \\','/_/\\_\\',' '],
+  ' ':['     ','     ','     ','     ','     '],
+}};
+
+// DOTS font
+FONTS['Dots'] = {h:5, chars:{
+  'A':['·· ·· ','·· ·· ','·····  ','··   ··','··   ··'],
+  ' ':['  ','  ','  ','  ','  '],
+}};
+
+// SLANT (/ \ style)
+FONTS['Slant'] = {h:6, chars:{
+  'A':['    ___','   /   |','  / /| |',' / ___ |','/_/  |_|','       '],
+  'B':['______','| ___ \\','| |_/ /','| ___ \\','| |_/ /','\\____/ '],
+  'C':['  ___  ',' / __| ','| (__  ',' \\___| ','      ','      '],
+  ' ':['   ','   ','   ','   ','   ','   '],
+}};
+
+// SIMPLE ASCII style using +, -, |, etc.
+FONTS['Simple'] = {h:5, chars:{}};
+
+// Build Simple font programmatically
+function makeSimple(ch){
+  const MAP={
+    'A':['  A  ',' A A ','AAAAA','A   A','A   A'],
+    'B':['BBBB ','B   B','BBBB ','B   B','BBBB '],
+    'C':[' CCC ','C    ','C    ','C    ',' CCC '],
+    'D':['DDD  ','D  D ','D   D','D  D ','DDD  '],
+    'E':['EEEEE','E    ','EEEE ','E    ','EEEEE'],
+    'F':['FFFFF','F    ','FFFF ','F    ','F    '],
+    'G':[' GGG ','G    ','G  GG','G   G',' GGG '],
+    'H':['H   H','H   H','HHHHH','H   H','H   H'],
+    'I':['IIIII','  I  ','  I  ','  I  ','IIIII'],
+    'J':['JJJJJ','  J  ','  J  ','J J  ',' JJ  '],
+    'K':['K  K ','K K  ','KK   ','K K  ','K  K '],
+    'L':['L    ','L    ','L    ','L    ','LLLLL'],
+    'M':['M   M','MM MM','M M M','M   M','M   M'],
+    'N':['N   N','NN  N','N N N','N  NN','N   N'],
+    'O':[' OOO ','O   O','O   O','O   O',' OOO '],
+    'P':['PPPP ','P   P','PPPP ','P    ','P    '],
+    'Q':[' QQQ ','Q   Q','Q Q Q','Q  QQ',' QQQQ'],
+    'R':['RRRR ','R   R','RRRR ','R  R ','R   R'],
+    'S':[' SSSS','S    ',' SSS ','    S','SSSS '],
+    'T':['TTTTT','  T  ','  T  ','  T  ','  T  '],
+    'U':['U   U','U   U','U   U','U   U',' UUU '],
+    'V':['V   V','V   V','V   V',' V V ','  V  '],
+    'W':['W   W','W   W','W W W','WW WW','W   W'],
+    'X':['X   X',' X X ','  X  ',' X X ','X   X'],
+    'Y':['Y   Y',' Y Y ','  Y  ','  Y  ','  Y  '],
+    'Z':['ZZZZZ','   Z ','  Z  ',' Z   ','ZZZZZ'],
+    '0':[' 000 ','0  0 ','0 0 0','0  0 ',' 000 '],
+    '1':['  1  ',' 11  ','  1  ','  1  ','11111'],
+    '2':[' 222 ','2   2','   2 ','  2  ','22222'],
+    '3':['3333 ','    3',' 333 ','    3','3333 '],
+    '4':['4   4','4   4','44444','    4','    4'],
+    '5':['55555','5    ','5555 ','    5','5555 '],
+    '6':[' 666 ','6    ','6666 ','6   6',' 666 '],
+    '7':['77777','   7 ','  7  ',' 7   ','7    '],
+    '8':[' 888 ','8   8',' 888 ','8   8',' 888 '],
+    '9':[' 999 ','9   9',' 9999','    9',' 999 '],
+    ' ':['     ','     ','     ','     ','     '],
+    '!':['  !  ','  !  ','  !  ','     ','  !  '],
+    '?':[' ??? ','?   ?','  ?  ','     ','  ?  '],
+    '.':['  .  ','     ','     ','     ','  .  '],
+  };
+  return MAP[ch]||['     ','     ','     ','     ','     '];
+}
+['ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 !?.'].join('').split('').forEach(c=>{
+  FONTS['Simple'].chars[c]=makeSimple(c);
+});
+
+// BANNER style (double-line)
+FONTS['Banner'] = {h:6, chars:{}};
+['ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 !?.'].join('').split('').forEach(c=>{
+  const rows=makeSimple(c).map(r=>r.split('').map(ch=>ch!==' '?ch+ch:' ').join(''));
+  FONTS['Banner'].chars[c]=[...rows,''];
+});
+
+// MINI (3-row)
+const MINI={
+  'A':'▲','B':'▬','C':'◡','D':'▷','E':'≡','F':'⊨','G':'⊂','H':'⊓','I':'|','J':'⌐','K':'⋈','L':'L','M':'▲▲','N':'◁▷','O':'○','P':'⊏','Q':'⊙','R':'↱','S':'§','T':'⊤','U':'U','V':'V','W':'W','X':'✕','Y':'Y','Z':'Z',' ':' '
+};
+FONTS['Mini']={h:1, chars:Object.fromEntries(Object.entries(MINI).map(([k,v])=>[[k],[v]]))};
+
+const FONT_NAMES=Object.keys(FONTS);
+let curFont='Block';
+
+function buildFontGrid(){
+  const g=document.getElementById('font-grid');
+  g.innerHTML=FONT_NAMES.map(f=>`<button class="font-btn ${f===curFont?'active':''}" onclick="selectFont('${f}')">${f}</button>`).join('');
+}
+function selectFont(f){curFont=f;buildFontGrid();generate();}
+
+function renderText(text, fontName){
+  const font=FONTS[fontName];
+  if(!font) return text;
+  const h=font.h;
+  const rows=Array.from({length:h},()=>'');
+  text.toUpperCase().split('').forEach(ch=>{
+    const charRows=font.chars[ch]||font.chars[' ']||Array(h).fill('   ');
+    for(let r=0;r<h;r++) rows[r]+=(charRows[r]||'   ')+' ';
+  });
+  return rows.join('\n');
+}
+
+function generate(){
+  const txt=document.getElementById('txt-in').value||' ';
+  const out=renderText(txt.slice(0,20), curFont);
+  document.getElementById('ascii-out').value=out;
+  const lines=out.split('\n').length;
+  const cols=Math.max(...out.split('\n').map(l=>l.length));
+  document.getElementById('out-info').textContent=`${lines} rows × ${cols} cols`;
+  applyColor();
+}
+
+function applyColor(){
+  const color=document.getElementById('color-sel').value;
+  const size=document.getElementById('size-sel').value;
+  const out=document.getElementById('ascii-out');
+  out.style.color=color;
+  out.style.fontSize=size;
+}
+
+function copyOut(){
+  const v=document.getElementById('ascii-out').value;
+  navigator.clipboard.writeText(v).catch(()=>{});
+}
+
+buildFontGrid();
+generate();
+</script>
+</body>
+</html>
