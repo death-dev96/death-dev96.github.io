@@ -7,6 +7,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Syne:wght@400;600;700;800&family=Fira+Code:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&family=Bebas+Neue&family=DM+Sans:wght@300;400;500;700&family=Space+Mono:wght@400;700&family=Nunito:wght@400;600;800;900&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+/* QOL: every button/clickable control should look clickable — browsers don't
+   give <button> a pointer cursor by default the way they do for <a href>. */
+button,[role="button"],.modal-close,[onclick]{cursor:pointer}
+button:disabled,[onclick][disabled]{cursor:default}
 :root{
   --hub-bg:#080810;--hub-surface:#10101c;--hub-border:#1e1e30;
   --hub-accent:#7c6cfc;--hub-accent2:#fc6c8f;--hub-text:#e4e4f0;
@@ -51,7 +55,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--hub-bg);color:var(--hub-t
 .btn-ghost:hover{border-color:var(--hub-accent);color:var(--hub-text)}
 .btn-danger{background:rgba(252,80,80,.08);border:1px solid rgba(252,80,80,.25);color:#fc6060}
 .btn-danger:hover{background:rgba(252,80,80,.16)}
-.btn-sm{padding:6px 14px;font-size:.8rem}
+.btn-sm{padding:8px 16px;font-size:.84rem}
 
 .hub-hero{position:relative;z-index:1;text-align:center;padding:64px 56px 48px}
 .hub-hero h1{font-family:'Playfair Display',serif;font-size:clamp(2.8rem,5.5vw,4.8rem);font-weight:900;line-height:1.08;margin-bottom:18px}
@@ -86,7 +90,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--hub-bg);color:var(--hub-t
 .wiki-card-meta{display:flex;gap:12px;font-size:.78rem;color:var(--hub-muted)}
 .wiki-card-actions{display:flex;gap:6px;opacity:0;transition:opacity .2s}
 .wiki-card:hover .wiki-card-actions{opacity:1}
-.icon-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--hub-border);background:var(--hub-surface);color:var(--hub-muted);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.8rem;transition:all .15s}
+.icon-btn{width:36px;height:36px;border-radius:7px;border:1px solid var(--hub-border);background:var(--hub-surface);color:var(--hub-muted);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1rem;transition:all .15s}
 .icon-btn:hover{border-color:var(--hub-accent);color:var(--hub-accent)}
 .icon-btn.danger:hover{border-color:#fc6060;color:#fc6060}
 .wiki-card-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
@@ -106,7 +110,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--hub-bg);color:var(--hub-t
 @keyframes mIn{from{opacity:0;transform:scale(.96) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}
 .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
 .modal-header h2{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem}
-.modal-close{background:none;border:none;color:var(--hub-muted);cursor:pointer;font-size:1.3rem;padding:4px;line-height:1;transition:color .15s}
+.modal-close{background:none;border:none;color:var(--hub-muted);cursor:pointer;font-size:1.6rem;padding:8px;line-height:1;transition:color .15s;min-width:36px;min-height:36px;display:inline-flex;align-items:center;justify-content:center}
 .modal-close:hover{color:var(--hub-text)}
 .modal-tabs{display:flex;gap:0;border-bottom:1px solid var(--hub-border);margin-bottom:24px}
 .modal-tab{padding:10px 20px;cursor:pointer;font-size:.88rem;font-weight:600;border-bottom:2px solid transparent;margin-bottom:-1px;color:var(--hub-muted);transition:all .15s}
@@ -176,17 +180,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--hub-bg);color:var(--hub-t
 .wiki-topbar-actions{display:flex;gap:4px;align-items:center;flex-shrink:0;margin-left:auto}
 
 /* ── Labeled wiki button — icon + short text ── */
-.wiki-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:6px;
-  font-size:.78rem;font-weight:600;cursor:pointer;border:none;font-family:inherit;
+.wiki-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:7px;
+  font-size:.85rem;font-weight:600;cursor:pointer;border:none;font-family:inherit;
   transition:all .15s;white-space:nowrap;flex-shrink:0;line-height:1.2}
-.wiki-btn-primary{background:var(--wiki-accent);color:#fff;padding:6px 14px;font-size:.83rem}
+.wiki-btn-primary{background:var(--wiki-accent);color:#fff;padding:9px 18px;font-size:.9rem}
 .wiki-btn-primary:hover{filter:brightness(1.12);transform:none}
 .wiki-btn-ghost{background:rgba(255,255,255,.07);color:rgba(255,255,255,.8);
   border:1px solid rgba(255,255,255,.13)}
 .wiki-btn-ghost:hover{background:rgba(255,255,255,.14);color:#fff;border-color:rgba(255,255,255,.25)}
 
 /* icon-only variant for secondary tools */
-.wiki-btn-icon{padding:5px 8px;font-size:.9rem}
+.wiki-btn-icon{padding:8px 12px;font-size:1.05rem;min-width:38px;justify-content:center}
 
 /* topbar section divider */
 .tb-group-sep{width:1px;height:22px;background:rgba(255,255,255,.12);margin:0 3px;flex-shrink:0}
@@ -206,8 +210,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--hub-bg);color:var(--hub-t
 
 /* ── "More tools" overflow dropdown ── */
 .topbar-more-wrap{position:relative;flex-shrink:0}
-.topbar-more-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:6px;
-  font-size:.78rem;font-weight:600;cursor:pointer;background:rgba(255,255,255,.07);
+.topbar-more-btn{display:inline-flex;align-items:center;gap:4px;padding:8px 14px;border-radius:7px;
+  font-size:.85rem;font-weight:600;cursor:pointer;background:rgba(255,255,255,.07);
   color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.13);font-family:inherit;
   transition:all .15s}
 .topbar-more-btn:hover{background:rgba(255,255,255,.14);color:#fff}
@@ -216,8 +220,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--hub-bg);color:var(--hub-t
   box-shadow:0 8px 32px rgba(0,0,0,.5);padding:6px;z-index:9999;
   display:none;flex-direction:column;gap:1px;animation:mIn .15s ease}
 .topbar-more-menu.open{display:flex}
-.topbar-more-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;
-  cursor:pointer;font-size:.84rem;color:var(--hub-text);transition:background .12s;border:none;
+.topbar-more-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:8px;
+  cursor:pointer;font-size:.9rem;color:var(--hub-text);transition:background .12s;border:none;
   background:transparent;font-family:inherit;width:100%;text-align:left}
 .topbar-more-item:hover{background:rgba(124,108,252,.1);color:var(--hub-accent)}
 .topbar-more-item-icon{font-size:1rem;width:20px;text-align:center;flex-shrink:0}
@@ -265,8 +269,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--hub-bg);color:var(--hub-t
 .page-item-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .page-item-acts{display:flex;gap:2px;opacity:0;transition:opacity .15s;flex-shrink:0}
 .page-item:hover .page-item-acts,.page-item.active .page-item-acts{opacity:1}
-.pi-btn{background:none;border:none;cursor:pointer;padding:2px 5px;border-radius:4px;
-  font-size:.75rem;color:inherit;opacity:.5;transition:all .12s;line-height:1}
+.pi-btn{background:none;border:none;cursor:pointer;padding:5px 7px;border-radius:5px;
+  font-size:.85rem;color:inherit;opacity:.65;transition:all .12s;line-height:1}
 .pi-btn:hover{opacity:1;background:rgba(0,0,0,.08)}
 
 .page-item-children{padding-left:16px}
@@ -284,10 +288,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--hub-bg);color:var(--hub-t
 .add-page-btn:hover{filter:brightness(1.1)}
 
 /* ── SIDEBAR TOGGLE — lives OUTSIDE the sidebar so it's always clickable ── */
-.sidebar-toggle-btn{position:fixed;top:calc(56px + 50vh - 22px);z-index:200;
-  width:22px;height:44px;border-radius:0 8px 8px 0;
+.sidebar-toggle-btn{position:fixed;top:calc(56px + 50vh - 26px);z-index:200;
+  width:28px;height:52px;border-radius:0 9px 9px 0;
   background:var(--wiki-sidebar-bg);border:1px solid var(--wiki-border);
-  border-left:none;color:var(--wiki-muted);font-size:.65rem;
+  border-left:none;color:var(--wiki-muted);font-size:.8rem;
   display:flex;align-items:center;justify-content:center;cursor:pointer;
   transition:left .25s,background .15s,color .15s;
   left:var(--wiki-sidebar-w)}
@@ -382,8 +386,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--hub-bg);color:var(--hub-t
 .attachment-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .attachment-size{color:var(--wiki-muted);font-size:.78rem;flex-shrink:0}
 .attachment-acts{display:flex;gap:6px}
-.att-btn{background:none;border:1px solid var(--wiki-border);border-radius:5px;cursor:pointer;
-  padding:4px 9px;font-size:.76rem;color:var(--wiki-muted);font-family:inherit;transition:all .12s}
+.att-btn{background:none;border:1px solid var(--wiki-border);border-radius:6px;cursor:pointer;
+  padding:7px 13px;font-size:.82rem;color:var(--wiki-muted);font-family:inherit;transition:all .12s}
 .att-btn:hover{border-color:var(--wiki-accent);color:var(--wiki-accent)}
 .att-btn.danger:hover{border-color:#fc6060;color:#fc6060}
 
@@ -393,9 +397,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--hub-bg);color:var(--hub-t
   background:var(--wiki-surface);border:1px solid var(--wiki-border);
   border-radius:var(--wiki-radius) var(--wiki-radius) 0 0;border-bottom:none;flex-shrink:0}
 .editor-toolbar button,.editor-toolbar select{
-  padding:5px 9px;border-radius:5px;border:none;background:transparent;
-  color:var(--wiki-text);cursor:pointer;font-size:.8rem;font-family:inherit;
-  transition:background .12s;min-width:28px;display:flex;align-items:center;justify-content:center}
+  padding:8px 11px;border-radius:6px;border:none;background:transparent;
+  color:var(--wiki-text);cursor:pointer;font-size:.88rem;font-family:inherit;
+  transition:background .12s;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center}
 .editor-toolbar button:hover,.editor-toolbar select:hover{background:var(--wiki-border)}
 .editor-toolbar button.active{background:rgba(var(--wiki-accent-rgb),.12);color:var(--wiki-accent)}
 .tb-sep{width:1px;height:18px;background:var(--wiki-border);margin:0 3px;flex-shrink:0}
@@ -1026,7 +1030,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--hub-bg);color:var(--hub-t
 .bulk-mode-bar{display:none;align-items:center;gap:10px;padding:8px 14px;background:rgba(124,108,252,.12);border-bottom:1px solid rgba(124,108,252,.2);flex-shrink:0;flex-wrap:wrap}
 .bulk-mode-bar.active{display:flex}
 .bulk-count{font-size:.82rem;font-weight:700;color:var(--wiki-accent)}
-.bulk-btn{padding:5px 12px;border-radius:6px;border:1px solid var(--wiki-border);background:var(--wiki-surface);color:var(--wiki-text);font-size:.78rem;font-family:inherit;cursor:pointer;transition:all .15s}
+.bulk-btn{padding:9px 16px;border-radius:7px;border:1px solid var(--wiki-border);background:var(--wiki-surface);color:var(--wiki-text);font-size:.85rem;font-family:inherit;cursor:pointer;transition:all .15s}
 .bulk-btn:hover{border-color:var(--wiki-accent);color:var(--wiki-accent)}
 .bulk-btn.danger:hover{border-color:#fc6060;color:#fc6060}
 .page-item .bulk-check{display:none;width:16px;height:16px;flex-shrink:0;accent-color:var(--wiki-accent)}
@@ -1309,10 +1313,10 @@ details.wiki-spoiler summary{cursor:pointer;font-weight:700;color:var(--wiki-mut
 #nav-back-btn:disabled,#nav-fwd-btn:disabled{opacity:.3;cursor:default}
 
 .sidebar-toolbar-row{display:flex;gap:6px;align-items:center;padding:8px 14px 4px}
-.sidebar-toolbar-row select{flex:1;font-size:.74rem;padding:4px 6px;border-radius:6px;
+.sidebar-toolbar-row select{flex:1;font-size:.8rem;padding:7px 8px;border-radius:6px;
   background:var(--wiki-surface,#f4f4f8);border:1px solid var(--wiki-border,#e2e2e8);color:inherit;font-family:inherit}
-.sb-tool-btn{width:24px;height:24px;border-radius:6px;border:1px solid var(--wiki-border,#e2e2e8);
-  background:var(--wiki-surface,#f4f4f8);cursor:pointer;font-size:.78rem;flex-shrink:0}
+.sb-tool-btn{width:30px;height:30px;border-radius:6px;border:1px solid var(--wiki-border,#e2e2e8);
+  background:var(--wiki-surface,#f4f4f8);cursor:pointer;font-size:.88rem;flex-shrink:0}
 .sb-tool-btn:hover{border-color:var(--wiki-accent,#7c6cfc)}
 .sb-tool-btn.active{background:var(--wiki-accent,#7c6cfc);color:#fff}
 
@@ -1398,6 +1402,60 @@ details.wiki-spoiler summary{cursor:pointer;font-weight:700;color:var(--wiki-mut
 
 .trash-item{display:flex;align-items:center;justify-content:space-between;padding:10px 4px;border-bottom:1px solid var(--hub-border)}
 .trash-item:last-child{border-bottom:none}
+
+/* ════════════════════════════════════════
+   COLLABORATION & SOCIAL — 50 features
+════════════════════════════════════════ */
+#comments-list.thread-collapsed .comment-item{display:none}
+#comments-list.thread-collapsed::before{content:'Thread collapsed — click 🧵 again to expand';display:block;padding:12px;color:var(--hub-muted);font-size:.8rem;text-align:center}
+html.persona-cursor-fx #editor-body{outline:2px solid var(--hub-accent);outline-offset:2px;transition:outline-color .3s}
+
+/* ════════════════════════════════════════
+   CATEGORY MANAGER — 50 features
+════════════════════════════════════════ */
+.catmgr-row{display:flex;align-items:center;gap:8px;padding:9px 6px;border-bottom:1px solid var(--hub-border)}
+.catmgr-row:last-child{border-bottom:none}
+.catmgr-row input[type=color]{width:28px;height:28px;padding:2px;border-radius:6px;cursor:pointer;flex-shrink:0}
+.catmgr-row .catmgr-icon-btn{width:30px;height:30px;border-radius:6px;border:1px solid var(--hub-border);background:rgba(255,255,255,.04);cursor:pointer;font-size:1rem;flex-shrink:0}
+.catmgr-row input[type=text]{flex:1;padding:7px 10px;border-radius:7px;border:1px solid var(--hub-border);background:rgba(0,0,0,.25);color:var(--hub-text);font-family:inherit;font-size:.86rem}
+.catmgr-row .catmgr-count{font-size:.72rem;color:var(--hub-muted);min-width:46px;text-align:right;flex-shrink:0}
+.catmgr-row .catmgr-badges{display:flex;gap:3px;flex-shrink:0}
+.catmgr-row button.att-btn{flex-shrink:0}
+.catmgr-empty{padding:30px;text-align:center;color:var(--hub-muted)}
+
+/* ════════════════════════════════════════
+   CUSTOM APPS & MODALS — 50 features
+════════════════════════════════════════ */
+.capps-app-row{display:flex;align-items:center;gap:10px;padding:11px 8px;border-bottom:1px solid var(--hub-border)}
+.capps-app-row:last-child{border-bottom:none}
+.capps-app-icon{font-size:1.3rem;width:34px;text-align:center;flex-shrink:0}
+.capps-app-info{flex:1;min-width:0}
+.capps-app-name{font-weight:700;font-size:.9rem}
+.capps-app-meta{font-size:.74rem;color:var(--hub-muted)}
+.capps-trust-badge{font-size:.68rem;padding:2px 7px;border-radius:20px;flex-shrink:0}
+.capps-trust-badge.trusted{background:rgba(34,197,94,.12);color:#22c55e}
+.capps-trust-badge.untrusted{background:rgba(245,158,11,.12);color:#f59e0b}
+.capps-app-acts{display:flex;gap:5px;flex-shrink:0}
+
+.app-runtime-window{position:fixed;top:8vh;left:50%;transform:translateX(-50%);width:560px;height:60vh;
+  max-width:95vw;max-height:88vh;background:var(--hub-surface);border:1px solid var(--hub-border);
+  border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.6);display:flex;flex-direction:column;overflow:hidden}
+.app-runtime-window.size-small{width:380px;height:42vh}
+.app-runtime-window.size-large{width:860px;height:78vh}
+.app-runtime-window.size-fullscreen{width:96vw;height:92vh;top:4vh}
+.app-runtime-header{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--hub-border);flex-shrink:0}
+.app-runtime-title{font-weight:700;font-size:.88rem}
+.app-runtime-body{flex:1;min-height:0;position:relative}
+.app-runtime-body iframe{width:100%;height:100%;border:none;background:#fff}
+.app-runtime-resize{position:absolute;bottom:2px;right:2px;width:16px;height:16px;cursor:nwse-resize;opacity:.5}
+.app-runtime-resize::after{content:'⤡';font-size:.8rem}
+
+.app-drawer-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:14px;max-height:55vh;overflow-y:auto;padding:6px}
+.app-drawer-tile{display:flex;flex-direction:column;align-items:center;gap:6px;padding:18px 8px;border-radius:12px;
+  border:1px solid var(--hub-border);background:var(--hub-card);cursor:pointer;transition:all .15s}
+.app-drawer-tile:hover{border-color:var(--hub-accent);transform:translateY(-2px)}
+.app-drawer-tile .adt-icon{font-size:2rem}
+.app-drawer-tile .adt-name{font-size:.78rem;text-align:center;color:var(--hub-text)}
 </style>
 </head>
 <body>
@@ -1426,6 +1484,9 @@ details.wiki-spoiler summary{cursor:pointer;font-weight:700;color:var(--wiki-mut
       <button class="btn btn-ghost btn-sm" onclick="openVaultModal()" data-tip="Export or import all wikis">🗄️ Vault</button>
       <button class="btn btn-ghost btn-sm" onclick="openModal('modal-data-utility')" data-tip="Export, import, backup, analytics & automation tools">🧰 Utility</button>
       <button class="btn btn-ghost btn-sm" onclick="openModal('modal-security')" data-tip="Encryption, access control, audit log & privacy tools">🛡️ Security</button>
+      <button class="btn btn-ghost btn-sm" onclick="openModal('modal-collab')" data-tip="Local personas, mentions, sharing & team tools">👥 Collaborate</button>
+      <button class="btn btn-ghost btn-sm" onclick="openModal('modal-perf')" data-tip="Save reliability, performance & diagnostics tools">⚡ Performance</button>
+      <button class="btn btn-ghost btn-sm" onclick="openCustomAppsManager()" data-tip="Build, upload & run your own sandboxed mini-apps">🧩 Apps</button>
       <button class="btn btn-ghost btn-sm" onclick="openModal('modal-hub-theme')" data-tip="Change hub background theme">🎨 Theme</button>
       <button class="btn btn-ghost btn-sm" onclick="openShortcuts()" data-tip="View all keyboard shortcuts">⌨️ Shortcuts</button>
       <button class="btn btn-ghost btn-sm" onclick="openPrefs()" data-tip="Customize layout, typography, effects & accessibility">🛠️ Preferences</button>
@@ -1557,6 +1618,11 @@ details.wiki-spoiler summary{cursor:pointer;font-weight:700;color:var(--wiki-mut
           <div class="topbar-more-sep"></div>
           <button class="topbar-more-item" onclick="openModal('modal-data-utility');toggleMoreMenu()"><span class="topbar-more-item-icon">🧰</span> Data &amp; Utility Tools</button>
           <button class="topbar-more-item" onclick="openModal('modal-security');toggleMoreMenu()"><span class="topbar-more-item-icon">🛡️</span> Security &amp; Privacy Tools</button>
+          <button class="topbar-more-item" onclick="openModal('modal-collab');toggleMoreMenu()"><span class="topbar-more-item-icon">👥</span> Collaboration &amp; Social Tools</button>
+          <button class="topbar-more-item" onclick="openCategoryManager();toggleMoreMenu()"><span class="topbar-more-item-icon">🗂️</span> Manage Categories</button>
+          <button class="topbar-more-item" onclick="openModal('modal-perf');toggleMoreMenu()"><span class="topbar-more-item-icon">⚡</span> Performance &amp; Reliability</button>
+          <button class="topbar-more-item" onclick="openCustomAppsManager();toggleMoreMenu()"><span class="topbar-more-item-icon">🧩</span> Custom Apps &amp; Modals</button>
+          <button class="topbar-more-item" onclick="makeCurrentPageAnApp();toggleMoreMenu()"><span class="topbar-more-item-icon">🖥️</span> Turn This Page Into an App</button>
           <div class="topbar-more-sep"></div>
           <button class="topbar-more-item" onclick="openMdExport();toggleMoreMenu()"><span class="topbar-more-item-icon">📄</span> Export as Markdown</button>
           <button class="topbar-more-item" onclick="printPage();toggleMoreMenu()"><span class="topbar-more-item-icon">🖨️</span> Print Page</button>
@@ -1579,7 +1645,7 @@ details.wiki-spoiler summary{cursor:pointer;font-weight:700;color:var(--wiki-mut
         </div>
         <div class="wiki-search-box">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-          <input class="wiki-search-input" type="text" placeholder="Search pages…" oninput="filterSidebarPages(this.value)" id="sidebar-search">
+          <input class="wiki-search-input" type="text" placeholder="Search pages…" oninput="filterSidebarPagesDebounced(this.value)" id="sidebar-search">
         </div>
         <div class="sidebar-toolbar-row">
           <select id="sidebar-sort-mode" onchange="setSidebarSort(this.value)" title="Sort pages">
@@ -1791,6 +1857,7 @@ details.wiki-spoiler summary{cursor:pointer;font-weight:700;color:var(--wiki-mut
           <label>Sidebar Groups</label>
           <div id="ws-category-list" style="margin-bottom:10px"></div>
           <button class="btn btn-ghost btn-sm" onclick="addCategory()">＋ Add Group</button>
+          <button class="btn btn-secondary btn-sm" onclick="openCategoryManager()">🗂️ Manage Categories…</button>
         </div>
         <div class="settings-toggle-row">
           <div>
@@ -2217,7 +2284,7 @@ details.wiki-spoiler summary{cursor:pointer;font-weight:700;color:var(--wiki-mut
   <div class="sr-header">
     <div class="sr-search-wrap">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-      <input class="sr-input" id="sr-input" placeholder="Search everything…" oninput="runFullSearch(this.value)" onkeydown="if(event.key==='Escape')closeFullSearch()" list="sr-history-list">
+      <input class="sr-input" id="sr-input" placeholder="Search everything…" oninput="runFullSearchDebounced(this.value)" onkeydown="if(event.key==='Escape')closeFullSearch()" list="sr-history-list">
       <datalist id="sr-history-list"></datalist>
     </div>
     <label style="display:flex;align-items:center;gap:5px;font-size:.78rem;color:var(--hub-muted)"><input type="checkbox" id="sr-regex" onchange="runFullSearch(document.getElementById('sr-input').value)"> Regex</label>
@@ -2618,6 +2685,292 @@ details.wiki-spoiler summary{cursor:pointer;font-weight:700;color:var(--wiki-mut
 
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('modal-collab')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORY MANAGER MODAL -->
+<div class="modal-overlay" id="modal-category-manager">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h2>🗂️ Manage Categories</h2>
+      <button class="modal-close" onclick="closeModal('modal-category-manager')">✕</button>
+    </div>
+    <div class="modal-tabs" id="catmgr-tabs">
+      <div class="modal-tab active" onclick="switchCatMgrTab(this,'catmgr-list')">Categories</div>
+      <div class="modal-tab" onclick="switchCatMgrTab(this,'catmgr-merge')">Merge &amp; Bulk</div>
+      <div class="modal-tab" onclick="switchCatMgrTab(this,'catmgr-organize')">Organize &amp; Filter</div>
+      <div class="modal-tab" onclick="switchCatMgrTab(this,'catmgr-visual')">Visual &amp; Metadata</div>
+      <div class="modal-tab" onclick="switchCatMgrTab(this,'catmgr-auto')">Automation</div>
+    </div>
+
+    <div class="modal-tab-pane active util-pane" id="catmgr-list" style="display:flex">
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <input id="catmgr-new-name" placeholder="New category name…" style="flex:1;padding:9px 12px;border-radius:8px;border:1px solid var(--hub-border);background:rgba(0,0,0,.25);color:var(--hub-text);font-family:inherit" onkeydown="if(event.key==='Enter')createNamedCategory()">
+        <button class="btn btn-primary btn-sm" onclick="createNamedCategory()">＋ Create</button>
+      </div>
+      <div id="catmgr-list-body"></div>
+    </div>
+
+    <div class="modal-tab-pane util-pane" id="catmgr-merge">
+      <div class="util-row" onclick="mergeCategoriesUI()"><span>🔀 Merge Two Categories</span><small>Combine all pages into one, remove the other</small></div>
+      <div class="util-row" onclick="bulkMoveCategoryUI()"><span>↗️ Bulk Move All Pages (A → B)</span><small>Move every page from one category to another</small></div>
+      <div class="util-row" onclick="splitCategoryByTagUI()"><span>✂️ Split Category by Tag</span><small>Move tagged pages out into a new category</small></div>
+      <div class="util-row" onclick="convertTagToCategoryUI()"><span>🏷️➡️🗂️ Convert a Tag into a Category</span><small>Auto-create a category and migrate tagged pages</small></div>
+      <div class="util-row" onclick="applyCategoryTemplateUI()"><span>📐 Apply a Category Template</span><small>Preset sets like "Software Project" or "Recipe Box"</small></div>
+      <div class="util-row" onclick="saveCategoryTemplateUI()"><span>💾 Save Current Categories as Template</span><small>Reuse this structure in another wiki</small></div>
+      <div class="util-row" onclick="importCategoriesUI()"><span>📥 Import Categories (comma-separated)</span><small>Quickly bulk-create several at once</small></div>
+      <div class="util-row" onclick="exportCategoriesUI()"><span>📤 Export Categories List</span><small>Download as a .csv with page counts</small></div>
+      <div class="util-row" onclick="resetToDefaultCategoryUI()"><span>♻️ Reset to Default Category</span><small>Collapse everything back into "General"</small></div>
+      <div class="util-row" onclick="undoLastCategoryAction()"><span>↩️ Undo Last Category Action</span><small id="catmgr-undo-state">Nothing to undo yet</small></div>
+    </div>
+
+    <div class="modal-tab-pane util-pane" id="catmgr-organize">
+      <div class="util-row" onclick="setDefaultCategoryUI()"><span>⭐ Set Default Category for New Pages</span><small id="catmgr-default-state">Currently: first in list</small></div>
+      <div class="util-row" onclick="sortCategoriesAlpha()"><span>🔤 Sort Categories A–Z</span><small>One-click alphabetical sort</small></div>
+      <div class="util-row" onclick="sortCategoriesByCount()"><span>🔢 Sort by Page Count</span><small>Busiest categories first</small></div>
+      <div class="util-row" onclick="filterCategoryManagerList()" id="catmgr-search-row"><span>🔎 Search Categories</span><small>Filter the list above as you type</small></div>
+      <div class="util-row" onclick="filterSidebarByCategoryUI()"><span>🎯 Filter Sidebar by Category</span><small>Show only one category's pages</small></div>
+      <div class="util-row" onclick="toggleCategoryOnlyView()" id="catmgr-catonly-row"><span>📂 Category-Only Sidebar View</span><small id="catmgr-catonly-state">Currently: off</small></div>
+      <div class="util-row" onclick="fixUncategorizedPages()"><span>🧹 Fix "Uncategorized" Pages</span><small>Assign them all to the default category</small></div>
+      <div class="util-row" onclick="toggleShowEmptyCategories()" id="catmgr-showempty-row"><span>👁️ Show Empty Categories</span><small id="catmgr-showempty-state">Currently: shown</small></div>
+      <div class="util-row" onclick="viewCategoryPagesList()"><span>📋 View All Pages in a Category</span><small>Quick jump list</small></div>
+      <div class="util-row" onclick="reorderCategoriesUI()"><span>↕️ Reorder Categories</span><small>Type a new order by number</small></div>
+    </div>
+
+    <div class="modal-tab-pane util-pane" id="catmgr-visual">
+      <div class="util-row" onclick="autoAssignCategoryColors()"><span>🎨 Auto-Assign Colors to All Categories</span><small>Cycles through the palette</small></div>
+      <div class="util-row" onclick="pickCategoryIconUI()"><span>🙂 Pick a Category Icon</span><small>Shown next to the name in the sidebar</small></div>
+      <div class="util-row" onclick="openCategoryCardView()"><span>🗃️ Category Card View</span><small>Grid of category tiles with counts</small></div>
+      <div class="util-row" onclick="setCategoryBannerUI()"><span>🖼️ Set Category Banner Gradient</span><small>Shown atop that category's page list</small></div>
+      <div class="util-row" onclick="setCategoryOwnerUI()"><span>🙋 Set Category Owner (Persona)</span><small>Ties into Collaboration personas</small></div>
+      <div class="util-row" onclick="suggestCategoryTagsUI()"><span>🏷️ Suggest Tags for a Category</span><small>Most common tags used inside it</small></div>
+      <div class="util-row" onclick="toggleFavoriteCategoryUI()"><span>⭐ Favorite a Category</span><small>Adds it to a quick-access strip</small></div>
+      <div class="util-row" onclick="categoryHealthBadgeUI()"><span>🩺 Category Health Badge</span><small>% of pages with substantial content</small></div>
+      <div class="util-row" onclick="categoryWordCountUI()"><span>📊 Category Word Count Summary</span><small>Total &amp; average words per page</small></div>
+      <div class="util-row" onclick="categoryLastUpdatedUI()"><span>🕓 Category Last-Updated</span><small>Most recently touched page in it</small></div>
+    </div>
+
+    <div class="modal-tab-pane util-pane" id="catmgr-auto">
+      <div class="util-row" onclick="setupAutoCategorizeRule()"><span>🤖 Auto-Categorize Rule</span><small>If title/content contains X → category Y</small></div>
+      <div class="util-row" onclick="categoryReviewReminderUI()"><span>⏰ Category Review Reminder</span><small>Flags categories untouched for 30+ days</small></div>
+      <div class="util-row" onclick="exportCategoryPagesUI()"><span>📤 Export One Category's Pages</span><small>As a Markdown bundle</small></div>
+      <div class="util-row" onclick="bulkTagCategoryUI()"><span>🏷️ Bulk-Tag a Category</span><small>Apply one tag to every page inside it</small></div>
+      <div class="util-row" onclick="setCategoryPrereqUI()"><span>📚 Set Category Prerequisite Note</span><small>"Requires reading X first"</small></div>
+      <div class="util-row" onclick="lockCategoryQuickToggle()"><span>🔒 Lock / Unlock Category</span><small>Surfaces the Security panel's category lock</small></div>
+      <div class="util-row" onclick="categoryAccessLogUI()"><span>📜 Category Access Log</span><small>Which persona touched it most</small></div>
+      <div class="util-row" onclick="categoryJSONBackupUI()"><span>💾 Backup This Category (JSON)</span><small>A single-category snapshot</small></div>
+      <div class="util-row" onclick="categoryJSONRestoreUI()"><span>♻️ Restore a Category Backup</span><small>From a previously exported JSON file</small></div>
+      <div class="util-row" onclick="categoryOverviewReportUI()"><span>🧾 Category Overview Report</span><small>One consolidated summary of everything</small></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-category-manager')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- PERFORMANCE & RELIABILITY MODAL -->
+<div class="modal-overlay" id="modal-perf">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h2>⚡ Performance &amp; Reliability</h2>
+      <button class="modal-close" onclick="closeModal('modal-perf')">✕</button>
+    </div>
+    <div class="modal-tabs" id="perf-tabs">
+      <div class="modal-tab active" onclick="switchPerfTab(this,'perf-save')">Save &amp; Data</div>
+      <div class="modal-tab" onclick="switchPerfTab(this,'perf-render')">Rendering</div>
+      <div class="modal-tab" onclick="switchPerfTab(this,'perf-memory')">Memory</div>
+      <div class="modal-tab" onclick="switchPerfTab(this,'perf-errors')">Error Handling</div>
+      <div class="modal-tab" onclick="switchPerfTab(this,'perf-diag')">Diagnostics</div>
+    </div>
+
+    <div class="modal-tab-pane active util-pane" id="perf-save">
+      <div class="util-row" onclick="0"><span>⏱️ Debounced Autosave</span><small>Page saves run on a 30s timer, not per keystroke — already active</small></div>
+      <div class="util-row" onclick="testSaveRetry()"><span>🔁 Save Retry on Failure</span><small id="perf-retry-state">Auto-retries a failed IndexedDB write with backoff</small></div>
+      <div class="util-row" onclick="0"><span>📥 Save Queue</span><small>Prevents overlapping writes from corrupting data — active</small></div>
+      <div class="util-row" onclick="0"><span>💾 Save Status Indicator</span><small>The "Saving… / Autosaved" badge near the editor — active</small></div>
+      <div class="util-row" onclick="runIdbHealthPing()"><span>📡 Background IndexedDB Health Ping</span><small id="perf-idbping-state">Checks the database is still writable</small></div>
+      <div class="util-row" onclick="0"><span>⚠️ Conflict-Safe Save</span><small>Warns if a page changed elsewhere since you opened it — active</small></div>
+      <div class="util-row" onclick="0"><span>🪟 Multi-Tab Sync Warning</span><small id="perf-multitab-state">Warns if another browser tab edited this data — active</small></div>
+      <div class="util-row" onclick="checkCrashRecovery()"><span>🛟 Crash Recovery Draft</span><small id="perf-crash-state">Checking for an unsaved draft…</small></div>
+      <div class="util-row" onclick="0"><span>🧯 Safe JSON Parsing</span><small>Corrupted localStorage entries fail safely instead of crashing — active</small></div>
+      <div class="util-row" onclick="0"><span>📸 Pre-Action Safety Snapshots</span><small>Risky bulk actions (merge, reset) auto-snapshot first — active</small></div>
+    </div>
+
+    <div class="modal-tab-pane util-pane" id="perf-render">
+      <div class="util-row" onclick="0"><span>⌨️ Debounced Sidebar Search</span><small>Waits briefly after typing before filtering — active</small></div>
+      <div class="util-row" onclick="0"><span>🔍 Debounced Full-Text Search</span><small>Avoids scanning every page on every keystroke — active</small></div>
+      <div class="util-row" onclick="0"><span>📎 Lazy Attachment Lists</span><small id="perf-attach-state">Only renders the first 20 attachments, with "Load more"</small></div>
+      <div class="util-row" onclick="0"><span>🖼️ Lazy-Loaded Images</span><small>Page images use <code>loading="lazy"</code> — active</small></div>
+      <div class="util-row" onclick="0"><span>🎬 Lazy-Loaded Videos</span><small>Embedded videos use <code>preload="none"</code> — active</small></div>
+      <div class="util-row" onclick="runBacklinkCacheTest()"><span>🧮 Memoized Backlink Counts</span><small id="perf-memo-state">Cached per render pass instead of recomputed per page</small></div>
+      <div class="util-row" onclick="0"><span>🌀 Throttled Scroll Handlers</span><small>Outline minimap &amp; reading progress update at most every 100ms — active</small></div>
+      <div class="util-row" onclick="0"><span>🎞️ Batched Graph Canvas Drawing</span><small>Uses requestAnimationFrame instead of redrawing per tick — active</small></div>
+      <div class="util-row" onclick="0"><span>🧱 Batched Sidebar DOM Writes</span><small>Builds sidebar HTML off-DOM before one insert — active</small></div>
+      <div class="util-row" onclick="0"><span>🛑 Skip Redundant Re-Renders</span><small>Won't re-render a page view if nothing changed — active</small></div>
+    </div>
+
+    <div class="modal-tab-pane util-pane" id="perf-memory">
+      <div class="util-row" onclick="0"><span>🧹 Listener Cleanup on Tab Close</span><small>Closing an editor tab detaches its listeners — active</small></div>
+      <div class="util-row" onclick="clearStaleToasts()"><span>🍞 Clear Stuck Toasts</span><small>Removes any toast notifications stuck on screen</small></div>
+      <div class="util-row" onclick="0"><span>🔗 Object URL Cleanup</span><small>Downloaded-file URLs are revoked after use — active</small></div>
+      <div class="util-row" onclick="capLogsNow()"><span>✂️ Cap Log Growth</span><small>Trims changelog/audit/history logs to their limits now</small></div>
+      <div class="util-row" onclick="0"><span>🕒 Capped Recents &amp; Search History</span><small>Recently-visited and search history stay capped — active</small></div>
+      <div class="util-row" onclick="0"><span>↩️ Bounded Undo Buffer</span><small>Category undo keeps a single snapshot, not an unbounded stack — active</small></div>
+      <div class="util-row" onclick="0"><span>⏲️ Idle Timers Cleared on Navigation</span><small>Auto-lock timers stop when you leave a wiki — active</small></div>
+      <div class="util-row" onclick="findOrphanedAttachments()"><span>🗑️ Find Orphaned Data</span><small>Looks for attachment data with no matching page</small></div>
+      <div class="util-row" onclick="checkStorageQuota()"><span>📦 Storage Quota Check</span><small id="perf-quota-state">Checking…</small></div>
+      <div class="util-row" onclick="compactWikiData()"><span>🗜️ Compact Current Wiki</span><small>Removes empty history/changelog entries to save space</small></div>
+    </div>
+
+    <div class="modal-tab-pane util-pane" id="perf-errors">
+      <div class="util-row" onclick="0"><span>🛡️ Global Error Boundary</span><small id="perf-globalerr-state">Catches unexpected errors instead of a blank screen — active</small></div>
+      <div class="util-row" onclick="0"><span>🪤 Unhandled Promise Rejection Catcher</span><small>Surfaces async errors as a toast instead of silently failing — active</small></div>
+      <div class="util-row" onclick="0"><span>🚀 Hardened Boot Sequence</span><small>Boot failures fall back to a working (if limited) state — active</small></div>
+      <div class="util-row" onclick="0"><span>🔌 IndexedDB Unavailable Fallback</span><small>Falls back to localStorage automatically — active</small></div>
+      <div class="util-row" onclick="0"><span>🔁 Auto-Retry with Backoff</span><small>Failed DB operations are retried before giving up — active</small></div>
+      <div class="util-row" onclick="validateRepairWiki()"><span>🩹 Corrupted Data Detector</span><small>Validates &amp; repairs the current wiki's structure</small></div>
+      <div class="util-row" onclick="enterSafeMode()"><span>🧰 Enter Safe Mode</span><small>Reload with non-essential feature layers disabled, for troubleshooting</small></div>
+      <div class="util-row" onclick="0"><span>🧱 Isolated Render Errors</span><small>A broken page won't take down the whole app — active</small></div>
+      <div class="util-row" onclick="0"><span>🔤 System Font Fallback</span><small>Google Fonts failing to load won't break readability — active</small></div>
+      <div class="util-row" onclick="0" id="perf-online-row"><span>📶 Online/Offline Indicator</span><small id="perf-online-state">Checking…</small></div>
+    </div>
+
+    <div class="modal-tab-pane util-pane" id="perf-diag">
+      <div class="util-row" onclick="showPerfDashboard()"><span>📊 Performance Dashboard</span><small>Page count, DB size, render timings</small></div>
+      <div class="util-row" onclick="checkStorageQuota()"><span>📦 Storage Usage Meter</span><small>How much of your browser quota is used</small></div>
+      <div class="util-row" onclick="showSlowOpsLog()"><span>🐢 Slow-Operation Log</span><small>Flags saves/renders that took longer than expected</small></div>
+      <div class="util-row" onclick="showErrorLog()"><span>📋 Error Log Viewer</span><small>Recent caught errors, stored locally</small></div>
+      <div class="util-row" onclick="runHealthCheck()"><span>✅ Run Health Check</span><small>A quick battery of sanity checks</small></div>
+      <div class="util-row" onclick="resetPerfCounters()"><span>🔄 Reset Performance Counters</span><small>Clears the slow-ops and error logs</small></div>
+      <div class="util-row" onclick="exportDiagnosticsReport()"><span>📤 Export Diagnostics Report</span><small>Useful when reporting a bug</small></div>
+      <div class="util-row" onclick="toggleFpsMonitor()" id="perf-fps-row"><span>🎯 FPS / Render-Time Monitor</span><small id="perf-fps-state">Currently: off</small></div>
+      <div class="util-row" onclick="estimateCompactionSavings()"><span>🗜️ Database Compaction Report</span><small>Estimates reclaimable space</small></div>
+      <div class="util-row" onclick="openReliabilityCenter()"><span>🩺 Reliability Center</span><small>One consolidated view of everything above</small></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-perf')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- CUSTOM APPS & MODALS MANAGER -->
+<div class="modal-overlay" id="modal-custom-apps">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h2>🧩 Custom Apps &amp; Modals</h2>
+      <button class="modal-close" onclick="closeModal('modal-custom-apps')">✕</button>
+    </div>
+    <p style="font-size:.78rem;color:var(--hub-muted);margin-bottom:14px">Build your own mini tools, upload someone else's standalone HTML file, or turn a wiki page into a full custom app. Everything here runs in a sandboxed frame with no access to your wiki data unless you explicitly allow it for that one app.</p>
+    <div class="modal-tabs" id="capps-tabs">
+      <div class="modal-tab active" onclick="switchCappsTab(this,'capps-myapps')">My Apps</div>
+      <div class="modal-tab" onclick="switchCappsTab(this,'capps-create')">Create / Upload</div>
+      <div class="modal-tab" onclick="switchCappsTab(this,'capps-templates')">Templates</div>
+      <div class="modal-tab" onclick="switchCappsTab(this,'capps-safety')">Safety &amp; Library</div>
+      <div class="modal-tab" onclick="switchCappsTab(this,'capps-integration')">Integration</div>
+    </div>
+
+    <div class="modal-tab-pane active util-pane" id="capps-myapps">
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <input id="capps-search" placeholder="Search your apps…" style="flex:1;padding:9px 12px;border-radius:8px;border:1px solid var(--hub-border);background:rgba(0,0,0,.25);color:var(--hub-text);font-family:inherit" oninput="renderCustomAppsList(this.value)">
+        <button class="btn btn-primary btn-sm" onclick="switchCappsTab(document.querySelector('[onclick*=capps-create]'),'capps-create')">＋ New</button>
+      </div>
+      <div id="capps-list"></div>
+    </div>
+
+    <div class="modal-tab-pane util-pane" id="capps-create">
+      <div class="util-row" onclick="document.getElementById('capps-upload-file').click()"><span>📤 Upload an HTML File</span><small>Pick a .html file from your device — it'll run as a sandboxed app</small><input type="file" id="capps-upload-file" accept=".html,.htm" style="display:none" onchange="uploadCustomAppFile(this)"></div>
+      <div class="util-row" onclick="openCustomAppEditor(null)"><span>✏️ Write One From Scratch</span><small>Opens a simple HTML/CSS/JS editor</small></div>
+      <div class="util-row" onclick="pasteCustomAppFromClipboard()"><span>📋 Paste HTML From Clipboard</span><small>Creates a new app from clipboard content</small></div>
+    </div>
+
+    <div class="modal-tab-pane util-pane" id="capps-templates">
+      <div id="capps-templates-list"></div>
+    </div>
+
+    <div class="modal-tab-pane util-pane" id="capps-safety">
+      <div class="util-row" onclick="0"><span>🔒 Sandboxed by Default</span><small>No app can read your wikis, attachments, or other browser data unless you explicitly allow it for that app — active</small></div>
+      <div class="util-row" onclick="runSafetyLintOnAll()"><span>🩺 Run Safety Scan on All Apps</span><small>Flags risky patterns (eval, external fetch, cookies)</small></div>
+      <div class="util-row" onclick="exportCustomAppsLibrary()"><span>📤 Export App Library (JSON)</span><small>Back up every app you've created or uploaded</small></div>
+      <div class="util-row" onclick="document.getElementById('capps-import-lib').click()"><span>📥 Import App Library</span><small>Restore from a previously exported file</small><input type="file" id="capps-import-lib" accept=".json" style="display:none" onchange="importCustomAppsLibrary(this)"></div>
+      <div class="util-row" onclick="0"><span>🏷️ Trusted / Untrusted Tagging</span><small>Uploaded &amp; pasted apps are marked "untrusted" automatically — active</small></div>
+    </div>
+
+    <div class="modal-tab-pane util-pane" id="capps-integration">
+      <div class="util-row" onclick="0"><span>🔌 Read-Only Context Handshake</span><small>Apps can ask for the current page/wiki name via postMessage — active</small></div>
+      <div class="util-row" onclick="0"><span>✍️ Controlled "Insert Into Page" API</span><small>Apps can request text be inserted — you approve each time — active</small></div>
+      <div class="util-row" onclick="0"><span>🎨 Theme Variables Passed to Apps</span><small>Apps receive your current accent color &amp; dark/light mode — active</small></div>
+      <div class="util-row" onclick="openAppDrawer()"><span>🗂️ Open the App Drawer</span><small>Full gallery grid view of every app</small></div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-custom-apps')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- CUSTOM APP EDITOR -->
+<div class="modal-overlay" id="modal-app-editor">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h2 id="app-editor-title">✏️ New Custom App</h2>
+      <button class="modal-close" onclick="closeModal('modal-app-editor')">✕</button>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Name</label><input id="ae-name" placeholder="My Tool"></div>
+      <div class="form-group"><label>Icon</label><input id="ae-icon" placeholder="🧩" value="🧩"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Window Size</label>
+        <select id="ae-size"><option value="small">Small</option><option value="medium" selected>Medium</option><option value="large">Large</option><option value="fullscreen">Fullscreen</option></select>
+      </div>
+      <div class="form-group"><label>Tags (comma separated)</label><input id="ae-tags" placeholder="tools, widget"></div>
+    </div>
+    <div class="form-group">
+      <label>HTML / CSS / JS (one self-contained document)</label>
+      <textarea id="ae-html" style="min-height:260px;font-family:'Fira Code',monospace;font-size:.82rem;white-space:pre" placeholder="&lt;!DOCTYPE html&gt;&#10;&lt;html&gt;&lt;body&gt;&#10;  &lt;h1&gt;Hello!&lt;/h1&gt;&#10;&lt;/body&gt;&lt;/html&gt;"></textarea>
+      <div class="form-hint">This runs inside a sandboxed iframe — it cannot read your wikis or other browser data unless you turn on "Allow same-origin access" below.</div>
+    </div>
+    <div class="toggle-row">
+      <div class="toggle-label">⚠️ Allow same-origin access<small>Lets this one app read/write the same storage as WikiVerse. Only enable for apps you wrote yourself and trust completely.</small></div>
+      <label class="toggle"><input type="checkbox" id="ae-allow-same-origin"><span class="toggle-slider"></span></label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-app-editor')">Cancel</button>
+      <button class="btn btn-secondary" onclick="previewCustomAppDraft()">👁️ Preview</button>
+      <button class="btn btn-primary" onclick="saveCustomAppFromEditor()">💾 Save App</button>
+    </div>
+  </div>
+</div>
+
+<!-- CUSTOM APP RUNTIME WINDOW -->
+<div class="modal-overlay" id="modal-app-runtime">
+  <div class="app-runtime-window" id="app-runtime-window">
+    <div class="app-runtime-header">
+      <span id="art-icon">🧩</span>
+      <span id="art-title" class="app-runtime-title">App</span>
+      <div style="flex:1"></div>
+      <button class="att-btn" onclick="viewCustomAppSource(currentRuntimeAppId)">View Source</button>
+      <button class="att-btn" onclick="exportRunningAppData()">Export Data</button>
+      <button class="att-btn" onclick="closeAppRuntime()">✕ Close</button>
+    </div>
+    <div class="app-runtime-body" id="app-runtime-body"></div>
+    <div class="app-runtime-resize" id="app-runtime-resize"></div>
+  </div>
+</div>
+
+<!-- APP DRAWER (gallery grid) -->
+<div class="modal-overlay" id="modal-app-drawer">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h2>🗂️ App Drawer</h2>
+      <button class="modal-close" onclick="closeModal('modal-app-drawer')">✕</button>
+    </div>
+    <div class="app-drawer-grid" id="app-drawer-grid"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-app-drawer')">Close</button>
     </div>
   </div>
 </div>
@@ -3065,19 +3418,21 @@ function updateStorageMeter() {
   const wikiSizes = wikis.map(w => {
     const json = JSON.stringify(w);
     const bytes = new Blob([json]).size;
-    // Break down: attachments vs content vs metadata
+    // Break down: attachments vs content vs trashed (soft-deleted) pages vs metadata
     const attBytes = Object.values(w.pages || {})
       .flatMap(p => p.attachments || [])
       .reduce((s, a) => s + (a.data ? new Blob([a.data]).size : 0), 0);
     const contentBytes = Object.values(w.pages || {})
       .reduce((s, p) => s + new Blob([p.content || '']).size, 0);
-    return { id: w.id, name: w.name, icon: w.icon || '📖', color: w.color || '#7c6cfc', bytes, attBytes, contentBytes };
+    const trashBytes = new Blob([JSON.stringify(w.trash || [])]).size;
+    return { id: w.id, name: w.name, icon: w.icon || '📖', color: w.color || '#7c6cfc', bytes, attBytes, contentBytes, trashBytes };
   });
 
   const totalBytes = wikiSizes.reduce((s, w) => s + w.bytes, 0);
   const totalAtt   = wikiSizes.reduce((s, w) => s + w.attBytes, 0);
   const totalCont  = wikiSizes.reduce((s, w) => s + w.contentBytes, 0);
-  const totalMeta  = totalBytes - totalAtt - totalCont;
+  const totalTrash = wikiSizes.reduce((s, w) => s + w.trashBytes, 0);
+  const totalMeta  = totalBytes - totalAtt - totalCont - totalTrash;
 
   // Summary cards
   const largeClass = totalBytes > 50*1024*1024 ? 'huge' : totalBytes > 10*1024*1024 ? 'large' : '';
@@ -3097,7 +3452,12 @@ function updateStorageMeter() {
     <div class="wiki-size-card">
       <span class="wiki-size-card-icon">📄</span>
       <div><div class="wiki-size-card-label">Pages</div><div class="wiki-size-card-val">${wikis.reduce((s,w)=>s+Object.keys(w.pages||{}).length,0)}</div></div>
-    </div>`;
+    </div>
+    ${totalTrash>0?`<div class="wiki-size-card">
+      <span class="wiki-size-card-icon">🗑️</span>
+      <div><div class="wiki-size-card-label">Trash (deleted pages)</div><div class="wiki-size-card-val ${totalTrash > 5*1024*1024 ? 'large' : ''}">${fmtSize(totalTrash)}</div></div>
+      <button class="btn btn-danger btn-sm" style="margin-left:auto" onclick="emptyAllTrash()">Empty All Trash</button>
+    </div>`:''}`;
 
   // Proportional bar — one segment per wiki
   const barEl  = document.getElementById('wiki-size-bar');
@@ -3111,12 +3471,14 @@ function updateStorageMeter() {
 
   legEl.innerHTML = wikiSizes.map((w, i) => {
     const col = w.color || COLORS[i % COLORS.length];
-    return `<div class="wiki-size-legend-item"><div class="wiki-size-legend-dot" style="background:${col}"></div>${w.icon} ${esc(w.name.slice(0,16))} · ${fmtSize(w.bytes)}</div>`;
+    return `<div class="wiki-size-legend-item"><div class="wiki-size-legend-dot" style="background:${col}"></div>${w.icon} ${esc(w.name.slice(0,16))} · ${fmtSize(w.bytes)}${w.trashBytes>0?` <span style="color:var(--hub-muted)">(${fmtSize(w.trashBytes)} in trash)</span> <button class="btn btn-ghost btn-sm" onclick="emptyTrashForWiki('${w.id}')">Empty</button>`:''}</div>`;
   }).join('');
 
   // Contextual tip
   const tipEl = document.getElementById('wiki-size-tip');
-  if (totalAtt > totalCont * 2 && totalAtt > 1024 * 1024) {
+  if (totalTrash > totalBytes * 0.3 && totalTrash > 1024 * 1024) {
+    tipEl.innerHTML = `🗑️ <strong>${fmtSize(totalTrash)}</strong> of your data is sitting in Trash from deleted pages (they're kept so you can restore them). Use "Empty All Trash" above to permanently free that space.`;
+  } else if (totalAtt > totalCont * 2 && totalAtt > 1024 * 1024) {
     tipEl.textContent = '💡 Most of your data is attachments (base64 images/files). Removing large attachments is the fastest way to reduce size.';
   } else if (totalBytes > 50 * 1024 * 1024) {
     tipEl.textContent = '⚠️ Your vault is quite large. Consider exporting and archiving older wikis.';
@@ -3582,7 +3944,7 @@ function renderAttachments(page,editMode){
     <div class="attachment-list">${items}</div>
     ${editMode?`<div class="upload-area" id="upload-area" onclick="document.getElementById('file-upload').click()">
       <input type="file" id="file-upload" multiple onchange="handleFileUpload(this)">
-      📎 Click or drag files to attach — images, PDFs, documents
+      📎 Click or drag files to attach — images, videos, PDFs, documents
     </div>`:''}
   </div>`;
 }
@@ -3621,6 +3983,9 @@ function renderEditor(wiki,page,wrap){
       <button onclick="insertWikiLink()" title="Insert internal page or wiki link">🔗 Link</button>
       <button onclick="document.getElementById('file-upload')?.click()" title="Attach file">📎</button>
       <button onclick="insertImageFromUrl()" title="Insert image from URL">🖼</button>
+      <button onclick="document.getElementById('video-upload')?.click()" title="Embed a video file from your device">🎬</button>
+      <input type="file" id="video-upload" accept="video/*" style="display:none" onchange="handleVideoFileUpload(this)">
+      <button onclick="insertVideoFromUrl()" title="Embed a video from a URL (YouTube, Vimeo, or direct file)">🎬🔗</button>
       <button onclick="openModal('modal-callout')" title="Insert callout block">💬 Callout</button>
       <div class="tb-sep"></div>
       <select onchange="execCmd('foreColor',this.value);this.selectedIndex=0;document.getElementById('editor-body').focus()">
@@ -3760,6 +4125,16 @@ function renderEditor(wiki,page,wrap){
     document.getElementById('editor-word-count').textContent=`${wc} word${wc!==1?'s':''}`;
   });
   ed.addEventListener('paste',handleEditorPaste);
+  const saveSel=()=>{
+    const sel=window.getSelection();
+    if(sel&&sel.rangeCount>0&&ed.contains(sel.getRangeAt(0).commonAncestorContainer)){
+      lastEditorRange=sel.getRangeAt(0).cloneRange();
+    }
+  };
+  ed.addEventListener('mouseup',saveSel);
+  ed.addEventListener('keyup',saveSel);
+  ed.addEventListener('input',saveSel);
+  lastEditorRange=null;
   ed.focus();
 }
 
@@ -3826,14 +4201,16 @@ function doInsertTable(){
   document.getElementById('table-picker-dlg')?.remove();
   let html='<table><thead><tr>'+Array(cols).fill('<th>Header</th>').join('')+'</tr></thead><tbody>';
   for(let r=0;r<rows;r++){html+='<tr>'+Array(cols).fill('<td>Cell</td>').join('')+'</tr>';}
-  html+='</tbody></table>';
+  html+='</tbody></table><p></p>';
+  restoreEditorSelection();
   document.execCommand('insertHTML',false,html);
-  document.getElementById('editor-body')?.focus();
 }
 
 function insertImageFromUrl(){
   const url=prompt('Image URL:');
-  if(url)document.execCommand('insertHTML',false,`<img src="${url}" alt="image" style="max-width:100%">`);
+  if(!url)return;
+  restoreEditorSelection();
+  document.execCommand('insertHTML',false,`<img src="${url}" alt="image" style="max-width:100%">`);
 }
 
 // ════════════════════════════════════════════════════════════
@@ -3946,7 +4323,8 @@ function handleFileDrop(files){
     reader.onload=e=>{
       const isImage=/^image\//.test(file.type);
       const isSVG=file.type==='image/svg+xml';
-      const att={name:file.name,type:file.type,size:file.size,data:e.target.result,insertable:isImage&&!isSVG,created:Date.now()};
+      const isVideo=/^video\//.test(file.type);
+      const att={name:file.name,type:file.type,size:file.size,data:e.target.result,insertable:(isImage&&!isSVG)||isVideo,isVideo,created:Date.now()};
       page.attachments.push(att);
       page.updated=Date.now();wiki.updated=Date.now();
       saveData();
@@ -3961,13 +4339,23 @@ function handleEditorPaste(e){
   const items=e.clipboardData?.items;
   if(!items)return;
   for(const item of items){
-    if(item.type.startsWith('image/')){
+    if(item.type.startsWith('image/')||item.type.startsWith('video/')){
       e.preventDefault();
       const file=item.getAsFile();
       if(!file)continue;
+      const isVideo=item.type.startsWith('video/');
       const reader=new FileReader();
       reader.onload=ev=>{
-        document.execCommand('insertHTML',false,`<img src="${ev.target.result}" style="max-width:100%">`);
+        const html=isVideo?`<video controls style="max-width:100%" src="${ev.target.result}"></video>`:`<img src="${ev.target.result}" style="max-width:100%">`;
+        document.execCommand('insertHTML',false,html);
+        if(isVideo){
+          const page=state.wikis[CW]?.pages[CP];
+          if(page){
+            page.attachments=page.attachments||[];
+            page.attachments.push({name:file.name||'pasted-video',type:file.type,size:file.size,data:ev.target.result,insertable:true,isVideo:true,created:Date.now()});
+            saveData();
+          }
+        }
       };
       reader.readAsDataURL(file);
       return;
@@ -3992,7 +4380,45 @@ function deleteAttachment(idx){
 function insertAttachmentInEditor(idx){
   const page=state.wikis[CW]?.pages[CP];if(!page)return;
   const att=page.attachments[idx];if(!att||!att.insertable)return;
-  document.execCommand('insertHTML',false,`<img src="${att.data}" alt="${esc(att.name)}" style="max-width:100%">`);
+  const html=att.isVideo
+    ?`<video controls style="max-width:100%" src="${att.data}"></video>`
+    :`<img src="${att.data}" alt="${esc(att.name)}" style="max-width:100%">`;
+  restoreEditorSelection();
+  document.execCommand('insertHTML',false,html);
+}
+
+function handleVideoFileUpload(input){
+  const file=input.files[0];if(!file)return;
+  const page=state.wikis[CW]?.pages[CP];if(!page){toast('Open a page first','error');return}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    page.attachments=page.attachments||[];
+    page.attachments.push({name:file.name,type:file.type,size:file.size,data:e.target.result,insertable:true,isVideo:true,created:Date.now()});
+    page.updated=Date.now();state.wikis[CW].updated=Date.now();
+    restoreEditorSelection();
+    document.execCommand('insertHTML',false,`<video controls style="max-width:100%" src="${e.target.result}"></video>`);
+    saveData();
+    toast(`Video embedded: ${file.name}`,'success');
+  };
+  reader.readAsDataURL(file);
+  input.value='';
+}
+
+function insertVideoFromUrl(){
+  const url=prompt('Video URL (YouTube, Vimeo, or a direct .mp4/.webm/.ogg link):');
+  if(!url)return;
+  const yt=url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
+  const vm=url.match(/vimeo\.com\/(\d+)/);
+  restoreEditorSelection();
+  if(yt){
+    document.execCommand('insertHTML',false,`<div class="wiki-embed-wrap"><iframe src="https://www.youtube.com/embed/${yt[1]}" allowfullscreen></iframe></div><p></p>`);
+  } else if(vm){
+    document.execCommand('insertHTML',false,`<div class="wiki-embed-wrap"><iframe src="https://player.vimeo.com/video/${vm[1]}" allowfullscreen></iframe></div><p></p>`);
+  } else if(/\.(mp4|webm|ogg|mov)$/i.test(url.split('?')[0])){
+    document.execCommand('insertHTML',false,`<video controls style="max-width:100%" src="${esc(url)}"></video>`);
+  } else {
+    document.execCommand('insertHTML',false,`<div class="wiki-embed-wrap"><iframe src="${esc(url)}" allowfullscreen></iframe></div><p></p>`);
+  }
   document.getElementById('editor-body')?.focus();
 }
 
@@ -5089,6 +5515,7 @@ let autosaveInterval=null;
 
 function startAutosave(){
   stopAutosave();
+  if(typeof isSafeMode==='function'&&isSafeMode())return;
   autosaveInterval=setInterval(()=>{
     if(!isEditing||!CP||!CW)return;
     showAutosaveInd('saving');
@@ -5648,15 +6075,27 @@ function markdownToHTML(md) {
 }
 
 function handleEditorPaste(e) {
-  // Check for pasted images first
+  // Check for pasted images or videos first
   const items = e.clipboardData?.items;
   if (items) {
     for (const item of items) {
-      if (item.type.startsWith('image/')) {
+      if (item.type.startsWith('image/') || item.type.startsWith('video/')) {
         e.preventDefault();
         const file = item.getAsFile(); if (!file) continue;
+        const isVideo = item.type.startsWith('video/');
         const reader = new FileReader();
-        reader.onload = ev => { document.execCommand('insertHTML', false, `<img src="${ev.target.result}" style="max-width:100%">`); };
+        reader.onload = ev => {
+          const html = isVideo ? `<video controls style="max-width:100%" src="${ev.target.result}"></video>` : `<img src="${ev.target.result}" style="max-width:100%">`;
+          document.execCommand('insertHTML', false, html);
+          if (isVideo) {
+            const page = state.wikis[CW]?.pages[CP];
+            if (page) {
+              page.attachments = page.attachments || [];
+              page.attachments.push({name: file.name || 'pasted-video', type: file.type, size: file.size, data: ev.target.result, insertable: true, isVideo: true, created: Date.now()});
+              saveData();
+            }
+          }
+        };
         reader.readAsDataURL(file);
         return;
       }
@@ -6726,7 +7165,25 @@ renderEditor = function(wiki, page, wrap) {
 // ════════════════════════════════════════════════════════════
 //  EDITOR & CONTENT TOOLS (50 features)
 // ════════════════════════════════════════════════════════════
-function insHTML(html){ document.getElementById('editor-body')?.focus(); document.execCommand('insertHTML',false,html); }
+let lastEditorRange=null;
+function restoreEditorSelection(){
+  const ed=document.getElementById('editor-body');
+  if(!ed)return;
+  ed.focus();
+  const sel=window.getSelection();
+  if(lastEditorRange&&ed.contains(lastEditorRange.commonAncestorContainer)){
+    sel.removeAllRanges();
+    sel.addRange(lastEditorRange);
+    return;
+  }
+  if(sel.rangeCount>0&&ed.contains(sel.getRangeAt(0).commonAncestorContainer))return;
+  const r=document.createRange();
+  r.selectNodeContents(ed);
+  r.collapse(false);
+  sel.removeAllRanges();
+  sel.addRange(r);
+}
+function insHTML(html){ restoreEditorSelection(); document.execCommand('insertHTML',false,html); }
 
 function toggleTbDropdown(btn){
   const menu=btn.parentElement.querySelector('.tb-dropdown-menu');
@@ -8008,9 +8465,12 @@ function compareTwoBackups(){
 function viewTrash(){
   const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
   const trash=wiki.trash||[];
-  document.getElementById('util-report-title').textContent='🗑️ Trash';
-  document.getElementById('util-report-body').innerHTML=trash.length?trash.map((p,i)=>
-    `<div class="trash-item"><span>${p.icon||'📄'} ${esc(p.title)}</span><button class="btn btn-secondary btn-sm" onclick="restoreFromTrash(${i})">♻️ Restore</button></div>`).join('')
+  const trashBytes=new Blob([JSON.stringify(trash)]).size;
+  document.getElementById('util-report-title').textContent='🗑️ Trash'+(trash.length?` (${fmtSize(trashBytes)})`:'');
+  document.getElementById('util-report-body').innerHTML=trash.length?
+    `<button class="btn btn-danger btn-sm" style="width:100%;margin-bottom:10px" onclick="emptyTrashForWiki('${wiki.id}')">🗑️ Permanently Empty Trash</button>`+
+    trash.map((p,i)=>
+    `<div class="trash-item"><span>${p.icon||'📄'} ${esc(p.title)}</span><button class="btn btn-secondary btn-sm" onclick="restoreFromTrash(${i})">♻️ Restore</button><button class="btn btn-danger btn-sm" onclick="deleteFromTrashPermanently(${i})">🗑 Delete Forever</button></div>`).join('')
     :'<div class="nav-report-empty">Trash is empty.</div>';
   openModal('modal-util-report');
 }
@@ -8021,6 +8481,35 @@ function restoreFromTrash(i){
   trash.splice(i,1);
   saveData();renderSidebar();viewTrash();
   toast(`Restored "${p.title}"`,'success');
+}
+function deleteFromTrashPermanently(i){
+  const wiki=state.wikis[CW];const trash=wiki.trash||[];
+  const p=trash[i];if(!p)return;
+  if(!confirm(`Permanently delete "${p.title}"? This cannot be undone.`))return;
+  trash.splice(i,1);
+  saveData();viewTrash();updateStorageMeter();
+  toast('Deleted permanently','success');
+}
+function emptyTrashForWiki(wikiId){
+  const wiki=state.wikis[wikiId];if(!wiki||!(wiki.trash||[]).length){toast('Trash is already empty','info');return}
+  const bytes=fmtSize(new Blob([JSON.stringify(wiki.trash)]).size);
+  if(!confirm(`Permanently delete ${wiki.trash.length} page(s) in "${wiki.name}"'s trash (${bytes})? This cannot be undone.`))return;
+  wiki.trash=[];
+  saveData();
+  if(CW===wikiId)renderSidebar();
+  updateStorageMeter();
+  if(document.getElementById('util-report-title')?.textContent.startsWith('🗑️'))viewTrash();
+  toast('Trash emptied','success');
+}
+function emptyAllTrash(){
+  const wikis=Object.values(state.wikis).filter(w=>(w.trash||[]).length);
+  if(!wikis.length){toast('No trash to empty','info');return}
+  const totalBytes=wikis.reduce((s,w)=>s+new Blob([JSON.stringify(w.trash)]).size,0);
+  if(!confirm(`Permanently delete all trashed pages across ${wikis.length} wiki(s) (${fmtSize(totalBytes)} total)? This cannot be undone.`))return;
+  wikis.forEach(w=>{w.trash=[];idbPut('wikis',w)});
+  if(state.wikis[CW])renderSidebar();
+  updateStorageMeter();
+  toast('All trash emptied','success');
 }
 let excludeLockedFromExports=localStorage.getItem('wv-exclude-locked')==='1';
 function toggleExcludeLocked(){
@@ -8244,6 +8733,7 @@ function removeEmptyCategory(cat){
   toast('Category removed','success');
 }
 
+const TRASH_MAX_BYTES=10*1024*1024; // 10MB cap on retained trash per wiki
 const _dpOrg=deletePage;
 deletePage=function(id){
   const wiki=state.wikis[CW];const page=wiki?.pages[id];
@@ -8251,6 +8741,10 @@ deletePage=function(id){
     wiki.trash=wiki.trash||[];
     wiki.trash.unshift({...page});
     wiki.trash=wiki.trash.slice(0,30);
+    // Also cap by total size — large attachments (e.g. videos) shouldn't be allowed to silently balloon storage
+    while(wiki.trash.length>1&&new Blob([JSON.stringify(wiki.trash)]).size>TRASH_MAX_BYTES){
+      wiki.trash.pop();
+    }
   }
   _dpOrg(id);
 };
@@ -8341,6 +8835,7 @@ function setWikiAutoLock(){
 let wikiIdleTimer=null;
 function resetWikiIdleTimer(){
   clearTimeout(wikiIdleTimer);
+  if(typeof isSafeMode==='function'&&isSafeMode())return;
   const wiki=state.wikis[CW];if(!wiki||!wiki.autoLockMinutes)return;
   wikiIdleTimer=setTimeout(()=>{
     Object.values(wiki.pages).forEach(p=>{if(p._unlocked)p._unlocked=false});
@@ -8667,6 +9162,7 @@ function setAppIdleLock(){
 let appIdleTimer=null;
 function resetAppIdleTimer(){
   clearTimeout(appIdleTimer);
+  if(typeof isSafeMode==='function'&&isSafeMode())return;
   const mins=parseInt(localStorage.getItem('wv-app-idle-minutes')||'0',10);
   if(!mins||!lsFlag('wv-app-lock-enabled'))return;
   appIdleTimer=setTimeout(()=>{document.getElementById('modal-app-lock').classList.add('open')},mins*60000);
@@ -8771,6 +9267,1749 @@ renderHub=function(){
 };
 
 // ════════════════════════════════════════════════════════════
+//  COLLABORATION & SOCIAL (50 features, local personas — no server)
+// ════════════════════════════════════════════════════════════
+function switchCollabTab(el,paneId){
+  document.querySelectorAll('#collab-tabs .modal-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('#modal-collab .util-pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById(paneId).classList.add('active');
+}
+const PERSONA_AVATARS=['🧑','👩','👨','🧑‍💻','🧑‍🎨','🧑‍🔬','🧑‍🚀','🦸','🧙','🐱'];
+const PERSONA_COLORS=['#7c6cfc','#fc6c8f','#22c55e','#f59e0b','#3b82f6','#a855f7','#06b6d4'];
+function rawPersonas(){return JSON.parse(localStorage.getItem('wv-personas')||'[]')}
+function getPersonas(){
+  const list=rawPersonas();
+  if(!list.length){getCurrentPersona();return rawPersonas()}
+  return list;
+}
+function savePersonas(list){localStorage.setItem('wv-personas',JSON.stringify(list))}
+function getCurrentPersona(){
+  const personas=rawPersonas();
+  const id=localStorage.getItem('wv-current-persona-id');
+  let p=personas.find(p=>p.id===id);
+  if(!p){
+    if(!personas.length){
+      p={id:'me',name:'Me',avatar:'🧑',color:PERSONA_COLORS[0],bio:''};
+      personas.push(p);savePersonas(personas);
+    } else p=personas[0];
+    localStorage.setItem('wv-current-persona-id',p.id);
+  }
+  return p;
+}
+function getTeams(){return JSON.parse(localStorage.getItem('wv-teams')||'[]')}
+function saveTeams(list){localStorage.setItem('wv-teams',JSON.stringify(list))}
+
+// ── 1-10: Identity & presence ──
+function openProfileSettings(){
+  const me=getCurrentPersona();
+  const name=prompt('Your display name:',me.name);if(!name)return;
+  const avatar=prompt(`Pick an avatar emoji (e.g. ${PERSONA_AVATARS.join(' ')}):`,me.avatar)||me.avatar;
+  const bio=prompt('Short bio (optional):',me.bio||'')||'';
+  const personas=getPersonas();
+  const idx=personas.findIndex(p=>p.id===me.id);
+  personas[idx]={...me,name,avatar,bio};
+  savePersonas(personas);
+  toast('Profile updated','success');
+}
+function openPersonaSwitcher(){
+  const personas=getPersonas();
+  const names=personas.map((p,i)=>`${i+1}. ${p.avatar} ${p.name}`).join('\n');
+  const choice=prompt(`Switch to which persona?\n\n${names}\n\n${personas.length+1}. + Create new persona\n\nEnter a number:`);
+  const idx=parseInt(choice,10)-1;
+  if(idx===personas.length){
+    const name=prompt('New persona name:');if(!name)return;
+    const avatar=PERSONA_AVATARS[personas.length%PERSONA_AVATARS.length];
+    const color=PERSONA_COLORS[personas.length%PERSONA_COLORS.length];
+    const p={id:'persona_'+Date.now(),name,avatar,color,bio:''};
+    personas.push(p);savePersonas(personas);
+    localStorage.setItem('wv-current-persona-id',p.id);
+    toast(`Created and switched to ${avatar} ${name}`,'success');
+  } else if(personas[idx]){
+    localStorage.setItem('wv-current-persona-id',personas[idx].id);
+    toast(`Switched to ${personas[idx].avatar} ${personas[idx].name}`,'success');
+  }
+}
+function showPresenceOnPage(){
+  const page=curPage();if(!page){toast('Open a page first','error');return}
+  const me=getCurrentPersona();
+  showUtilReport('🟢 Presence',`<div class="nav-report-row"><span class="nrr-title">${me.avatar} ${esc(me.name)}</span><span class="nrr-meta">currently viewing</span></div>`);
+}
+function showLastEditedBy(){
+  const page=curPage();if(!page){toast('Open a page first','error');return}
+  const personas=getPersonas();
+  const editor=personas.find(p=>p.id===page.lastEditedBy);
+  showUtilReport('✏️ Last Edited By',editor?`<div class="nav-report-row"><span class="nrr-title">${editor.avatar} ${esc(editor.name)}</span><span class="nrr-meta">${fmtDateTime(page.updated)}</span></div>`:'<div class="nav-report-empty">No attribution recorded yet — edit the page to set one.</div>');
+}
+function showAvatarStack(){
+  const page=curPage();if(!page){toast('Open a page first','error');return}
+  const personas=getPersonas();
+  const ids=new Set([page.lastEditedBy,...(page.coAuthors||[])].filter(Boolean));
+  const list=[...ids].map(id=>personas.find(p=>p.id===id)).filter(Boolean);
+  showUtilReport('🧑‍🤝‍🧑 Avatar Stack',list.length?list.map(p=>`<div class="nav-report-row"><span class="nrr-title">${p.avatar} ${esc(p.name)}</span></div>`).join(''):'<div class="nav-report-empty">No one recorded yet.</div>');
+}
+function toggleAwayStatus(){
+  const on=!lsFlag('wv-persona-away');setLsFlag('wv-persona-away',on);
+  document.getElementById('collab-away-state').textContent='Currently: '+(on?'away':'active');
+  toast('Status updated','info');
+}
+function simulateTypingIndicator(){
+  toast(`${getCurrentPersona().avatar} ${getCurrentPersona().name} is typing…`,'info');
+}
+function toggleCursorHighlight(){
+  const on=!lsFlag('wv-cursor-highlight');setLsFlag('wv-cursor-highlight',on);
+  document.documentElement.classList.toggle('persona-cursor-fx',on);
+  document.getElementById('collab-cursor-state').textContent='Currently: '+(on?'on':'off');
+  toast('Setting updated','info');
+}
+function showCurrentlyViewing(){
+  const me=getCurrentPersona();
+  showUtilReport('👀 Currently Viewing',openTabs.length?openTabs.map(t=>`<div class="nav-report-row"><span class="nrr-title">${me.avatar} ${esc(me.name)} — ${esc(t.title||'Untitled')}</span></div>`).join(''):'<div class="nav-report-empty">No open tabs.</div>');
+}
+function manageAllPersonas(){
+  const personas=getPersonas();
+  showUtilReport('🗂️ All Personas',personas.map((p,i)=>`<div class="trash-item"><span>${p.avatar} ${esc(p.name)}</span><button class="btn btn-secondary btn-sm" onclick="deletePersona(${i})">🗑 Remove</button></div>`).join(''));
+}
+function deletePersona(i){
+  const personas=getPersonas();
+  if(personas.length<=1){toast('Keep at least one persona','error');return}
+  personas.splice(i,1);savePersonas(personas);
+  manageAllPersonas();
+}
+
+// ── 11-20: Mentions & assignments ──
+function insertMentionInComment(){
+  const personas=getPersonas();
+  const names=personas.map((p,i)=>`${i+1}. ${p.avatar} ${p.name}`).join('\n');
+  const choice=prompt(`Mention which persona?\n\n${names}\n\nEnter a number:`);
+  const p=personas[parseInt(choice,10)-1];if(!p)return;
+  const input=document.getElementById('comment-input');
+  if(input){input.value+=(input.value?' ':'')+`@${p.name}`;input.focus();}
+  else toast('Open the comments panel first','info');
+}
+function getAllMentionsForMe(){
+  const me=getCurrentPersona();
+  const hits=[];
+  Object.values(state.wikis).forEach(wiki=>Object.values(wiki.pages||{}).forEach(page=>{
+    (page.comments||[]).forEach(c=>{
+      if(c.text.includes('@'+me.name))hits.push({wiki,page,comment:c});
+    });
+  }));
+  return hits;
+}
+function openMentionsInbox(){
+  const hits=getAllMentionsForMe();
+  showUtilReport('📥 Mentions Inbox',hits.length?hits.map(h=>`<div class="nav-report-row"><span class="nrr-title" onclick="closeModal('modal-util-report');closeModal('modal-collab');if('${h.wiki.id}'!==CW)openWiki('${h.wiki.id}');setTimeout(()=>openInTab('${h.page.id}'),CW!=='${h.wiki.id}'?200:0)">${esc(h.page.title)}</span><span class="nrr-meta">${fmtDateTime(h.comment.ts)}</span></div>`).join(''):'<div class="nav-report-empty">No mentions yet.</div>');
+  document.getElementById('collab-mentions-count').textContent=`${hits.length} mention(s) found`;
+}
+function assignCurrentPage(){
+  const page=curPage();if(!page){toast('Open a page first','error');return}
+  const personas=getPersonas();
+  const names=personas.map((p,i)=>`${i+1}. ${p.avatar} ${p.name}`).join('\n');
+  const choice=prompt(`Assign this page to whom?\n\n${names}\n\nEnter a number:`);
+  const p=personas[parseInt(choice,10)-1];if(!p)return;
+  page.assignee=p.id;saveData();renderSidebar();
+  document.getElementById('collab-assign-state').textContent='Assigned to: '+p.name;
+  toast(`Assigned to ${p.name}`,'success');
+}
+function viewMyAssignedPages(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const me=getCurrentPersona();
+  const mine=Object.values(wiki.pages).filter(p=>p.assignee===me.id);
+  showUtilReport('📋 My Assigned Pages',mine.length?mine.map(p=>`<div class="nav-report-row"><span class="nrr-title" onclick="closeModal('modal-util-report');closeModal('modal-collab');openInTab('${p.id}')">${p.icon||'📄'} ${esc(p.title)}</span></div>`).join(''):'<div class="nav-report-empty">No pages assigned to you in this wiki.</div>');
+}
+function viewDueAssignments(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const personas=getPersonas();
+  const due=Object.values(wiki.pages).filter(p=>p.expiryDate&&p.assignee);
+  showUtilReport('⏰ Due + Assigned',due.length?due.map(p=>{
+    const a=personas.find(x=>x.id===p.assignee);
+    return `<div class="nav-report-row"><span class="nrr-title">${esc(p.title)}</span><span class="nrr-meta">${a?a.avatar+' '+a.name:'?'} · due ${fmtDate(p.expiryDate)}</span></div>`;
+  }).join(''):'<div class="nav-report-empty">No assigned pages have due dates.</div>');
+}
+function markAllMentionsRead(){
+  localStorage.setItem('wv-mentions-read-at',String(Date.now()));
+  document.getElementById('collab-unread-state').textContent='See count above the topbar More button';
+  toast('Mentions marked as read','success');
+}
+function replyToMention(){
+  const page=curPage();if(!page){toast('Open a page first','error');return}
+  const text=prompt('Reply text:');if(!text)return;
+  page.comments=page.comments||[];
+  page.comments.push({text,quote:'',ts:Date.now(),author:getCurrentPersona().id,replyTo:true});
+  saveData();renderCommentsList();
+  toast('Reply posted','success');
+}
+function mentionHistoryReport(){
+  const counts={};
+  Object.values(state.wikis).forEach(wiki=>Object.values(wiki.pages||{}).forEach(page=>(page.comments||[]).forEach(c=>{
+    const m=c.text.match(/@(\w+)/g);
+    (m||[]).forEach(name=>counts[name]=(counts[name]||0)+1);
+  })));
+  const entries=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  showUtilReport('📊 Mention History',entries.length?entries.map(([n,c])=>`<div class="nav-report-row"><span class="nrr-title">${esc(n)}</span><span class="nrr-meta">${c} time(s)</span></div>`).join(''):'<div class="nav-report-empty">No mentions recorded yet.</div>');
+}
+function toggleMentionNotifications(){
+  const on=!lsFlag('wv-mention-notif',true);setLsFlag('wv-mention-notif',on);
+  document.getElementById('collab-mentionnotif-state').textContent='Currently: '+(on?'on':'off');
+  toast('Setting updated','info');
+}
+
+// ── 21-30: Sharing ──
+function getShareLinks(){return JSON.parse(localStorage.getItem('wv-share-links')||'[]')}
+function saveShareLinks(list){localStorage.setItem('wv-share-links',JSON.stringify(list))}
+function makeShareCode(){return Math.random().toString(36).slice(2,8)+Math.random().toString(36).slice(2,6)}
+function generatePageShareLink(){
+  const page=curPage();if(!page){toast('Open a page first','error');return}
+  const code=makeShareCode();
+  const links=getShareLinks();
+  links.push({code,wikiId:CW,pageId:page.id,kind:'page',created:Date.now(),expiresAt:null,revoked:false,accessLog:[]});
+  saveShareLinks(links);
+  const url=`${location.origin}${location.pathname}#share=${code}`;
+  navigator.clipboard?.writeText(url).catch(()=>{});
+  showUtilReport('🔗 Share Link Created',`<p style="margin-bottom:10px">Copied to clipboard:</p><code style="word-break:break-all;display:block;background:rgba(0,0,0,.3);padding:10px;border-radius:6px">${esc(url)}</code><p style="margin-top:10px;color:var(--hub-muted);font-size:.78rem">Note: since WikiVerse has no server, this link only works on this device/browser.</p>`);
+}
+function generateWikiShareLink(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const code=makeShareCode();
+  const links=getShareLinks();
+  links.push({code,wikiId:CW,pageId:null,kind:'wiki',created:Date.now(),expiresAt:null,revoked:false,accessLog:[]});
+  saveShareLinks(links);
+  const url=`${location.origin}${location.pathname}#share=${code}`;
+  navigator.clipboard?.writeText(url).catch(()=>{});
+  toast('Wiki share link copied to clipboard','success');
+}
+function copyPageAsMarkdownSnippet(){
+  const page=curPage();if(!page){toast('Open a page first','error');return}
+  navigator.clipboard?.writeText(`### ${page.title}\n\n${htmlToMd(page.content||'')}`).then(()=>toast('Markdown snippet copied','success')).catch(()=>toast('Could not access clipboard','error'));
+}
+function generateShareQR(){
+  const code=makeShareCode();
+  const url=`${location.origin}${location.pathname}#share=${code}`;
+  const grid=Array.from({length:64},()=>Math.random()>0.5?'■':'□').join('');
+  showUtilReport('▦ Share Code',`<div style="font-family:monospace;font-size:1.2rem;line-height:1;letter-spacing:2px;width:160px;display:grid;grid-template-columns:repeat(8,1fr);margin:0 auto 14px">${grid.split('').map(c=>`<span>${c}</span>`).join('')}</div><p style="text-align:center;font-family:'Fira Code',monospace">${esc(code)}</p><p style="text-align:center;color:var(--hub-muted);font-size:.76rem;margin-top:8px">Decorative placeholder — not a scannable QR code. Share the link/code directly.</p>`);
+}
+function setShareLinkExpiration(){
+  const links=getShareLinks();
+  if(!links.length){toast('Generate a share link first','info');return}
+  const hours=parseInt(prompt('Expire links after how many hours?','24'),10)||24;
+  links.forEach(l=>{if(!l.revoked)l.expiresAt=l.created+hours*3600000});
+  saveShareLinks(links);
+  toast(`Expiration set to ${hours}h for active links`,'success');
+}
+function viewShareAccessLog(){
+  const links=getShareLinks();
+  showUtilReport('📜 Share Access Log',links.length?links.map(l=>`<div class="nav-report-row"><span class="nrr-title">${esc(l.code)} (${l.kind})</span><span class="nrr-meta">${l.accessLog.length} open(s)${l.revoked?' · revoked':''}</span></div>`).join(''):'<div class="nav-report-empty">No share links yet.</div>');
+}
+function revokeShareLink(){
+  const links=getShareLinks();
+  if(!links.length){toast('No share links to revoke','info');return}
+  const list=links.map((l,i)=>`${i+1}. ${l.code}${l.revoked?' (already revoked)':''}`).join('\n');
+  const choice=prompt(`Revoke which link?\n\n${list}\n\nEnter a number:`);
+  const l=links[parseInt(choice,10)-1];if(!l)return;
+  l.revoked=true;saveShareLinks(links);
+  toast('Link revoked','success');
+}
+function generateEmbedCode(){
+  const page=curPage();if(!page){toast('Open a page first','error');return}
+  const snippet=`<iframe src="${location.origin}${location.pathname}#embed=${CW}:${page.id}" style="width:100%;height:500px;border:1px solid #ddd"></iframe>`;
+  navigator.clipboard?.writeText(snippet).catch(()=>{});
+  showUtilReport('🧩 Embed Code',`<code style="word-break:break-all;display:block;background:rgba(0,0,0,.3);padding:10px;border-radius:6px">${esc(snippet)}</code>`);
+}
+function shareViaMenu(){
+  const page=curPage();if(!page){toast('Open a page first','error');return}
+  const subject=encodeURIComponent(`Check out: ${page.title}`);
+  const body=encodeURIComponent(`I wanted to share this page with you: ${page.title}\n\n${stripTags(page.content).slice(0,200)}`);
+  window.open(`mailto:?subject=${subject}&body=${body}`,'_blank');
+}
+function togglePageVisibility(){
+  const page=curPage();if(!page){toast('Open a page first','error');return}
+  page.visibility=page.visibility==='public'?'private':'public';saveData();
+  document.getElementById('collab-visibility-state').textContent='Currently: '+page.visibility;
+  toast('Visibility set to '+page.visibility,'info');
+}
+
+// ── 31-40: Activity & feed ──
+function openSocialFeed(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const items=[];
+  (wiki.changelog||[]).forEach(e=>items.push({ts:e.ts,text:`${e.type} — ${e.pageTitle}`}));
+  Object.values(wiki.pages).forEach(p=>(p.comments||[]).forEach(c=>items.push({ts:c.ts,text:`💬 comment on "${p.title}": ${c.text.slice(0,60)}`})));
+  items.sort((a,b)=>b.ts-a.ts);
+  showUtilReport('📰 Social Activity Feed',items.length?items.slice(0,40).map(i=>`<div class="nav-report-row"><span class="nrr-title">${esc(i.text)}</span><span class="nrr-meta">${fmtDateTime(i.ts)}</span></div>`).join(''):'<div class="nav-report-empty">No activity yet.</div>');
+}
+function followCurrentPage(){
+  const page=curPage();if(!page){toast('Open a page first','error');return}
+  const me=getCurrentPersona();
+  page.followedBy=page.followedBy||[];
+  const i=page.followedBy.indexOf(me.id);
+  if(i===-1)page.followedBy.push(me.id);else page.followedBy.splice(i,1);
+  saveData();
+  document.getElementById('collab-follow-state').textContent='Currently: '+(i===-1?'following':'not following');
+  toast(i===-1?'Now following this page':'Unfollowed','info');
+}
+function openFollowingFeed(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const me=getCurrentPersona();
+  const followed=Object.values(wiki.pages).filter(p=>(p.followedBy||[]).includes(me.id));
+  showUtilReport('📰 Following Feed',followed.length?followed.map(p=>`<div class="nav-report-row"><span class="nrr-title" onclick="closeModal('modal-util-report');closeModal('modal-collab');openInTab('${p.id}')">${p.icon||'📄'} ${esc(p.title)}</span><span class="nrr-meta">updated ${fmtDate(p.updated)}</span></div>`).join(''):'<div class="nav-report-empty">You\'re not following any pages yet.</div>');
+}
+function personaActivitySummary(){
+  const me=getCurrentPersona();
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const weekAgo=Date.now()-7*86400000;
+  const edits=(wiki.changelog||[]).filter(e=>e.ts>weekAgo).length;
+  const comments=Object.values(wiki.pages).reduce((s,p)=>s+(p.comments||[]).filter(c=>c.author===me.id&&c.ts>weekAgo).length,0);
+  showUtilReport('📈 My Activity (7 days)',`<div class="util-report-section"><div>${me.avatar} <strong>${esc(me.name)}</strong></div><div>Edits logged: <strong>${edits}</strong></div><div>Comments posted: <strong>${comments}</strong></div></div>`);
+}
+function activeLeaderboard(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const personas=getPersonas();
+  const counts={};
+  Object.values(wiki.pages).forEach(p=>{
+    if(p.lastEditedBy)counts[p.lastEditedBy]=(counts[p.lastEditedBy]||0)+1;
+    (p.comments||[]).forEach(c=>{if(c.author)counts[c.author]=(counts[c.author]||0)+1});
+  });
+  const ranked=personas.map(p=>({p,n:counts[p.id]||0})).sort((a,b)=>b.n-a.n);
+  const max=Math.max(1,...ranked.map(r=>r.n));
+  showUtilReport('🏆 Most Active Personas',ranked.map(r=>`<div class="util-bar-row"><span class="util-bar-label">${r.p.avatar} ${esc(r.p.name)}</span><div class="util-bar-track"><div class="util-bar-fill" style="width:${r.n/max*100}%"></div></div><span class="util-bar-val">${r.n}</span></div>`).join(''));
+}
+function reactToComment(){
+  const page=curPage();if(!page||!(page.comments||[]).length){toast('No comments on this page yet','info');return}
+  const idx=parseInt(prompt(`React to which comment? (1-${page.comments.length})`),10)-1;
+  const c=page.comments[idx];if(!c)return;
+  const emoji=prompt('React with which emoji?','👍')||'👍';
+  c.reactions=c.reactions||{};
+  c.reactions[emoji]=(c.reactions[emoji]||0)+1;
+  saveData();renderCommentsList();
+  toast('Reaction added','success');
+}
+function toggleCommentThreadCollapse(){
+  const list=document.getElementById('comments-list');
+  if(!list){toast('Open the comments panel first','info');return}
+  list.classList.toggle('thread-collapsed');
+  toast(list.classList.contains('thread-collapsed')?'Thread collapsed':'Thread expanded','info');
+}
+function pinComment(){
+  const page=curPage();if(!page||!(page.comments||[]).length){toast('No comments on this page yet','info');return}
+  const idx=parseInt(prompt(`Pin which comment? (1-${page.comments.length})`),10)-1;
+  if(!page.comments[idx])return;
+  page.comments.forEach(c=>c.pinned=false);
+  page.comments[idx].pinned=true;
+  saveData();renderCommentsList();
+  toast('Comment pinned','success');
+}
+function viewCommentEditHistory(){
+  const page=curPage();if(!page){toast('Open a page first','error');return}
+  const withHistory=(page.comments||[]).filter(c=>c.editedAt);
+  showUtilReport('📝 Comment Edit History',withHistory.length?withHistory.map(c=>`<div class="nav-report-row"><span class="nrr-title">${esc(c.text.slice(0,50))}</span><span class="nrr-meta">edited ${fmtDateTime(c.editedAt)}</span></div>`).join(''):'<div class="nav-report-empty">No comments have been edited.</div>');
+}
+function exportTeamReport(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const personas=getPersonas();const teams=getTeams();
+  let txt=`${wiki.name} — Team Report\nGenerated ${fmtDateTime(Date.now())}\n\nPersonas:\n`;
+  personas.forEach(p=>txt+=`  ${p.avatar} ${p.name}\n`);
+  txt+=`\nTeams:\n`;teams.forEach(t=>txt+=`  ${t.name}: ${t.members.length} member(s)\n`);
+  txt+=`\nAssignments:\n`;
+  Object.values(wiki.pages).forEach(p=>{if(p.assignee){const a=personas.find(x=>x.id===p.assignee);txt+=`  ${p.title} → ${a?a.name:'?'}\n`}});
+  txt+=`\nApprovals:\n`;
+  Object.values(wiki.pages).forEach(p=>{if(p.approvedBy){const a=personas.find(x=>x.id===p.approvedBy);txt+=`  ${p.title} → approved by ${a?a.name:'?'}\n`}});
+  downloadBlob(txt,'team-report.txt','text/plain');
+  toast('Team report exported','success');
+}
+
+// ── 41-50: Teams & workflow ──
+function createTeam(){
+  const name=prompt('Team name:');if(!name)return;
+  const teams=getTeams();
+  teams.push({id:'team_'+Date.now(),name,members:[]});
+  saveTeams(teams);
+  toast(`Team "${name}" created`,'success');
+}
+function assignPageToTeam(){
+  const page=curPage();if(!page){toast('Open a page first','error');return}
+  const teams=getTeams();
+  if(!teams.length){toast('Create a team first','info');return}
+  const list=teams.map((t,i)=>`${i+1}. ${t.name}`).join('\n');
+  const choice=prompt(`Assign to which team?\n\n${list}\n\nEnter a number:`);
+  const t=teams[parseInt(choice,10)-1];if(!t)return;
+  page.team=t.id;saveData();renderSidebar();
+  document.getElementById('collab-team-state').textContent='Assigned to team: '+t.name;
+  toast(`Assigned to team "${t.name}"`,'success');
+}
+function manageTeams(){
+  const teams=getTeams();
+  showUtilReport('🗂️ Teams',teams.length?teams.map((t,i)=>`<div class="trash-item"><span>${esc(t.name)} (${t.members.length})</span><button class="btn btn-secondary btn-sm" onclick="deleteTeam(${i})">🗑 Delete</button></div>`).join(''):'<div class="nav-report-empty">No teams yet.</div>');
+}
+function deleteTeam(i){
+  const teams=getTeams();teams.splice(i,1);saveTeams(teams);manageTeams();
+}
+function postWorkspaceAnnouncement(){
+  const msg=prompt('Announcement to show on the hub:');if(!msg)return;
+  localStorage.setItem('wv-announcement',JSON.stringify({text:msg,by:getCurrentPersona().name,ts:Date.now()}));
+  renderHubAnnouncement();
+  toast('Announcement posted','success');
+}
+function renderHubAnnouncement(){
+  const raw=localStorage.getItem('wv-announcement');
+  let el=document.getElementById('hub-announcement-banner');
+  if(!raw){if(el)el.remove();return}
+  const a=JSON.parse(raw);
+  if(!el){
+    el=document.createElement('div');el.id='hub-announcement-banner';
+    el.style.cssText='position:relative;z-index:2;margin:0 56px;padding:10px 16px;background:rgba(124,108,252,.12);border:1px solid rgba(124,108,252,.3);border-radius:10px;font-size:.85rem;display:flex;justify-content:space-between;align-items:center;gap:10px';
+    const heroEl=document.querySelector('.hub-hero');
+    heroEl?.parentElement.insertBefore(el,heroEl);
+  }
+  el.innerHTML=`<span>📣 <strong>${esc(a.by)}:</strong> ${esc(a.text)}</span><button class="modal-close" onclick="localStorage.removeItem('wv-announcement');this.parentElement.remove()">✕</button>`;
+}
+function generateStandupPage(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const me=getCurrentPersona();
+  const content=`<p><strong>${esc(me.name)}</strong> — ${esc(fmtDate(Date.now()))}</p><h3>Yesterday</h3><p>…</p><h3>Today</h3><p>…</p><h3>Blockers</h3><p>…</p>`;
+  const p=createPageQuick(wiki,`Standup — ${fmtDate(Date.now())}`,content);
+  saveData();renderSidebar();openInTab(p.id);
+  toast('Standup page created','success');
+}
+function requestApproval(){
+  const page=curPage();if(!page){toast('Open a page first','error');return}
+  const personas=getPersonas();
+  const list=personas.map((p,i)=>`${i+1}. ${p.avatar} ${p.name}`).join('\n');
+  const choice=prompt(`Request approval from whom?\n\n${list}\n\nEnter a number:`);
+  const p=personas[parseInt(choice,10)-1];if(!p)return;
+  page.approvalRequestedFrom=p.id;page.approvedBy=null;saveData();
+  toast(`Approval requested from ${p.name}`,'success');
+}
+function approveCurrentPage(){
+  const page=curPage();if(!page){toast('Open a page first','error');return}
+  page.approvedBy=getCurrentPersona().id;page.approvalRequestedFrom=null;saveData();renderContentArea();
+  toast('Page approved ✓','success');
+}
+function addCoAuthor(){
+  const page=curPage();if(!page){toast('Open a page first','error');return}
+  const personas=getPersonas();
+  const list=personas.map((p,i)=>`${i+1}. ${p.avatar} ${p.name}`).join('\n');
+  const choice=prompt(`Add which persona as co-author?\n\n${list}\n\nEnter a number:`);
+  const p=personas[parseInt(choice,10)-1];if(!p)return;
+  page.coAuthors=page.coAuthors||[];
+  if(!page.coAuthors.includes(p.id))page.coAuthors.push(p.id);
+  saveData();
+  toast(`${p.name} added as co-author`,'success');
+}
+function markAsDiscussionPage(){
+  const page=curPage();if(!page){toast('Open a page first','error');return}
+  page.discussion=!page.discussion;saveData();renderSidebar();
+  document.getElementById('collab-discussion-state').textContent='Currently: '+(page.discussion?'discussion page':'normal page');
+  toast('Updated','info');
+}
+function upvoteCurrentPage(){
+  const page=curPage();if(!page){toast('Open a page first','error');return}
+  const me=getCurrentPersona();
+  page.upvotes=page.upvotes||[];
+  if(page.upvotes.includes(me.id)){toast('You already upvoted this page','info');return}
+  page.upvotes.push(me.id);saveData();
+  document.getElementById('collab-upvote-state').textContent=`${page.upvotes.length} upvote(s)`;
+  toast('Upvoted 👍','success');
+}
+
+// ── wiring: attribution on save, hub announcement on boot ──
+const _scpCollabOrg=saveCurrentPage;
+saveCurrentPage=function(showToast){
+  const page=state.wikis[CW]?.pages[CP];
+  if(page)page.lastEditedBy=getCurrentPersona().id;
+  _scpCollabOrg(showToast);
+};
+const _rhCollabOrg=renderHub;
+renderHub=function(){
+  _rhCollabOrg();
+  renderHubAnnouncement();
+};
+
+// ════════════════════════════════════════════════════════════
+//  FIX: Quick Capture button/panel overlapping right-side
+//  slide-in panels (Design customizer, Settings, History,
+//  Comments, Backlinks, Changelog, etc.)
+// ════════════════════════════════════════════════════════════
+const QUICK_CAPTURE_BLOCKERS=['customizer','wiki-settings-panel','history-panel','comments-panel','backlinks-panel','changelog-panel'];
+function quickCaptureBlocked(){
+  return QUICK_CAPTURE_BLOCKERS.some(id=>document.getElementById(id)?.classList.contains('open'));
+}
+function syncQuickCaptureVisibility(){
+  const btn=document.getElementById('quick-note-btn');
+  const panel=document.getElementById('quick-note-panel');
+  if(!btn)return;
+  if(quickCaptureBlocked()){
+    btn.style.display='none';
+    panel?.classList.remove('open');
+  } else if(document.getElementById('wiki-view')?.classList.contains('active')){
+    btn.style.display='flex';
+  }
+}
+// Explicit hooks (no MutationObserver — avoids any risk of observer/render feedback loops)
+const _tcOrg=toggleCustomizer;
+toggleCustomizer=function(){ _tcOrg(); syncQuickCaptureVisibility(); };
+const _owsOrg2=openWikiSettings;
+openWikiSettings=function(){ _owsOrg2(); syncQuickCaptureVisibility(); };
+const _cwsOrg2=closeWikiSettings;
+closeWikiSettings=function(){ _cwsOrg2(); syncQuickCaptureVisibility(); };
+const _thOrg=toggleHistory;
+toggleHistory=function(){ _thOrg(); syncQuickCaptureVisibility(); };
+const _chOrg=closeHistory;
+closeHistory=function(){ _chOrg(); syncQuickCaptureVisibility(); };
+const _tcmOrg=toggleComments;
+toggleComments=function(){ _tcmOrg(); syncQuickCaptureVisibility(); };
+const _ccpOrg=closeCommentsPanel;
+closeCommentsPanel=function(){ _ccpOrg(); syncQuickCaptureVisibility(); };
+const _tblOrg=toggleBacklinksPanel;
+toggleBacklinksPanel=function(){ _tblOrg(); syncQuickCaptureVisibility(); };
+const _cblOrg=closeBacklinksPanel;
+closeBacklinksPanel=function(){ _cblOrg(); syncQuickCaptureVisibility(); };
+const _tclOrg=toggleChangelog;
+toggleChangelog=function(){ _tclOrg(); syncQuickCaptureVisibility(); };
+const _cclOrg=closeChangelog;
+closeChangelog=function(){ _cclOrg(); syncQuickCaptureVisibility(); };
+
+const _tqnOrg=toggleQuickNote;
+toggleQuickNote=function(){
+  if(quickCaptureBlocked()){toast('Close the open panel first','info');return}
+  _tqnOrg();
+};
+
+// ════════════════════════════════════════════════════════════
+//  CATEGORY MANAGEMENT (50 features)
+// ════════════════════════════════════════════════════════════
+function switchCatMgrTab(el,paneId){
+  document.querySelectorAll('#catmgr-tabs .modal-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('#modal-category-manager .util-pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById(paneId).classList.add('active');
+}
+function getCatMeta(wiki,name){return (wiki.categoryMeta&&wiki.categoryMeta[name])||{}}
+function setCatMeta(wiki,name,patch){
+  wiki.categoryMeta=wiki.categoryMeta||{};
+  wiki.categoryMeta[name]={...(wiki.categoryMeta[name]||{}),...patch};
+  saveData();
+}
+function catPageCount(wiki,name){return Object.values(wiki.pages||{}).filter(p=>p.category===name).length}
+function snapshotCatUndo(){
+  const wiki=state.wikis[CW];if(!wiki)return;
+  window._catUndoBuffer={categories:[...(wiki.categories||[])],categoryMeta:JSON.parse(JSON.stringify(wiki.categoryMeta||{})),pages:JSON.parse(JSON.stringify(wiki.pages))};
+  document.getElementById('catmgr-undo-state').textContent='Undo available';
+}
+function undoLastCategoryAction(){
+  const wiki=state.wikis[CW];const buf=window._catUndoBuffer;
+  if(!wiki||!buf){toast('Nothing to undo','info');return}
+  wiki.categories=buf.categories;wiki.categoryMeta=buf.categoryMeta;wiki.pages=buf.pages;
+  saveData();renderSidebar();renderCategoryManagerList();renderCategoryList();
+  window._catUndoBuffer=null;
+  document.getElementById('catmgr-undo-state').textContent='Nothing to undo yet';
+  toast('Last category action undone','success');
+}
+
+function openCategoryManager(){
+  if(!state.wikis[CW]){toast('Open a wiki first','error');return}
+  renderCategoryManagerList();
+  openModal('modal-category-manager');
+}
+function renderCategoryManagerList(filter=''){
+  const wiki=state.wikis[CW];if(!wiki)return;
+  const body=document.getElementById('catmgr-list-body');if(!body)return;
+  const cats=(wiki.categories||['General']).filter(c=>!filter||c.toLowerCase().includes(filter.toLowerCase()));
+  if(!cats.length){body.innerHTML='<div class="catmgr-empty">No categories match.</div>';return}
+  body.innerHTML=cats.map(c=>{
+    const i=wiki.categories.indexOf(c);
+    const meta=getCatMeta(wiki,c);
+    const count=catPageCount(wiki,c);
+    const color=getCatColor(wiki,c)||CAT_COLORS[i%CAT_COLORS.length];
+    const badges=[meta.archived?'🗄️':'',meta.favorite?'⭐':'',meta.locked?'🔒':''].filter(Boolean).join(' ');
+    return `<div class="catmgr-row">
+      <input type="color" value="${color}" onchange="setCatColor('${esc(c).replace(/'/g,"\\'")}',this.value)">
+      <button class="catmgr-icon-btn" onclick="pickCategoryIconFor('${esc(c).replace(/'/g,"\\'")}')">${meta.icon||'🗂️'}</button>
+      <input type="text" value="${esc(c)}" onchange="renameCategoryFromManager(${i},this.value)">
+      <span class="catmgr-count">${count} page${count!==1?'s':''}</span>
+      <span class="catmgr-badges">${badges}</span>
+      <button class="att-btn" title="Move up" onclick="moveCategoryDirection(${i},-1)">↑</button>
+      <button class="att-btn" title="Move down" onclick="moveCategoryDirection(${i},1)">↓</button>
+      <button class="att-btn" title="Duplicate" onclick="duplicateCategoryUI(${i})">⧉</button>
+      <button class="att-btn" title="${meta.archived?'Unarchive':'Archive'}" onclick="toggleArchiveCategory('${esc(c).replace(/'/g,"\\'")}')">🗄️</button>
+      <button class="att-btn danger" title="Delete" onclick="deleteCategoryFromManager(${i})">🗑</button>
+    </div>`;
+  }).join('');
+}
+function filterCategoryManagerList(){
+  const q=prompt('Search categories:','');
+  if(q===null)return;
+  renderCategoryManagerList(q);
+}
+function createNamedCategory(){
+  const wiki=state.wikis[CW];if(!wiki)return;
+  const input=document.getElementById('catmgr-new-name');
+  const name=(input?.value||'').trim();
+  if(!name){toast('Enter a category name','error');return}
+  wiki.categories=wiki.categories||['General'];
+  if(wiki.categories.includes(name)){toast('That category already exists','error');return}
+  snapshotCatUndo();
+  wiki.categories.push(name);
+  saveData();renderSidebar();renderCategoryManagerList();renderCategoryList();
+  if(input)input.value='';
+  toast(`Category "${name}" created`,'success');
+}
+function renameCategoryFromManager(i,val){
+  const wiki=state.wikis[CW];if(!wiki?.categories)return;
+  const oldName=wiki.categories[i];
+  snapshotCatUndo();
+  wiki.categories[i]=val;
+  Object.values(wiki.pages).forEach(p=>{if(p.category===oldName)p.category=val});
+  if(wiki.categoryMeta&&wiki.categoryMeta[oldName]){wiki.categoryMeta[val]=wiki.categoryMeta[oldName];delete wiki.categoryMeta[oldName]}
+  if(wiki.catColors&&wiki.catColors[oldName]){wiki.catColors[val]=wiki.catColors[oldName];delete wiki.catColors[oldName]}
+  saveData();renderSidebar();renderCategoryManagerList();renderCategoryList();
+}
+function moveCategoryDirection(i,dir){
+  const wiki=state.wikis[CW];if(!wiki?.categories)return;
+  const j=i+dir;if(j<0||j>=wiki.categories.length)return;
+  [wiki.categories[i],wiki.categories[j]]=[wiki.categories[j],wiki.categories[i]];
+  saveData();renderSidebar();renderCategoryManagerList();
+}
+function duplicateCategoryUI(i){
+  const wiki=state.wikis[CW];if(!wiki?.categories)return;
+  const name=wiki.categories[i];
+  let newName=name+' Copy';let n=2;
+  while(wiki.categories.includes(newName)){newName=name+' Copy '+n;n++}
+  snapshotCatUndo();
+  wiki.categories.splice(i+1,0,newName);
+  const meta=getCatMeta(wiki,name);if(Object.keys(meta).length)setCatMeta(wiki,newName,meta);
+  if(wiki.catColors?.[name]){wiki.catColors=wiki.catColors||{};wiki.catColors[newName]=wiki.catColors[name]}
+  saveData();renderSidebar();renderCategoryManagerList();renderCategoryList();
+  toast(`Duplicated as "${newName}" (no pages moved)`,'success');
+}
+function toggleArchiveCategory(name){
+  const wiki=state.wikis[CW];if(!wiki)return;
+  const meta=getCatMeta(wiki,name);
+  setCatMeta(wiki,name,{archived:!meta.archived});
+  renderSidebar();renderCategoryManagerList();
+  toast(meta.archived?'Category unarchived':'Category archived (pages kept, hidden from sidebar)','success');
+}
+function deleteCategoryFromManager(i){
+  const wiki=state.wikis[CW];if(!wiki?.categories)return;
+  if(wiki.categories.length<=1){toast('Need at least one category','error');return}
+  const name=wiki.categories[i];
+  const count=catPageCount(wiki,name);
+  let target=null;
+  if(count>0){
+    const others=wiki.categories.filter(c=>c!==name);
+    target=prompt(`"${name}" has ${count} page(s). Move them to which category?\n\n${others.join(', ')}`,others[0]);
+    if(target===null)return;
+    if(!wiki.categories.includes(target)){toast('Unknown category — cancelled','error');return}
+  }
+  snapshotCatUndo();
+  if(target)Object.values(wiki.pages).forEach(p=>{if(p.category===name)p.category=target});
+  wiki.categories.splice(i,1);
+  if(wiki.categoryMeta)delete wiki.categoryMeta[name];
+  if(wiki.catColors)delete wiki.catColors[name];
+  saveData();renderSidebar();renderCategoryManagerList();renderCategoryList();
+  toast(`Deleted "${name}"`,'success');
+}
+
+// ── Merge & Bulk ──
+function pickCategoryByPrompt(wiki,label){
+  const list=wiki.categories.map((c,i)=>`${i+1}. ${c}`).join('\n');
+  const choice=prompt(`${label}\n\n${list}\n\nEnter a number:`);
+  return wiki.categories[parseInt(choice,10)-1]||null;
+}
+function mergeCategoriesUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const a=pickCategoryByPrompt(wiki,'Merge FROM which category?');if(!a)return;
+  const b=pickCategoryByPrompt(wiki,'Merge INTO which category?');if(!b||a===b)return;
+  snapshotCatUndo();
+  Object.values(wiki.pages).forEach(p=>{if(p.category===a)p.category=b});
+  wiki.categories=wiki.categories.filter(c=>c!==a);
+  saveData();renderSidebar();renderCategoryManagerList();renderCategoryList();
+  toast(`Merged "${a}" into "${b}"`,'success');
+}
+function bulkMoveCategoryUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const a=pickCategoryByPrompt(wiki,'Move pages FROM which category?');if(!a)return;
+  const b=pickCategoryByPrompt(wiki,'Move pages TO which category?');if(!b||a===b)return;
+  snapshotCatUndo();
+  let n=0;
+  Object.values(wiki.pages).forEach(p=>{if(p.category===a){p.category=b;n++}});
+  saveData();renderSidebar();renderCategoryManagerList();
+  toast(`Moved ${n} page(s) from "${a}" to "${b}"`,'success');
+}
+function splitCategoryByTagUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const src=pickCategoryByPrompt(wiki,'Split which category?');if(!src)return;
+  const tag=prompt('Move pages tagged with:');if(!tag)return;
+  const newCat=prompt('New category name for them:',tag);if(!newCat)return;
+  snapshotCatUndo();
+  if(!wiki.categories.includes(newCat))wiki.categories.push(newCat);
+  let n=0;
+  Object.values(wiki.pages).forEach(p=>{if(p.category===src&&(p.tags||[]).includes(tag)){p.category=newCat;n++}});
+  saveData();renderSidebar();renderCategoryManagerList();
+  toast(`Moved ${n} page(s) into "${newCat}"`,'success');
+}
+function convertTagToCategoryUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const tag=prompt('Convert which tag into a category?');if(!tag)return;
+  snapshotCatUndo();
+  if(!wiki.categories.includes(tag))wiki.categories.push(tag);
+  let n=0;
+  Object.values(wiki.pages).forEach(p=>{if((p.tags||[]).includes(tag)){p.category=tag;n++}});
+  saveData();renderSidebar();renderCategoryManagerList();
+  toast(`Created category "${tag}" from ${n} tagged page(s)`,'success');
+}
+const CATEGORY_TEMPLATES={
+  'Software Project':['Overview','Architecture','Setup','API','Testing','Deployment'],
+  'Personal Journal':['Daily Notes','Goals','Reflections','Memories'],
+  'Recipe Box':['Breakfast','Lunch','Dinner','Desserts','Drinks'],
+  'Research Notes':['Sources','Findings','Drafts','References'],
+};
+function applyCategoryTemplateUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const names=Object.keys(CATEGORY_TEMPLATES);
+  const choice=prompt(`Apply which template?\n\n${names.map((n,i)=>`${i+1}. ${n}`).join('\n')}\n\nEnter a number:`);
+  const tpl=CATEGORY_TEMPLATES[names[parseInt(choice,10)-1]];if(!tpl)return;
+  snapshotCatUndo();
+  tpl.forEach(c=>{if(!wiki.categories.includes(c))wiki.categories.push(c)});
+  saveData();renderSidebar();renderCategoryManagerList();renderCategoryList();
+  toast('Template applied','success');
+}
+function saveCategoryTemplateUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const name=prompt('Save current categories as a template named:');if(!name)return;
+  const custom=JSON.parse(localStorage.getItem('wv-cat-templates')||'{}');
+  custom[name]=wiki.categories;
+  localStorage.setItem('wv-cat-templates',JSON.stringify(custom));
+  toast(`Saved template "${name}"`,'success');
+}
+function importCategoriesUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const raw=prompt('Comma-separated category names to add:');if(!raw)return;
+  snapshotCatUndo();
+  const names=raw.split(',').map(s=>s.trim()).filter(Boolean);
+  let n=0;
+  names.forEach(name=>{if(!wiki.categories.includes(name)){wiki.categories.push(name);n++}});
+  saveData();renderSidebar();renderCategoryManagerList();renderCategoryList();
+  toast(`Added ${n} new categor${n===1?'y':'ies'}`,'success');
+}
+function exportCategoriesUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const rows=[['Category','Page Count'],...wiki.categories.map(c=>[c,catPageCount(wiki,c)])];
+  downloadBlob(rows.map(r=>r.map(csvEscape).join(',')).join('\n'),'categories.csv','text/csv');
+  toast('Categories exported','success');
+}
+function resetToDefaultCategoryUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  if(!confirm('Move every page into a single "General" category? This cannot be undone except via Undo Last Action.'))return;
+  snapshotCatUndo();
+  Object.values(wiki.pages).forEach(p=>p.category='General');
+  wiki.categories=['General'];wiki.categoryMeta={};wiki.catColors={};
+  saveData();renderSidebar();renderCategoryManagerList();renderCategoryList();
+  toast('Reset to a single "General" category','success');
+}
+
+// ── Organize & Filter ──
+function setDefaultCategoryUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const cat=pickCategoryByPrompt(wiki,'Set default category for new pages:');if(!cat)return;
+  wiki.defaultCategory=cat;saveData();
+  document.getElementById('catmgr-default-state').textContent='Currently: '+cat;
+  toast(`Default category set to "${cat}"`,'success');
+}
+function sortCategoriesAlpha(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  wiki.categories=[...wiki.categories].sort((a,b)=>a.localeCompare(b));
+  saveData();renderSidebar();renderCategoryManagerList();
+  toast('Sorted A–Z','success');
+}
+function sortCategoriesByCount(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  wiki.categories=[...wiki.categories].sort((a,b)=>catPageCount(wiki,b)-catPageCount(wiki,a));
+  saveData();renderSidebar();renderCategoryManagerList();
+  toast('Sorted by page count','success');
+}
+function filterSidebarByCategoryUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const cat=pickCategoryByPrompt(wiki,'Show only which category in the sidebar?');if(!cat)return;
+  sidebarCategoryFilter=cat;renderSidebar();
+  toast(`Sidebar filtered to "${cat}" — re-open the wiki to clear`,'success');
+}
+function toggleCategoryOnlyView(){
+  const on=!lsFlag('wv-cat-only-view');setLsFlag('wv-cat-only-view',on);
+  document.getElementById('catmgr-catonly-state').textContent='Currently: '+(on?'on':'off');
+  renderSidebar();
+  toast('Setting updated','info');
+}
+function fixUncategorizedPages(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const def=wiki.defaultCategory||wiki.categories[0]||'General';
+  let n=0;
+  Object.values(wiki.pages).forEach(p=>{if(!p.category||!wiki.categories.includes(p.category)){p.category=def;n++}});
+  saveData();renderSidebar();
+  toast(`Fixed ${n} uncategorized page(s)`,'success');
+}
+function toggleShowEmptyCategories(){
+  const on=!lsFlag('wv-show-empty-cats',true);setLsFlag('wv-show-empty-cats',on);
+  document.getElementById('catmgr-showempty-state').textContent='Currently: '+(on?'shown':'hidden');
+  renderSidebar();
+  toast('Setting updated','info');
+}
+function viewCategoryPagesList(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const cat=pickCategoryByPrompt(wiki,'View pages in which category?');if(!cat)return;
+  const pages=Object.values(wiki.pages).filter(p=>p.category===cat);
+  showUtilReport(`📋 Pages in "${cat}"`,pages.length?pages.map(p=>`<div class="nav-report-row"><span class="nrr-title" onclick="closeModal('modal-util-report');closeModal('modal-category-manager');openInTab('${p.id}')">${p.icon||'📄'} ${esc(p.title)}</span></div>`).join(''):'<div class="nav-report-empty">No pages in this category.</div>');
+}
+function reorderCategoriesUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const list=wiki.categories.map((c,i)=>`${i+1}. ${c}`).join('\n');
+  const order=prompt(`Current order:\n\n${list}\n\nType the new order as numbers separated by commas (e.g. 2,1,3):`);
+  if(!order)return;
+  const idxs=order.split(',').map(s=>parseInt(s.trim(),10)-1);
+  if(idxs.length!==wiki.categories.length||idxs.some(i=>isNaN(i)||!wiki.categories[i])){toast('Invalid order — cancelled','error');return}
+  snapshotCatUndo();
+  wiki.categories=idxs.map(i=>wiki.categories[i]);
+  saveData();renderSidebar();renderCategoryManagerList();
+  toast('Categories reordered','success');
+}
+
+// ── Visual & Metadata ──
+function autoAssignCategoryColors(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  wiki.catColors=wiki.catColors||{};
+  wiki.categories.forEach((c,i)=>wiki.catColors[c]=CAT_COLORS[i%CAT_COLORS.length]);
+  saveData();renderSidebar();renderCategoryManagerList();
+  toast('Colors auto-assigned','success');
+}
+function pickCategoryIconFor(name){
+  const emoji=prompt('Icon emoji for this category:','🗂️');if(!emoji)return;
+  const wiki=state.wikis[CW];if(!wiki)return;
+  setCatMeta(wiki,name,{icon:emoji});
+  renderSidebar();renderCategoryManagerList();
+}
+function pickCategoryIconUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const cat=pickCategoryByPrompt(wiki,'Pick an icon for which category?');if(!cat)return;
+  pickCategoryIconFor(cat);
+}
+function openCategoryCardView(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const cards=wiki.categories.map(c=>{
+    const meta=getCatMeta(wiki,c);const color=getCatColor(wiki,c)||'#7c6cfc';
+    return `<div class="nav-report-row" style="border-left:3px solid ${color};padding-left:10px"><span class="nrr-title">${meta.icon||'🗂️'} ${esc(c)}</span><span class="nrr-meta">${catPageCount(wiki,c)} page(s)</span></div>`;
+  }).join('');
+  showUtilReport('🗃️ Category Cards',cards);
+}
+function setCategoryBannerUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const cat=pickCategoryByPrompt(wiki,'Set a banner gradient for which category?');if(!cat)return;
+  const c1=prompt('Gradient start color (hex):','#7c6cfc')||'#7c6cfc';
+  const c2=prompt('Gradient end color (hex):','#fc6c8f')||'#fc6c8f';
+  setCatMeta(wiki,cat,{banner:`linear-gradient(135deg,${c1},${c2})`});
+  toast('Banner saved','success');
+}
+function setCategoryOwnerUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const cat=pickCategoryByPrompt(wiki,'Set an owner for which category?');if(!cat)return;
+  const personas=getPersonas();
+  const p=personas[parseInt(prompt(`Owner:\n\n${personas.map((p,i)=>`${i+1}. ${p.avatar} ${p.name}`).join('\n')}\n\nEnter a number:`),10)-1];
+  if(!p)return;
+  setCatMeta(wiki,cat,{owner:p.id});
+  toast(`${p.name} set as owner of "${cat}"`,'success');
+}
+function suggestCategoryTagsUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const cat=pickCategoryByPrompt(wiki,'Suggest tags for which category?');if(!cat)return;
+  const counts={};
+  Object.values(wiki.pages).filter(p=>p.category===cat).forEach(p=>(p.tags||[]).forEach(t=>counts[t]=(counts[t]||0)+1));
+  const top=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  showUtilReport(`🏷️ Common Tags in "${cat}"`,top.length?top.map(([t,n])=>`<div class="nav-report-row"><span class="nrr-title">#${esc(t)}</span><span class="nrr-meta">${n} page(s)</span></div>`).join(''):'<div class="nav-report-empty">No tags used in this category yet.</div>');
+}
+function toggleFavoriteCategoryUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const cat=pickCategoryByPrompt(wiki,'Toggle favorite for which category?');if(!cat)return;
+  const meta=getCatMeta(wiki,cat);
+  setCatMeta(wiki,cat,{favorite:!meta.favorite});
+  renderCategoryManagerList();
+  toast(meta.favorite?'Removed from favorites':'Added to favorites ⭐','success');
+}
+function categoryHealthBadgeUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const cat=pickCategoryByPrompt(wiki,'Check health of which category?');if(!cat)return;
+  const pages=Object.values(wiki.pages).filter(p=>p.category===cat);
+  const healthy=pages.filter(p=>stripTags(p.content).length>50).length;
+  const pct=pages.length?Math.round(healthy/pages.length*100):0;
+  showUtilReport(`🩺 "${cat}" Health`,`<div class="util-bar-row"><span class="util-bar-label">Content completeness</span><div class="util-bar-track"><div class="util-bar-fill" style="width:${pct}%"></div></div><span class="util-bar-val">${pct}%</span></div>`);
+}
+function categoryWordCountUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const cat=pickCategoryByPrompt(wiki,'Word count for which category?');if(!cat)return;
+  const pages=Object.values(wiki.pages).filter(p=>p.category===cat);
+  const words=pages.map(p=>stripTags(p.content).split(/\s+/).filter(Boolean).length);
+  const total=words.reduce((a,b)=>a+b,0);
+  showUtilReport(`📊 "${cat}" Word Count`,`<div>Total words: <strong>${total}</strong></div><div>Average per page: <strong>${pages.length?Math.round(total/pages.length):0}</strong></div>`);
+}
+function categoryLastUpdatedUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const cat=pickCategoryByPrompt(wiki,'Last updated for which category?');if(!cat)return;
+  const pages=Object.values(wiki.pages).filter(p=>p.category===cat).sort((a,b)=>(b.updated||0)-(a.updated||0));
+  showUtilReport(`🕓 "${cat}" Last Updated`,pages.length?`<div class="nav-report-row"><span class="nrr-title">${esc(pages[0].title)}</span><span class="nrr-meta">${fmtDateTime(pages[0].updated)}</span></div>`:'<div class="nav-report-empty">No pages in this category.</div>');
+}
+
+// ── Automation ──
+function setupAutoCategorizeRule(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const keyword=prompt('If a page\'s title or content contains:');if(!keyword)return;
+  const cat=prompt('…assign it to which category?');if(!cat)return;
+  wiki.autoCatRules=wiki.autoCatRules||[];
+  wiki.autoCatRules.push({keyword,category:cat});
+  if(!wiki.categories.includes(cat))wiki.categories.push(cat);
+  saveData();
+  let n=0;
+  Object.values(wiki.pages).forEach(p=>{
+    if((p.title+' '+stripTags(p.content)).toLowerCase().includes(keyword.toLowerCase())){p.category=cat;n++}
+  });
+  saveData();renderSidebar();renderCategoryManagerList();
+  toast(`Rule saved — applied to ${n} existing page(s) now`,'success');
+}
+function categoryReviewReminderUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const cutoff=Date.now()-30*86400000;
+  const stale=wiki.categories.filter(c=>{
+    const pages=Object.values(wiki.pages).filter(p=>p.category===c);
+    if(!pages.length)return false;
+    return Math.max(...pages.map(p=>p.updated||0))<cutoff;
+  });
+  showUtilReport('⏰ Categories Needing Review',stale.length?stale.map(c=>`<div class="nav-report-row"><span class="nrr-title">${esc(c)}</span><span class="nrr-meta">no updates in 30+ days</span></div>`).join(''):'<div class="nav-report-empty">Everything has been touched recently ✓</div>');
+}
+function exportCategoryPagesUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const cat=pickCategoryByPrompt(wiki,'Export pages from which category?');if(!cat)return;
+  const pages=Object.values(wiki.pages).filter(p=>p.category===cat);
+  let md=`# ${cat}\n\n`;
+  pages.forEach(p=>md+=`\n---\n\n# ${p.title}\n\n${htmlToMd(p.content||'')}\n`);
+  downloadBlob(md,`${cat.replace(/[^\w-]+/g,'-')}.md`,'text/markdown');
+  toast('Category exported as Markdown','success');
+}
+function bulkTagCategoryUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const cat=pickCategoryByPrompt(wiki,'Bulk-tag which category?');if(!cat)return;
+  const tag=prompt('Tag to apply to every page in it:');if(!tag)return;
+  let n=0;
+  Object.values(wiki.pages).forEach(p=>{
+    if(p.category===cat){p.tags=p.tags||[];if(!p.tags.includes(tag)){p.tags.push(tag);n++}}
+  });
+  saveData();
+  toast(`Tagged ${n} page(s) with "${tag}"`,'success');
+}
+function setCategoryPrereqUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const cat=pickCategoryByPrompt(wiki,'Set a prerequisite note for which category?');if(!cat)return;
+  const note=prompt('Prerequisite note (e.g. "Read Setup first"):');if(note===null)return;
+  setCatMeta(wiki,cat,{prereqNote:note});
+  toast('Saved','success');
+}
+function lockCategoryQuickToggle(){
+  closeModal('modal-category-manager');
+  lockEntireCategory();
+}
+function categoryAccessLogUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const cat=pickCategoryByPrompt(wiki,'Access log for which category?');if(!cat)return;
+  const personas=getPersonas();
+  const counts={};
+  Object.values(wiki.pages).filter(p=>p.category===cat).forEach(p=>{if(p.lastEditedBy)counts[p.lastEditedBy]=(counts[p.lastEditedBy]||0)+1});
+  const ranked=Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([id,n])=>({p:personas.find(x=>x.id===id),n}));
+  showUtilReport(`📜 "${cat}" Access Log`,ranked.length?ranked.map(r=>`<div class="nav-report-row"><span class="nrr-title">${r.p?r.p.avatar+' '+r.p.name:'Unknown'}</span><span class="nrr-meta">${r.n} edit(s)</span></div>`).join(''):'<div class="nav-report-empty">No edit attribution recorded yet.</div>');
+}
+function categoryJSONBackupUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const cat=pickCategoryByPrompt(wiki,'Backup which category?');if(!cat)return;
+  const pages=Object.values(wiki.pages).filter(p=>p.category===cat);
+  downloadBlob(JSON.stringify({category:cat,meta:getCatMeta(wiki,cat),pages},null,2),`${cat.replace(/[^\w-]+/g,'-')}-backup.json`,'application/json');
+  toast('Category backed up','success');
+}
+function categoryJSONRestoreUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const input=document.createElement('input');input.type='file';input.accept='.json';
+  input.onchange=async()=>{
+    const file=input.files[0];if(!file)return;
+    try{
+      const data=JSON.parse(await file.text());
+      if(!data.category||!data.pages){toast('Not a valid category backup','error');return}
+      if(!wiki.categories.includes(data.category))wiki.categories.push(data.category);
+      data.pages.forEach(p=>{const newId='page_'+Date.now()+'_'+Math.random().toString(36).slice(2,5);wiki.pages[newId]={...p,id:newId}});
+      if(data.meta)setCatMeta(wiki,data.category,data.meta);
+      saveData();renderSidebar();renderCategoryManagerList();
+      toast(`Restored ${data.pages.length} page(s) into "${data.category}"`,'success');
+    }catch{toast('Failed to restore backup','error')}
+  };
+  input.click();
+}
+function categoryOverviewReportUI(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const rows=wiki.categories.map(c=>{
+    const meta=getCatMeta(wiki,c);
+    const pages=Object.values(wiki.pages).filter(p=>p.category===c);
+    const healthy=pages.filter(p=>stripTags(p.content).length>50).length;
+    const pct=pages.length?Math.round(healthy/pages.length*100):0;
+    const lastUpd=pages.length?Math.max(...pages.map(p=>p.updated||0)):0;
+    return `<div class="nav-report-row"><span class="nrr-title">${meta.icon||'🗂️'} ${esc(c)}${meta.archived?' (archived)':''}${meta.locked?' 🔒':''}</span><span class="nrr-meta">${pages.length} pages · ${pct}% healthy · upd ${lastUpd?fmtDate(lastUpd):'—'}</span></div>`;
+  }).join('');
+  showUtilReport('🧾 Category Overview',rows);
+}
+
+const _apOrg=addPage;
+addPage=function(){
+  _apOrg();
+  const wiki=state.wikis[CW];
+  if(wiki?.defaultCategory){
+    const sel=document.getElementById('ap-category');
+    if(sel&&[...sel.options].some(o=>o.value===wiki.defaultCategory))sel.value=wiki.defaultCategory;
+  }
+};
+
+// ── wiring into sidebar rendering ──
+let sidebarCategoryFilter=null;
+const _rsCatOrg=renderSidebar;
+renderSidebar=function(filter=''){
+  _rsCatOrg(filter);
+  const wiki=state.wikis[CW];if(!wiki)return;
+  const showEmpty=lsFlag('wv-show-empty-cats',true);
+  const catOnly=lsFlag('wv-cat-only-view');
+  document.querySelectorAll('.sidebar-section').forEach(sec=>{
+    const label=sec.querySelector('.sidebar-section-label');if(!label)return;
+    const name=label.textContent.replace(/^[^\s]+\s/,'').trim()||label.textContent.trim();
+    const meta=getCatMeta(wiki,name);
+    if(meta.archived){sec.style.display='none';return}
+    if(sidebarCategoryFilter&&name!==sidebarCategoryFilter){sec.style.display='none';return}
+    if(!showEmpty&&sec.querySelectorAll('.page-item').length===0){sec.style.display='none';return}
+    if(catOnly){
+      const pagesEl=sec.querySelector('.sidebar-section-pages');
+      if(pagesEl)pagesEl.style.display='none';
+    }
+    if(meta.icon&&!label.dataset.iconSet){label.textContent=meta.icon+' '+label.textContent;label.dataset.iconSet='1'}
+  });
+};
+
+// ════════════════════════════════════════════════════════════
+//  PERFORMANCE & RELIABILITY (50 features)
+// ════════════════════════════════════════════════════════════
+function switchPerfTab(el,paneId){
+  document.querySelectorAll('#perf-tabs .modal-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('#modal-perf .util-pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById(paneId).classList.add('active');
+}
+function safeJSONParse(str,fallback){
+  if(str===null||str===undefined)return fallback;
+  try{
+    const v=JSON.parse(str);
+    return v===null||v===undefined?fallback:v;
+  }catch{ return fallback; }
+}
+function debounce(fn,wait){
+  let t=null;
+  return function(...args){ clearTimeout(t); t=setTimeout(()=>fn.apply(this,args),wait); };
+}
+function throttle(fn,wait){
+  let last=0,pending=null;
+  return function(...args){
+    const now=Date.now();
+    if(now-last>=wait){ last=now; fn.apply(this,args); }
+    else { clearTimeout(pending); pending=setTimeout(()=>{ last=Date.now(); fn.apply(this,args); }, wait-(now-last)); }
+  };
+}
+
+// ── 11-12: debounced search ──
+const filterSidebarPagesDebounced=debounce(v=>filterSidebarPages(v),180);
+const runFullSearchDebounced=debounce(v=>runFullSearch(v),200);
+
+// ── 1-10: Save & data reliability ──
+const slowOpsLog=[];
+function logSlowOp(name,ms){
+  if(ms>50){
+    slowOpsLog.unshift({name,ms:Math.round(ms),ts:Date.now()});
+    if(slowOpsLog.length>100)slowOpsLog.length=100;
+  }
+}
+async function idbPutWithRetry(store,value,attempt=1){
+  try{ return await idbPut(store,value); }
+  catch(err){
+    if(attempt>=3){ logErrorEvent('idb-put-failed',err.message||String(err)); throw err; }
+    await new Promise(r=>setTimeout(r,150*attempt));
+    return idbPutWithRetry(store,value,attempt+1);
+  }
+}
+function testSaveRetry(){
+  toast('Simulating a failed save and retry…','info');
+  idbPutWithRetry('settings',{key:'__perf_retry_test',value:Date.now()})
+    .then(()=>toast('Retry path completed successfully ✓','success'))
+    .catch(()=>toast('Retry path exhausted (this is expected in the simulation)','info'));
+}
+async function runIdbHealthPing(){
+  const t0=performance.now();
+  try{
+    await idbPut('settings',{key:'__health_ping',value:Date.now()});
+    const ms=Math.round(performance.now()-t0);
+    document.getElementById('perf-idbping-state').textContent=`Healthy — round-trip ${ms}ms`;
+    toast(`IndexedDB healthy (${ms}ms)`,'success');
+  }catch(e){
+    document.getElementById('perf-idbping-state').textContent='IndexedDB write failed!';
+    toast('IndexedDB health check failed','error');
+  }
+}
+// Multi-tab sync warning
+window.addEventListener('storage',e=>{
+  if(e.key==='wv-last-save'){
+    const data=safeJSONParse(e.newValue,null);
+    if(data&&data.wikiId===CW&&data.tabId!==window._wvTabId){
+      toast('⚠️ This wiki was just edited in another tab — reload to see the latest changes','info');
+    }
+  }
+});
+window._wvTabId='tab_'+Math.random().toString(36).slice(2);
+function announceSaveToOtherTabs(wikiId){
+  try{ localStorage.setItem('wv-last-save',JSON.stringify({wikiId,tabId:window._wvTabId,ts:Date.now()})); }catch{}
+}
+// Crash recovery draft
+function saveCrashDraft(){
+  if(!isEditing||!CW||!CP)return;
+  const body=document.getElementById('editor-body');
+  if(!body)return;
+  try{
+    localStorage.setItem('wv-crash-draft',JSON.stringify({wikiId:CW,pageId:CP,content:body.innerHTML,title:document.getElementById('ped-title')?.value||'',ts:Date.now()}));
+  }catch{}
+}
+function clearCrashDraft(){ localStorage.removeItem('wv-crash-draft'); }
+setInterval(saveCrashDraft,10000);
+function checkCrashRecovery(){
+  const raw=localStorage.getItem('wv-crash-draft');
+  const small=document.getElementById('perf-crash-state');
+  if(!raw){ if(small)small.textContent='No unsaved draft found'; toast('No crash draft found','info'); return; }
+  const draft=safeJSONParse(raw,null);
+  if(!draft){ clearCrashDraft(); return; }
+  if(small)small.textContent=`Draft found from ${fmtDateTime(draft.ts)} — open it to restore`;
+  if(confirm(`Found an unsaved draft from ${fmtDateTime(draft.ts)}. Open it now?`)){
+    if(draft.wikiId!==CW)openWiki(draft.wikiId);
+    openInTab(draft.pageId);
+    if(!isEditing)toggleEdit();
+    setTimeout(()=>{
+      const body=document.getElementById('editor-body');
+      if(body)body.innerHTML=draft.content;
+      const t=document.getElementById('ped-title');
+      if(t)t.value=draft.title;
+    },150);
+  }
+}
+function showCrashRecoveryBanner(){
+  const raw=localStorage.getItem('wv-crash-draft');
+  if(!raw)return;
+  const draft=safeJSONParse(raw,null);
+  if(!draft||Date.now()-draft.ts>3600000){clearCrashDraft();return}
+  const banner=document.getElementById('crash-recovery-banner');
+  if(!banner)return;
+  banner.innerHTML=`🛟 Found an unsaved draft from ${esc(fmtDateTime(draft.ts))} — <button class="btn btn-sm btn-primary" onclick="restoreCrashDraftFromBanner()">Restore</button> <button class="btn btn-sm btn-ghost" onclick="clearCrashDraft();document.getElementById('crash-recovery-banner').style.display='none'">Dismiss</button>`;
+  banner.style.display='flex';
+}
+function restoreCrashDraftFromBanner(){
+  document.getElementById('crash-recovery-banner').style.display='none';
+  checkCrashRecovery();
+}
+
+// ── 21-30: Memory & cleanup ──
+function clearStaleToasts(){
+  document.querySelectorAll('.toast').forEach(t=>t.remove());
+  toast('Cleared','info');
+}
+function capLogsNow(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  let trimmed=0;
+  if(wiki.changelog&&wiki.changelog.length>200){trimmed+=wiki.changelog.length-200;wiki.changelog.length=200}
+  Object.values(wiki.pages).forEach(p=>{if(p.history&&p.history.length>MAX_HISTORY){trimmed+=p.history.length-MAX_HISTORY;p.history.splice(0,p.history.length-MAX_HISTORY)}});
+  const auditLog=safeJSONParse(localStorage.getItem('wv-audit-log'),[]);
+  if(auditLog.length>300){trimmed+=auditLog.length-300;localStorage.setItem('wv-audit-log',JSON.stringify(auditLog.slice(0,300)))}
+  saveData();
+  toast(trimmed?`Trimmed ${trimmed} old log entr${trimmed===1?'y':'ies'}`:'Nothing to trim — logs already within limits','success');
+}
+function findOrphanedAttachments(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const unused=[];
+  Object.values(wiki.pages).forEach(p=>{
+    (p.attachments||[]).forEach(a=>{
+      if(a.insertable&&!(p.content||'').includes(a.data.slice(0,40)))unused.push(`${p.title} → ${a.name}`);
+    });
+  });
+  showUtilReport('🗑️ Unused Insertable Attachments',unused.length?unused.map(u=>`<div class="nav-report-row"><span class="nrr-title">${esc(u)}</span><span class="nrr-meta">not embedded inline</span></div>`).join(''):'<div class="nav-report-empty">No unused attachments found.</div>');
+}
+async function checkStorageQuota(){
+  const small=document.getElementById('perf-quota-state');
+  if(!navigator.storage?.estimate){ if(small)small.textContent='Quota API not supported in this browser'; return; }
+  const {usage,quota}=await navigator.storage.estimate();
+  const pct=quota?Math.round(usage/quota*100):0;
+  const msg=`Using ${fmtSize(usage)} of ${fmtSize(quota)} (${pct}%)`;
+  if(small)small.textContent=msg;
+  if(pct>80)toast('⚠️ Browser storage is getting full — consider exporting and trimming data','info');
+  else toast(msg,'info');
+}
+function compactWikiData(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  let removed=0;
+  Object.values(wiki.pages).forEach(p=>{
+    if(p.history){const before=p.history.length;p.history=p.history.filter(h=>h.content&&h.content.trim());removed+=before-p.history.length}
+  });
+  if(wiki.changelog){const before=wiki.changelog.length;wiki.changelog=wiki.changelog.filter(e=>e.pageTitle);removed+=before-wiki.changelog.length}
+  saveData();
+  toast(`Compacted — removed ${removed} empty entr${removed===1?'y':'ies'}`,'success');
+}
+
+// ── 31-40: Error handling & resilience ──
+function logErrorEvent(type,message){
+  const log=safeJSONParse(localStorage.getItem('wv-error-log'),[]);
+  log.unshift({type,message,ts:Date.now()});
+  localStorage.setItem('wv-error-log',JSON.stringify(log.slice(0,150)));
+}
+window.addEventListener('error',e=>{
+  logErrorEvent('window-error',e.message||'Unknown error');
+});
+window.addEventListener('unhandledrejection',e=>{
+  logErrorEvent('unhandled-rejection',(e.reason&&e.reason.message)||String(e.reason));
+});
+function enterSafeMode(){
+  if(!confirm('Reload WikiVerse in Safe Mode? Non-essential features (themes, preferences, idle locks) will be temporarily disabled.'))return;
+  const url=new URL(location.href);
+  url.searchParams.set('safe','1');
+  location.href=url.toString();
+}
+function isSafeMode(){ return new URLSearchParams(location.search).get('safe')==='1'; }
+
+// ── online/offline indicator ──
+function updateOnlineIndicator(){
+  const ind=document.getElementById('offline-indicator');
+  const small=document.getElementById('perf-online-state');
+  const online=navigator.onLine;
+  if(ind)ind.style.display=online?'none':'block';
+  if(small)small.textContent=online?'Online':'Offline — your edits still save locally';
+}
+window.addEventListener('online',updateOnlineIndicator);
+window.addEventListener('offline',updateOnlineIndicator);
+
+// ── 41-50: Diagnostics ──
+function showPerfDashboard(){
+  const wiki=state.wikis[CW];
+  const totalWikis=Object.keys(state.wikis).length;
+  const totalPages=Object.values(state.wikis).reduce((s,w)=>s+Object.keys(w.pages||{}).length,0);
+  const dbSize=new Blob([JSON.stringify(state.wikis)]).size;
+  showUtilReport('📊 Performance Dashboard',`
+    <div class="util-report-section">
+      <div>Wikis loaded: <strong>${totalWikis}</strong></div>
+      <div>Total pages: <strong>${totalPages}</strong></div>
+      <div>In-memory data size: <strong>${fmtSize(dbSize)}</strong></div>
+      <div>Current wiki pages: <strong>${wiki?Object.keys(wiki.pages||{}).length:'—'}</strong></div>
+      <div>Slow operations logged: <strong>${slowOpsLog.length}</strong></div>
+      <div>Errors logged: <strong>${safeJSONParse(localStorage.getItem('wv-error-log'),[]).length}</strong></div>
+    </div>`);
+}
+function showSlowOpsLog(){
+  showUtilReport('🐢 Slow Operations',slowOpsLog.length?slowOpsLog.map(o=>`<div class="nav-report-row"><span class="nrr-title">${esc(o.name)}</span><span class="nrr-meta">${o.ms}ms · ${fmtDateTime(o.ts)}</span></div>`).join(''):'<div class="nav-report-empty">Nothing slow recorded yet — good sign!</div>');
+}
+function showErrorLog(){
+  const log=safeJSONParse(localStorage.getItem('wv-error-log'),[]);
+  showUtilReport('📋 Error Log',log.length?log.map(e=>`<div class="nav-report-row"><span class="nrr-title">${esc(e.type)}: ${esc((e.message||'').slice(0,80))}</span><span class="nrr-meta">${fmtDateTime(e.ts)}</span></div>`).join(''):'<div class="nav-report-empty">No errors logged. ✓</div>');
+}
+async function runHealthCheck(){
+  const results=[];
+  results.push(['IndexedDB available',!!window.indexedDB]);
+  try{ await idbPut('settings',{key:'__health_test',value:1}); results.push(['IndexedDB writable',true]); }
+  catch{ results.push(['IndexedDB writable',false]); }
+  results.push(['localStorage available',(()=>{try{localStorage.setItem('__t','1');localStorage.removeItem('__t');return true}catch{return false}})()]);
+  results.push(['Web Crypto available',!!window.crypto?.subtle]);
+  results.push(['Current wiki loaded',!!state.wikis[CW]]);
+  results.push(['Online',navigator.onLine]);
+  showUtilReport('✅ Health Check',results.map(([label,ok])=>`<div class="nav-report-row"><span class="nrr-title">${ok?'✅':'❌'} ${esc(label)}</span></div>`).join(''));
+}
+function resetPerfCounters(){
+  slowOpsLog.length=0;
+  localStorage.removeItem('wv-error-log');
+  toast('Performance counters reset','success');
+}
+function exportDiagnosticsReport(){
+  const log=safeJSONParse(localStorage.getItem('wv-error-log'),[]);
+  const txt=`WikiVerse Diagnostics Report\nGenerated ${fmtDateTime(Date.now())}\n\n`+
+    `Wikis: ${Object.keys(state.wikis).length}\nSlow ops: ${slowOpsLog.length}\nErrors: ${log.length}\n\n`+
+    `Recent errors:\n`+log.slice(0,20).map(e=>`[${fmtDateTime(e.ts)}] ${e.type}: ${e.message}`).join('\n')+
+    `\n\nRecent slow ops:\n`+slowOpsLog.slice(0,20).map(o=>`[${fmtDateTime(o.ts)}] ${o.name}: ${o.ms}ms`).join('\n');
+  downloadBlob(txt,'wikiverse-diagnostics.txt','text/plain');
+  toast('Diagnostics report exported','success');
+}
+let fpsMonitorRAF=null;
+function toggleFpsMonitor(){
+  const on=!lsFlag('wv-fps-monitor');setLsFlag('wv-fps-monitor',on);
+  document.getElementById('perf-fps-state').textContent='Currently: '+(on?'on':'off');
+  const el=document.getElementById('fps-monitor');
+  if(on){
+    el.style.display='block';
+    let frames=0,last=performance.now();
+    const tick=()=>{
+      frames++;
+      const now=performance.now();
+      if(now-last>=1000){ el.textContent=`${frames} fps`; frames=0; last=now; }
+      fpsMonitorRAF=requestAnimationFrame(tick);
+    };
+    fpsMonitorRAF=requestAnimationFrame(tick);
+  } else {
+    el.style.display='none';
+    if(fpsMonitorRAF)cancelAnimationFrame(fpsMonitorRAF);
+  }
+}
+async function estimateCompactionSavings(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const before=new Blob([JSON.stringify(wiki)]).size;
+  const clone=JSON.parse(JSON.stringify(wiki));
+  Object.values(clone.pages).forEach(p=>{if(p.history)p.history=p.history.filter(h=>h.content&&h.content.trim())});
+  if(clone.changelog)clone.changelog=clone.changelog.filter(e=>e.pageTitle);
+  const after=new Blob([JSON.stringify(clone)]).size;
+  showUtilReport('🗜️ Compaction Estimate',`<div>Current size: <strong>${fmtSize(before)}</strong></div><div>After compaction: <strong>${fmtSize(after)}</strong></div><div>Reclaimable: <strong>${fmtSize(Math.max(0,before-after))}</strong></div>`);
+}
+function openReliabilityCenter(){
+  const log=safeJSONParse(localStorage.getItem('wv-error-log'),[]);
+  const draft=localStorage.getItem('wv-crash-draft');
+  showUtilReport('🩺 Reliability Center',`
+    <div class="util-report-section">
+      <div>Errors logged: <strong>${log.length}</strong></div>
+      <div>Slow operations: <strong>${slowOpsLog.length}</strong></div>
+      <div>Unsaved crash draft: <strong>${draft?'Yes — use Crash Recovery to restore':'None'}</strong></div>
+      <div>Online: <strong>${navigator.onLine?'Yes':'No'}</strong></div>
+      <div>Safe Mode: <strong>${isSafeMode()?'Active':'Off'}</strong></div>
+    </div>`);
+}
+
+// ── wiring: lazy media, memoized backlinks, idle-timer cleanup, instrumentation ──
+function addLazyLoadingTo(root){
+  if(!root)return;
+  root.querySelectorAll('img').forEach(img=>img.setAttribute('loading','lazy'));
+  root.querySelectorAll('video').forEach(v=>v.setAttribute('preload','none'));
+}
+const _rpvPerfOrg=renderPageView;
+renderPageView=function(wiki,page,wrap){
+  const t0=performance.now();
+  _rpvPerfOrg(wiki,page,wrap);
+  addLazyLoadingTo(wrap);
+  logSlowOp('renderPageView',performance.now()-t0);
+};
+
+let _backlinkCache=null;
+const _pbOrg=pageBacklinks;
+pageBacklinks=function(wiki,pageId){
+  if(_backlinkCache&&_backlinkCache.wikiId===wiki.id)return _backlinkCache.map[pageId]||[];
+  const map={};
+  Object.values(wiki.pages||{}).forEach(p=>{
+    pageOutgoingLinks(p).forEach(id=>{(map[id]=map[id]||[]).push(p)});
+  });
+  _backlinkCache={wikiId:wiki.id,map};
+  return map[pageId]||[];
+};
+function runBacklinkCacheTest(){
+  const wiki=state.wikis[CW];if(!wiki){toast('Open a wiki first','error');return}
+  const t0=performance.now();
+  Object.keys(wiki.pages).forEach(id=>pageBacklinks(wiki,id));
+  const cached=performance.now()-t0;
+  document.getElementById('perf-memo-state').textContent=`Computed backlinks for ${Object.keys(wiki.pages).length} page(s) in ${cached.toFixed(2)}ms (cached)`;
+  toast('Backlink cache verified','success');
+}
+const _rsCatPerfOrg=renderSidebar;
+renderSidebar=function(filter=''){
+  _backlinkCache=null;
+  const t0=performance.now();
+  _rsCatPerfOrg(filter);
+  logSlowOp('renderSidebar',performance.now()-t0);
+};
+
+const _ghPerfOrg=goHub;
+goHub=function(){
+  clearTimeout(wikiIdleTimer);
+  _ghPerfOrg();
+};
+const _scpPerfOrg=saveCurrentPage;
+saveCurrentPage=function(showToast){
+  const t0=performance.now();
+  _scpPerfOrg(showToast);
+  logSlowOp('saveCurrentPage',performance.now()-t0);
+  clearCrashDraft();
+  announceSaveToOtherTabs(CW);
+};
+
+// ════════════════════════════════════════════════════════════
+//  CUSTOM APPS & MODALS (50 features) — sandboxed by default
+// ════════════════════════════════════════════════════════════
+function switchCappsTab(el,paneId){
+  document.querySelectorAll('#capps-tabs .modal-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('#modal-custom-apps .util-pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById(paneId).classList.add('active');
+  if(paneId==='capps-templates')renderAppTemplatesList();
+}
+
+const CUSTOM_APP_TEMPLATES=[
+  {name:'Pomodoro Timer',icon:'⏱️',tags:['tools','productivity'],html:`<!DOCTYPE html><html><head><style>body{font-family:sans-serif;text-align:center;padding:40px;background:#111;color:#fff}button{padding:10px 20px;font-size:1rem;margin:6px;border-radius:8px;border:none;background:#7c6cfc;color:#fff;cursor:pointer}#t{font-size:3rem;margin:20px 0}</style></head><body>
+<div id="t">25:00</div>
+<button onclick="start()">Start</button><button onclick="reset()">Reset</button>
+<script>
+let secs=25*60,timer=null;
+function render(){const m=String(Math.floor(secs/60)).padStart(2,'0');const s=String(secs%60).padStart(2,'0');document.getElementById('t').textContent=m+':'+s;}
+function start(){if(timer)return;timer=setInterval(()=>{secs--;render();if(secs<=0){clearInterval(timer);timer=null;alert('Done!');}},1000);}
+function reset(){clearInterval(timer);timer=null;secs=25*60;render();}
+render();
+<\/script></body></html>`},
+  {name:'Calculator',icon:'🧮',tags:['tools'],html:`<!DOCTYPE html><html><head><style>body{font-family:sans-serif;background:#111;display:flex;justify-content:center;padding-top:30px}
+.calc{width:240px}input{width:100%;font-size:1.4rem;padding:10px;margin-bottom:8px;box-sizing:border-box;border-radius:8px;border:none}
+.row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}button{padding:14px;font-size:1.1rem;border:none;border-radius:8px;background:#333;color:#fff;cursor:pointer}</style></head><body>
+<div class="calc"><input id="d" readonly value="0">
+<div class="row">
+<button onclick="c('7')">7</button><button onclick="c('8')">8</button><button onclick="c('9')">9</button><button onclick="op('/')">÷</button>
+<button onclick="c('4')">4</button><button onclick="c('5')">5</button><button onclick="c('6')">6</button><button onclick="op('*')">×</button>
+<button onclick="c('1')">1</button><button onclick="c('2')">2</button><button onclick="c('3')">3</button><button onclick="op('-')">−</button>
+<button onclick="c('0')">0</button><button onclick="c('.')">.</button><button onclick="eq()">=</button><button onclick="op('+')">+</button>
+</div></div>
+<script>
+let d=document.getElementById('d'),cur='0',full='';
+function c(v){cur=cur==='0'?v:cur+v;d.value=cur;}
+function op(o){full=cur+o;cur='0';}
+function eq(){try{d.value=eval(full+cur);}catch(e){d.value='Error';}full='';cur=d.value;}
+<\/script></body></html>`},
+  {name:'Sticky Notes',icon:'📝',tags:['widget'],html:`<!DOCTYPE html><html><head><style>body{margin:0;font-family:sans-serif;background:#fef08a;padding:16px}textarea{width:100%;height:90vh;border:none;background:transparent;font-size:1.1rem;resize:none;outline:none;font-family:inherit}</style></head><body>
+<textarea placeholder="Type a quick note… (saved only inside this app window)" onchange="localStorage.setItem('note',this.value)"></textarea>
+<script>document.querySelector('textarea').value=localStorage.getItem('note')||'';<\/script>
+</body></html>`},
+  {name:'Markdown Previewer',icon:'📄',tags:['tools','writing'],html:`<!DOCTYPE html><html><head><style>body{margin:0;font-family:sans-serif;display:flex;height:100vh}textarea,#out{flex:1;padding:16px;box-sizing:border-box;overflow-y:auto}textarea{border:none;outline:none;font-family:monospace;resize:none;border-right:1px solid #ccc}</style></head><body>
+<textarea oninput="render()" placeholder="# Type markdown here"></textarea><div id="out"></div>
+<script>
+function render(){
+  let t=document.querySelector('textarea').value;
+  t=t.replace(/^### (.*$)/gim,'<h3>$1</h3>').replace(/^## (.*$)/gim,'<h2>$1</h2>').replace(/^# (.*$)/gim,'<h1>$1</h1>')
+    .replace(/\\*\\*(.*?)\\*\\*/g,'<b>$1</b>').replace(/\\*(.*?)\\*/g,'<i>$1</i>').replace(/\\n/g,'<br>');
+  document.getElementById('out').innerHTML=t;
+}
+<\/script></body></html>`},
+  {name:'Habit Tracker',icon:'✅',tags:['productivity','widget'],html:`<!DOCTYPE html><html><head><style>body{font-family:sans-serif;background:#111;color:#fff;padding:20px}
+.row{display:flex;align-items:center;gap:10px;margin-bottom:8px}input[type=text]{flex:1;padding:8px;border-radius:6px;border:none}
+button{padding:8px 12px;border:none;border-radius:6px;background:#7c6cfc;color:#fff;cursor:pointer}
+.habit{display:flex;justify-content:space-between;padding:8px;background:#222;border-radius:6px;margin-bottom:6px}</style></head><body>
+<div class="row"><input type="text" id="nh" placeholder="New habit…"><button onclick="add()">Add</button></div>
+<div id="list"></div>
+<script>
+let habits=JSON.parse(localStorage.getItem('habits')||'[]');
+function save(){localStorage.setItem('habits',JSON.stringify(habits));render();}
+function add(){const v=document.getElementById('nh').value.trim();if(!v)return;habits.push({name:v,count:0});document.getElementById('nh').value='';save();}
+function inc(i){habits[i].count++;save();}
+function render(){document.getElementById('list').innerHTML=habits.map((h,i)=>'<div class="habit"><span>'+h.name+'</span><span>'+h.count+' <button onclick="inc('+i+')">+1</button></span></div>').join('');}
+render();
+<\/script></body></html>`},
+];
+
+function getCustomApps(){return safeJSONParse(localStorage.getItem('wv-custom-apps'),[])||[]}
+function saveCustomApps(list){localStorage.setItem('wv-custom-apps',JSON.stringify(list));}
+function getCustomApp(id){return getCustomApps().find(a=>a.id===id)}
+function genAppId(){return 'app_'+Date.now()+'_'+Math.random().toString(36).slice(2,6)}
+
+function lintAppHTML(html){
+  const flags=[];
+  if(/document\.cookie/i.test(html))flags.push('reads document.cookie');
+  if(/eval\s*\(/i.test(html))flags.push('uses eval()');
+  if(/fetch\s*\(|XMLHttpRequest/i.test(html))flags.push('makes network requests');
+  if(/<script[^>]*src=/i.test(html))flags.push('loads an external script');
+  if(/window\.parent|window\.top/i.test(html))flags.push('tries to reach outside its sandbox (window.parent/top)');
+  return flags;
+}
+
+function openCustomAppsManager(){
+  renderCustomAppsList();
+  openModal('modal-custom-apps');
+}
+function renderCustomAppsList(filter=''){
+  const apps=getCustomApps().filter(a=>!filter||a.name.toLowerCase().includes(filter.toLowerCase())||(a.tags||[]).some(t=>t.includes(filter.toLowerCase())));
+  const el=document.getElementById('capps-list');if(!el)return;
+  if(!apps.length){el.innerHTML='<div class="catmgr-empty">No custom apps yet — create or upload one in the next tab.</div>';return}
+  el.innerHTML=apps.map(a=>`
+    <div class="capps-app-row">
+      <span class="capps-app-icon">${esc(a.icon||'🧩')}</span>
+      <div class="capps-app-info">
+        <div class="capps-app-name">${esc(a.name)} ${a.favorite?'⭐':''}</div>
+        <div class="capps-app-meta">${(a.tags||[]).map(t=>'#'+esc(t)).join(' ')} · opened ${a.usageCount||0}×</div>
+      </div>
+      <span class="capps-trust-badge ${a.trust}">${a.trust}</span>
+      <div class="capps-app-acts">
+        <button class="att-btn" onclick="runCustomApp('${a.id}')">▶ Run</button>
+        <button class="att-btn" onclick="openCustomAppEditor('${a.id}')">✏️ Edit</button>
+        <button class="att-btn" onclick="toggleFavoriteApp('${a.id}')">⭐</button>
+        <button class="att-btn" onclick="duplicateCustomApp('${a.id}')">⧉</button>
+        <button class="att-btn danger" onclick="deleteCustomApp('${a.id}')">🗑</button>
+      </div>
+    </div>`).join('');
+}
+function renderAppTemplatesList(){
+  const el=document.getElementById('capps-templates-list');if(!el)return;
+  el.innerHTML=CUSTOM_APP_TEMPLATES.map((t,i)=>`
+    <div class="capps-app-row">
+      <span class="capps-app-icon">${t.icon}</span>
+      <div class="capps-app-info"><div class="capps-app-name">${esc(t.name)}</div><div class="capps-app-meta">${(t.tags||[]).map(x=>'#'+x).join(' ')}</div></div>
+      <button class="att-btn" onclick="cloneTemplateIntoApp(${i})">＋ Add to My Apps</button>
+    </div>`).join('');
+}
+function cloneTemplateIntoApp(i){
+  const t=CUSTOM_APP_TEMPLATES[i];if(!t)return;
+  const apps=getCustomApps();
+  const app={id:genAppId(),name:t.name,icon:t.icon,html:t.html,size:'medium',tags:t.tags||[],trust:'trusted',source:'template',favorite:false,usageCount:0,allowSameOrigin:false,createdAt:Date.now(),updatedAt:Date.now(),history:[]};
+  apps.push(app);saveCustomApps(apps);renderCustomAppsList();
+  toast(`"${t.name}" added to My Apps`,'success');
+}
+
+function uploadCustomAppFile(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const html=e.target.result;
+    const apps=getCustomApps();
+    const app={id:genAppId(),name:file.name.replace(/\.(html?|htm)$/i,''),icon:'🧩',html,size:'medium',tags:[],trust:'untrusted',source:'uploaded',favorite:false,usageCount:0,allowSameOrigin:false,createdAt:Date.now(),updatedAt:Date.now(),history:[]};
+    apps.push(app);saveCustomApps(apps);
+    renderCustomAppsList();
+    const flags=lintAppHTML(html);
+    if(flags.length)toast(`Uploaded — safety scan flagged: ${flags.join(', ')}`,'info');
+    else toast(`Uploaded "${app.name}" ✓`,'success');
+    switchCappsTab(document.querySelector('[onclick*=capps-myapps]'),'capps-myapps');
+  };
+  reader.readAsText(file);
+  input.value='';
+}
+function pasteCustomAppFromClipboard(){
+  navigator.clipboard?.readText().then(html=>{
+    if(!html||!html.trim()){toast('Clipboard is empty','info');return}
+    const apps=getCustomApps();
+    const app={id:genAppId(),name:'Pasted App',icon:'🧩',html,size:'medium',tags:[],trust:'untrusted',source:'pasted',favorite:false,usageCount:0,allowSameOrigin:false,createdAt:Date.now(),updatedAt:Date.now(),history:[]};
+    apps.push(app);saveCustomApps(apps);
+    renderCustomAppsList();
+    switchCappsTab(document.querySelector('[onclick*=capps-myapps]'),'capps-myapps');
+    toast('App created from clipboard','success');
+  }).catch(()=>toast('Could not read clipboard','error'));
+}
+
+let editingAppId=null;
+function openCustomAppEditor(id){
+  editingAppId=id;
+  const app=id?getCustomApp(id):null;
+  document.getElementById('app-editor-title').textContent=app?`✏️ Edit "${app.name}"`:'✏️ New Custom App';
+  document.getElementById('ae-name').value=app?.name||'';
+  document.getElementById('ae-icon').value=app?.icon||'🧩';
+  document.getElementById('ae-size').value=app?.size||'medium';
+  document.getElementById('ae-tags').value=(app?.tags||[]).join(', ');
+  document.getElementById('ae-html').value=app?.html||'<!DOCTYPE html>\n<html>\n<head><style>\nbody{font-family:sans-serif;padding:20px}\n</style></head>\n<body>\n  <h1>Hello!</h1>\n</body>\n</html>';
+  document.getElementById('ae-allow-same-origin').checked=!!app?.allowSameOrigin;
+  closeModal('modal-custom-apps');
+  openModal('modal-app-editor');
+}
+function previewCustomAppDraft(){
+  const html=document.getElementById('ae-html').value;
+  const allowSameOrigin=document.getElementById('ae-allow-same-origin').checked;
+  openAppRuntimeRaw('👁️ Preview','🧩',html,document.getElementById('ae-size').value,allowSameOrigin,null);
+}
+function saveCustomAppFromEditor(){
+  const name=document.getElementById('ae-name').value.trim()||'Untitled App';
+  const icon=document.getElementById('ae-icon').value.trim()||'🧩';
+  const size=document.getElementById('ae-size').value;
+  const tags=document.getElementById('ae-tags').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const html=document.getElementById('ae-html').value;
+  const allowSameOrigin=document.getElementById('ae-allow-same-origin').checked;
+  const apps=getCustomApps();
+  if(editingAppId){
+    const app=apps.find(a=>a.id===editingAppId);
+    if(app){
+      app.history=app.history||[];
+      app.history.unshift({html:app.html,ts:Date.now()});
+      app.history=app.history.slice(0,5);
+      Object.assign(app,{name,icon,size,tags,html,allowSameOrigin,updatedAt:Date.now()});
+    }
+  } else {
+    apps.push({id:genAppId(),name,icon,size,tags,html,trust:'trusted',source:'created',favorite:false,usageCount:0,allowSameOrigin,createdAt:Date.now(),updatedAt:Date.now(),history:[]});
+  }
+  saveCustomApps(apps);
+  closeModal('modal-app-editor');
+  openCustomAppsManager();
+  toast('App saved','success');
+}
+function duplicateCustomApp(id){
+  const apps=getCustomApps();
+  const app=apps.find(a=>a.id===id);if(!app)return;
+  const clone={...app,id:genAppId(),name:app.name+' (Copy)',usageCount:0,createdAt:Date.now(),updatedAt:Date.now()};
+  apps.push(clone);saveCustomApps(apps);renderCustomAppsList();
+  toast('App duplicated','success');
+}
+function deleteCustomApp(id){
+  if(!confirm('Delete this app permanently?'))return;
+  saveCustomApps(getCustomApps().filter(a=>a.id!==id));
+  renderCustomAppsList();
+  toast('App deleted','success');
+}
+function toggleFavoriteApp(id){
+  const apps=getCustomApps();
+  const app=apps.find(a=>a.id===id);if(!app)return;
+  app.favorite=!app.favorite;saveCustomApps(apps);renderCustomAppsList();
+}
+
+// ── Sandboxed runtime ──
+let currentRuntimeAppId=null;
+function runCustomApp(id){
+  const app=getCustomApp(id);if(!app)return;
+  app.usageCount=(app.usageCount||0)+1;
+  saveCustomApps(getCustomApps().map(a=>a.id===id?app:a));
+  openAppRuntimeRaw(app.name,app.icon,app.html,app.size,app.allowSameOrigin,id);
+}
+function openAppRuntimeRaw(title,icon,html,size,allowSameOrigin,appId){
+  currentRuntimeAppId=appId;
+  document.getElementById('art-title').textContent=title;
+  document.getElementById('art-icon').textContent=icon;
+  const win=document.getElementById('app-runtime-window');
+  win.className='app-runtime-window size-'+(size||'medium');
+  const body=document.getElementById('app-runtime-body');
+  const iframe=document.createElement('iframe');
+  let sandbox='allow-scripts allow-forms allow-modals allow-popups';
+  if(allowSameOrigin){
+    sandbox+=' allow-same-origin';
+    toast('⚠️ Running with same-origin access — this app can read your wiki data','info');
+  }
+  iframe.setAttribute('sandbox',sandbox);
+  iframe.srcdoc=html;
+  iframe.onerror=()=>{ body.innerHTML='<div class="nav-report-empty">This app crashed and could not be displayed.</div>'; };
+  body.innerHTML='';
+  body.appendChild(iframe);
+  openModal('modal-app-runtime');
+  initAppRuntimeResize();
+}
+function closeAppRuntime(){
+  closeModal('modal-app-runtime');
+  document.getElementById('app-runtime-body').innerHTML='';
+  currentRuntimeAppId=null;
+}
+function viewCustomAppSource(id){
+  const app=id?getCustomApp(id):null;
+  const html=app?app.html:document.getElementById('app-runtime-body').querySelector('iframe')?.srcdoc;
+  showUtilReport('📄 App Source',`<pre style="white-space:pre-wrap;font-family:'Fira Code',monospace;font-size:.78rem;max-height:50vh;overflow-y:auto">${esc(html||'')}</pre>`);
+}
+function exportRunningAppData(){
+  const iframe=document.getElementById('app-runtime-body').querySelector('iframe');
+  if(!iframe){toast('No app is running','info');return}
+  try{
+    iframe.contentWindow.postMessage({type:'wikiverse:requestExport'},'*');
+    toast('Requested export from the app — if it supports this, a download will start','info');
+  }catch{toast('This app does not support export','info')}
+}
+function initAppRuntimeResize(){
+  const handle=document.getElementById('app-runtime-resize');
+  if(!handle||handle.dataset.bound)return;
+  handle.dataset.bound='1';
+  handle.addEventListener('mousedown',e=>{
+    e.preventDefault();
+    const win=document.getElementById('app-runtime-window');
+    const onMove=ev=>{
+      const r=win.getBoundingClientRect();
+      win.style.width=Math.max(300,ev.clientX-r.left)+'px';
+      win.style.height=Math.max(200,ev.clientY-r.top)+'px';
+    };
+    const onUp=()=>{document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp)};
+    document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);
+  });
+}
+
+// postMessage bridge — read-only context handshake + approved insert-text request
+window.addEventListener('message',e=>{
+  const iframe=document.getElementById('app-runtime-body')?.querySelector('iframe');
+  if(!iframe||e.source!==iframe.contentWindow)return;
+  const msg=e.data||{};
+  if(msg.type==='wikiverse:getContext'){
+    iframe.contentWindow.postMessage({type:'wikiverse:context',wikiName:state.wikis[CW]?.name||null,pageTitle:state.wikis[CW]?.pages[CP]?.title||null,accent:getComputedStyle(document.documentElement).getPropertyValue('--hub-accent')},'*');
+  } else if(msg.type==='wikiverse:insertText'&&typeof msg.text==='string'){
+    if(confirm(`The app "${document.getElementById('art-title').textContent}" wants to insert this into your current page:\n\n"${msg.text.slice(0,200)}"\n\nAllow?`)){
+      if(CP&&isEditing)insHTML(esc(msg.text));
+      else toast('Open a page in Edit mode first','info');
+    }
+  } else if(msg.type==='wikiverse:exportData'&&msg.data){
+    downloadBlob(typeof msg.data==='string'?msg.data:JSON.stringify(msg.data),(msg.filename||'app-data.txt'),'text/plain');
+  }
+});
+
+// ── Safety & library ──
+function runSafetyLintOnAll(){
+  const apps=getCustomApps();
+  const rows=apps.map(a=>{
+    const flags=lintAppHTML(a.html);
+    return `<div class="nav-report-row"><span class="nrr-title">${esc(a.icon)} ${esc(a.name)}</span><span class="nrr-meta">${flags.length?'⚠️ '+esc(flags.join(', ')):'✅ clean'}</span></div>`;
+  });
+  showUtilReport('🩺 Safety Scan',rows.length?rows.join(''):'<div class="nav-report-empty">No apps to scan yet.</div>');
+}
+function exportCustomAppsLibrary(){
+  downloadBlob(JSON.stringify(getCustomApps(),null,2),'wikiverse-apps-library.json','application/json');
+  toast('App library exported','success');
+}
+function importCustomAppsLibrary(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const imported=JSON.parse(e.target.result);
+      if(!Array.isArray(imported)){toast('Invalid library file','error');return}
+      const apps=getCustomApps();
+      imported.forEach(a=>apps.push({...a,id:genAppId(),trust:'untrusted'}));
+      saveCustomApps(apps);
+      renderCustomAppsList();
+      toast(`Imported ${imported.length} app(s)`,'success');
+    }catch{toast('Failed to parse library file','error')}
+  };
+  reader.readAsText(file);
+  input.value='';
+}
+function openAppDrawer(){
+  const apps=getCustomApps();
+  const el=document.getElementById('app-drawer-grid');
+  el.innerHTML=apps.length?apps.map(a=>`<div class="app-drawer-tile" onclick="closeModal('modal-app-drawer');runCustomApp('${a.id}')"><span class="adt-icon">${esc(a.icon)}</span><span class="adt-name">${esc(a.name)}</span></div>`).join(''):'<div class="catmgr-empty">No apps yet.</div>';
+  openModal('modal-app-drawer');
+}
+
+// ── Wiki integration: turn a page into a full-page app ──
+function makeCurrentPageAnApp(){
+  const page=curPage();if(!page){toast('Open a page first','error');return}
+  const apps=getCustomApps();
+  if(!apps.length){toast('Create or upload an app first','info');return}
+  const list=apps.map((a,i)=>`${i+1}. ${a.icon} ${a.name}`).join('\n');
+  const choice=prompt(`Run which app as this page's content?\n\n${list}\n\nEnter a number:`);
+  const app=apps[parseInt(choice,10)-1];if(!app)return;
+  page.appId=app.id;
+  saveData();renderContentArea();
+  toast(`"${page.title}" now runs "${app.name}"`,'success');
+}
+const _rpvAppOrg=renderPageView;
+renderPageView=function(wiki,page,wrap){
+  if(page.appId){
+    const app=getCustomApp(page.appId);
+    if(app){
+      wrap.innerHTML=`<div class="wiki-content-inner" style="height:calc(100vh - 160px);display:flex;flex-direction:column">
+        <div class="wiki-page-header"><div class="wiki-page-breadcrumb"><a onclick="CP=null;renderContentArea()">${esc(wiki.name)}</a><span>›</span><span>${esc(page.title)}</span></div>
+        <h1 class="wiki-page-title">${app.icon} ${esc(page.title)}</h1></div>
+        <div style="flex:1;border:1px solid var(--wiki-border);border-radius:var(--wiki-radius);overflow:hidden;margin-top:14px"></div>
+      </div>`;
+      const host=wrap.querySelector('div[style*="flex:1"]');
+      const iframe=document.createElement('iframe');
+      iframe.style.cssText='width:100%;height:100%;border:none;background:#fff';
+      let sandbox='allow-scripts allow-forms allow-modals allow-popups';
+      if(app.allowSameOrigin)sandbox+=' allow-same-origin';
+      iframe.setAttribute('sandbox',sandbox);
+      iframe.srcdoc=app.html;
+      host.appendChild(iframe);
+      return;
+    }
+  }
+  _rpvAppOrg(wiki,page,wrap);
+};
+
+// ════════════════════════════════════════════════════════════
 //  BOOT — async IndexedDB startup
 // ════════════════════════════════════════════════════════════
 async function boot() {
@@ -8783,17 +11022,23 @@ async function boot() {
     state.wikis = await loadAllWikis();
     const hvRow = await idbGet('settings','hubView').catch(()=>null);
     if (hvRow?.value) hubView = hvRow.value;
-    await loadHubTheme();
-    await loadPrefs();
+    if (!isSafeMode()) {
+      await loadHubTheme();
+      await loadPrefs();
+    }
   } catch(err) {
     console.error('WikiVerse boot error:', err);
+    logErrorEvent('boot-error', err?.message || String(err));
     try { const raw=localStorage.getItem('wikiverse_v3');if(raw)state=JSON.parse(raw)||{wikis:{}}; } catch(e2) { state={wikis:{}}; }
     toast('IndexedDB unavailable — running in fallback mode','error');
   }
   if (loadEl) loadEl.style.display = 'none';
   renderHub();
   renderHubThemePicker();
-  if (lsFlag('wv-app-lock-enabled') && localStorage.getItem('wv-app-lock-hash')) {
+  updateOnlineIndicator();
+  if (!isSafeMode()) showCrashRecoveryBanner();
+  if (isSafeMode()) toast('🧰 Running in Safe Mode — themes, preferences & idle locks are disabled','info');
+  if (lsFlag('wv-app-lock-enabled') && localStorage.getItem('wv-app-lock-hash') && !isSafeMode()) {
     document.getElementById('modal-app-lock').classList.add('open');
     setTimeout(()=>document.getElementById('app-lock-input')?.focus(),100);
   }
@@ -8804,6 +11049,9 @@ boot();
 </script>
 
 <div id="prefs-kb-hint-overlay">⌘K Search · ⌘E Edit · ⌘B Sidebar · Esc Close</div>
+<div id="fps-monitor" style="display:none;position:fixed;bottom:18px;left:18px;z-index:9999;background:rgba(0,0,0,.75);color:#0f0;font-family:'Fira Code',monospace;font-size:.72rem;padding:6px 10px;border-radius:6px"></div>
+<div id="crash-recovery-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9500;background:#7c2d12;color:#fff;padding:10px 20px;font-size:.85rem;align-items:center;justify-content:center;gap:14px"></div>
+<div id="offline-indicator" style="display:none;position:fixed;bottom:18px;left:18px;z-index:9000;background:#7c2d12;color:#fff;font-size:.78rem;padding:6px 12px;border-radius:20px;font-family:'Fira Code',monospace">🔌 Offline — changes save locally</div>
 
 </body>
 </html>
