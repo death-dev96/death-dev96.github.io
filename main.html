@@ -1,0 +1,1902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Toolkit</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#0b0c10;
+  --surface:#13141a;
+  --surface2:#1a1b24;
+  --border:#22232f;
+  --border2:#2e3040;
+  --text:#eeeef2;
+  --muted:#6b6d80;
+  --muted2:#4a4c5c;
+  --accent:#f0c060;
+  --accent2:#e8816a;
+  --radius:16px;
+  --font-display:'Outfit',sans-serif;
+  --font-body:'Crimson Pro',serif;
+  --font-mono:'Fira Code',monospace;
+}
+
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font-body);
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+  line-height:1.6;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* ══════════════════════════════════════
+   BACKGROUND ELEMENTS
+══════════════════════════════════════ */
+.bg-layer{position:fixed;inset:0;pointer-events:none;z-index:0}
+
+.bg-grid{
+  background-image:
+    linear-gradient(rgba(240,192,96,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(240,192,96,.025) 1px,transparent 1px);
+  background-size:56px 56px;
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+}
+
+.bg-glow-1{
+  position:fixed;top:-20vh;right:-10vw;width:60vw;height:60vh;
+  background:radial-gradient(ellipse,rgba(240,192,96,.06) 0%,transparent 65%);
+  pointer-events:none;z-index:0;
+}
+.bg-glow-2{
+  position:fixed;bottom:-20vh;left:-10vw;width:50vw;height:50vh;
+  background:radial-gradient(ellipse,rgba(232,129,106,.05) 0%,transparent 65%);
+  pointer-events:none;z-index:0;
+}
+.bg-noise{
+  position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.025;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ══════════════════════════════════════
+   LAYOUT
+══════════════════════════════════════ */
+.wrapper{
+  position:relative;z-index:1;
+  max-width:1280px;
+  margin:0 auto;
+  padding:0 40px 80px;
+}
+
+/* ══════════════════════════════════════
+   HEADER
+══════════════════════════════════════ */
+header{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  padding:52px 40px 0;
+  position:relative;z-index:1;
+  flex-wrap:wrap;gap:24px;
+  max-width:1280px;margin:0 auto;
+}
+
+.header-left{}
+
+.eyebrow{
+  font-family:var(--font-mono);
+  font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--accent);opacity:.7;margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.eyebrow::before{content:'';width:24px;height:1px;background:var(--accent);opacity:.5}
+
+.site-title{
+  font-family:var(--font-display);
+  font-size:clamp(2.6rem,4.5vw,4rem);
+  font-weight:800;
+  letter-spacing:-.03em;
+  line-height:1;
+  color:var(--text);
+}
+.site-title em{
+  font-style:normal;
+  background:linear-gradient(120deg,var(--accent) 0%,var(--accent2) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+
+.site-sub{
+  font-family:var(--font-body);
+  font-size:1.1rem;
+  color:var(--muted);
+  margin-top:12px;
+  max-width:420px;
+  font-style:italic;
+  line-height:1.6;
+}
+
+.header-right{
+  display:flex;flex-direction:column;align-items:flex-end;gap:10px;
+}
+
+.time-display{
+  font-family:var(--font-mono);
+  font-size:2rem;font-weight:500;
+  color:var(--text);letter-spacing:-.02em;
+  opacity:.85;
+}
+.date-display{
+  font-family:var(--font-mono);
+  font-size:.75rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;
+}
+.greeting{
+  font-family:var(--font-body);font-style:italic;
+  font-size:.95rem;color:var(--accent);opacity:.8;
+}
+
+/* ══════════════════════════════════════
+   SECTION LABEL
+══════════════════════════════════════ */
+.section-label{
+  font-family:var(--font-mono);
+  font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted2);
+  display:flex;align-items:center;gap:12px;
+  margin:56px 0 24px;
+}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ══════════════════════════════════════
+   TOOL GRID
+══════════════════════════════════════ */
+.tool-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:20px;
+}
+.tool-grid.featured{
+  grid-template-columns:repeat(3,1fr);
+  grid-auto-rows:auto;
+}
+.tool-grid.featured .tool-card:first-child{
+  grid-column:span 2;
+  grid-row:span 1;
+}
+
+.tool-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:28px;
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1), border-color .2s, box-shadow .2s;
+  animation:cardIn .5s ease both;
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  min-height:180px;
+  text-decoration:none;
+  color:inherit;
+}
+
+@keyframes cardIn{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.tool-card:nth-child(1){animation-delay:.05s}
+.tool-card:nth-child(2){animation-delay:.10s}
+.tool-card:nth-child(3){animation-delay:.15s}
+.tool-card:nth-child(4){animation-delay:.20s}
+.tool-card:nth-child(5){animation-delay:.25s}
+.tool-card:nth-child(6){animation-delay:.30s}
+.tool-card:nth-child(7){animation-delay:.35s}
+.tool-card:nth-child(8){animation-delay:.40s}
+
+.tool-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,var(--card-color,#f0c060) 0%,transparent 60%);
+  opacity:.04;transition:opacity .2s;
+}
+.tool-card::after{
+  content:'';position:absolute;
+  top:0;left:0;right:0;height:2px;
+  background:var(--card-color,#f0c060);
+  opacity:.6;transition:opacity .2s;
+}
+.tool-card:hover{
+  transform:translateY(-5px);
+  border-color:var(--card-color,#f0c060);
+  box-shadow:0 16px 48px rgba(0,0,0,.4), 0 0 0 1px var(--card-color,#f0c060) inset;
+}
+.tool-card:hover::before{opacity:.08}
+.tool-card:hover::after{opacity:1}
+
+.tool-card-header{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  margin-bottom:16px;
+}
+
+.tool-icon{
+  width:52px;height:52px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem;
+  background:var(--surface2);
+  border:1px solid var(--border2);
+  flex-shrink:0;
+  transition:transform .2s;
+}
+.tool-card:hover .tool-icon{transform:scale(1.08) rotate(-3deg)}
+
+.tool-badge{
+  font-family:var(--font-mono);
+  font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;
+  padding:3px 8px;border-radius:20px;
+  background:rgba(255,255,255,.04);
+  border:1px solid var(--border2);
+  color:var(--muted);
+  align-self:flex-start;
+}
+.tool-badge.new{background:rgba(240,192,96,.12);border-color:rgba(240,192,96,.3);color:var(--accent)}
+.tool-badge.hot{background:rgba(232,129,106,.12);border-color:rgba(232,129,106,.3);color:var(--accent2)}
+
+.tool-name{
+  font-family:var(--font-display);
+  font-size:1.25rem;font-weight:700;
+  letter-spacing:-.02em;
+  margin-bottom:6px;
+  color:var(--text);
+}
+
+.tool-desc{
+  font-family:var(--font-body);
+  font-size:.95rem;
+  color:var(--muted);
+  line-height:1.55;
+  flex:1;
+}
+
+.tool-card-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:20px;padding-top:16px;
+  border-top:1px solid var(--border);
+}
+
+.tool-tags{display:flex;gap:6px;flex-wrap:wrap}
+.tool-tag{
+  font-family:var(--font-mono);font-size:.62rem;
+  padding:2px 7px;border-radius:4px;
+  background:rgba(255,255,255,.04);color:var(--muted2);
+  letter-spacing:.06em;
+}
+
+.tool-open-hint{
+  font-family:var(--font-mono);font-size:.68rem;
+  color:var(--muted2);letter-spacing:.06em;
+  display:flex;align-items:center;gap:5px;
+  opacity:0;transition:opacity .2s;
+}
+.tool-card:hover .tool-open-hint{opacity:1}
+.tool-open-hint::after{content:'→';color:var(--card-color,#f0c060)}
+
+/* ── featured card extra styles ── */
+.tool-card.featured-card{min-height:220px}
+.tool-card.featured-card .tool-name{font-size:1.6rem}
+.tool-card.featured-card .tool-desc{font-size:1rem}
+.featured-stats{
+  display:flex;gap:20px;margin-top:12px;
+}
+.featured-stat{display:flex;flex-direction:column;gap:2px}
+.featured-stat-num{
+  font-family:var(--font-mono);font-size:1.1rem;font-weight:500;
+  color:var(--card-color,#f0c060);
+}
+.featured-stat-label{font-size:.72rem;color:var(--muted);font-family:var(--font-body)}
+
+/* ══════════════════════════════════════
+   IFRAME OVERLAY (tool launcher)
+══════════════════════════════════════ */
+.tool-overlay{
+  position:fixed;inset:0;z-index:9000;
+  display:flex;flex-direction:column;
+  background:var(--bg);
+  transform:translateY(100vh);
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+}
+.tool-overlay.open{transform:translateY(0)}
+
+.tool-overlay-bar{
+  display:flex;align-items:center;gap:14px;
+  padding:0 20px;
+  height:46px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+  z-index:1;
+}
+
+.overlay-back{
+  display:flex;align-items:center;gap:7px;
+  padding:6px 12px;border-radius:7px;
+  background:transparent;border:1px solid var(--border2);
+  color:var(--muted);font-family:var(--font-mono);font-size:.75rem;
+  cursor:pointer;transition:all .15s;letter-spacing:.05em;
+  flex-shrink:0;
+}
+.overlay-back:hover{border-color:var(--accent);color:var(--accent)}
+
+.overlay-title-wrap{
+  display:flex;align-items:center;gap:10px;flex:1;min-width:0;
+}
+.overlay-tool-icon{font-size:1.1rem}
+.overlay-tool-name{
+  font-family:var(--font-display);font-weight:700;font-size:.95rem;
+  color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.overlay-tool-desc{
+  font-size:.75rem;color:var(--muted);font-family:var(--font-body);font-style:italic;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+
+.overlay-color-bar{
+  height:2px;flex-shrink:0;
+  position:absolute;top:0;left:0;right:0;
+}
+
+.overlay-actions{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.overlay-action-btn{
+  padding:5px 11px;border-radius:7px;border:1px solid var(--border2);
+  background:transparent;color:var(--muted);font-family:var(--font-mono);
+  font-size:.72rem;cursor:pointer;transition:all .15s;letter-spacing:.05em;
+}
+.overlay-action-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+.tool-overlay iframe{
+  flex:1;border:none;width:100%;
+  display:block;
+}
+
+/* loading shimmer */
+.overlay-loading{
+  position:absolute;inset:46px 0 0 0;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg);
+  z-index:2;
+  transition:opacity .3s;
+  flex-direction:column;gap:16px;
+}
+.overlay-loading.hidden{opacity:0;pointer-events:none}
+.overlay-spinner{
+  width:32px;height:32px;border-radius:50%;
+  border:2px solid var(--border2);
+  border-top-color:var(--accent);
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.overlay-loading-name{
+  font-family:var(--font-mono);font-size:.78rem;color:var(--muted);letter-spacing:.1em;
+}
+
+/* ══════════════════════════════════════
+   QUICK TOOLS STRIP (mini inline tools)
+══════════════════════════════════════ */
+.quick-strip{
+  display:flex;gap:12px;flex-wrap:wrap;
+  margin-top:8px;
+}
+.quick-tool{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:10px;padding:14px 18px;
+  display:flex;align-items:center;gap:10px;
+  cursor:pointer;transition:all .18s;
+  font-family:var(--font-display);font-size:.85rem;font-weight:600;
+  color:var(--text);flex-shrink:0;
+}
+.quick-tool:hover{border-color:var(--border2);background:var(--surface2);transform:translateY(-2px)}
+.quick-tool-icon{font-size:1.1rem}
+.quick-tool-label{display:flex;flex-direction:column;gap:1px}
+.quick-tool-name{font-size:.82rem;font-weight:700}
+.quick-tool-sub{font-size:.7rem;color:var(--muted);font-family:var(--font-body);font-style:italic}
+
+/* ══════════════════════════════════════
+   INLINE QUICK TOOLS (no iframe)
+══════════════════════════════════════ */
+.inline-tool-overlay{
+  position:fixed;inset:0;z-index:8000;
+  background:rgba(0,0,0,.7);backdrop-filter:blur(8px);
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.inline-tool-overlay.open{display:flex}
+.inline-tool-box{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:20px;padding:32px;width:100%;
+  max-width:520px;max-height:88vh;overflow-y:auto;
+  animation:cardIn .2s ease;position:relative;
+}
+.inline-tool-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:24px;
+}
+.inline-tool-title{font-family:var(--font-display);font-weight:800;font-size:1.2rem}
+.inline-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.2rem;padding:4px;line-height:1}
+.inline-close:hover{color:var(--text)}
+
+/* ══════════════════════════════════════
+   FOOTER
+══════════════════════════════════════ */
+footer{
+  position:relative;z-index:1;
+  max-width:1280px;margin:0 auto;
+  padding:32px 40px 48px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-top:1px solid var(--border);
+  flex-wrap:wrap;gap:12px;
+}
+.footer-brand{
+  font-family:var(--font-display);font-weight:700;font-size:.9rem;
+  display:flex;align-items:center;gap:8px;color:var(--muted);
+}
+.footer-brand span{color:var(--accent)}
+.footer-note{font-family:var(--font-body);font-style:italic;font-size:.85rem;color:var(--muted2)}
+
+/* ══════════════════════════════════════
+   BUTTONS
+══════════════════════════════════════ */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;border-radius:8px;font-weight:600;font-size:.85rem;cursor:pointer;border:none;transition:all .18s;font-family:var(--font-display);text-decoration:none}
+.btn-primary{background:var(--accent);color:#000}
+.btn-primary:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--muted)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm{padding:6px 13px;font-size:.78rem}
+
+/* ══════════════════════════════════════
+   TOAST
+══════════════════════════════════════ */
+.toast-stack{position:fixed;bottom:20px;right:20px;z-index:99999;display:flex;flex-direction:column;gap:7px}
+.tk-toast{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:9px;padding:11px 16px;font-size:.83rem;
+  display:flex;align-items:center;gap:8px;
+  box-shadow:0 4px 20px rgba(0,0,0,.4);
+  animation:cardIn .2s ease;font-family:var(--font-display);
+}
+.tk-toast.ok{border-left:3px solid #22c55e}
+.tk-toast.err{border-left:3px solid #ef4444}
+.tk-toast.info{border-left:3px solid var(--accent)}
+
+/* ══════════════════════════════════════
+   REPORT ISSUE MODAL
+══════════════════════════════════════ */
+.issue-overlay{
+  position:fixed;inset:0;z-index:9500;
+  background:rgba(0,0,0,.75);backdrop-filter:blur(10px);
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.issue-overlay.open{display:flex}
+.issue-box{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:18px;padding:32px;width:100%;max-width:500px;
+  animation:cardIn .2s ease;
+}
+.issue-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:8px;
+}
+.issue-title{font-family:var(--font-display);font-weight:800;font-size:1.15rem;display:flex;align-items:center;gap:8px}
+.issue-sub{font-family:var(--font-body);font-style:italic;font-size:.88rem;color:var(--muted);margin-bottom:24px}
+.issue-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.2rem;padding:4px;line-height:1;transition:color .15s}
+.issue-close:hover{color:var(--text)}
+.issue-field{margin-bottom:18px}
+.issue-label{
+  display:block;font-family:var(--font-mono);font-size:.68rem;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  margin-bottom:8px;
+}
+.issue-chips{display:flex;gap:7px;flex-wrap:wrap}
+.issue-chip{
+  padding:6px 14px;border-radius:20px;
+  border:1px solid var(--border2);background:transparent;
+  color:var(--muted);font-family:var(--font-display);font-size:.8rem;font-weight:600;
+  cursor:pointer;transition:all .15s;
+}
+.issue-chip:hover{border-color:var(--border2);color:var(--text);background:var(--surface2)}
+.issue-chip.sel-app{background:rgba(124,108,252,.12);border-color:#7c6cfc;color:#a594fd}
+.issue-chip.sel-type-bug{background:rgba(239,68,68,.1);border-color:#ef4444;color:#ef4444}
+.issue-chip.sel-type-feat{background:rgba(34,197,94,.1);border-color:#22c55e;color:#22c55e}
+.issue-chip.sel-type-toolkit{background:rgba(240,192,96,.1);border-color:var(--accent);color:var(--accent)}
+.issue-actions{display:flex;gap:10px;margin-top:24px}
+.issue-submit{
+  flex:1;padding:11px;border-radius:9px;border:none;
+  background:linear-gradient(135deg,#7c6cfc,#a07cfc);color:#fff;
+  font-family:var(--font-display);font-size:.88rem;font-weight:700;
+  cursor:pointer;transition:all .18s;
+}
+.issue-submit:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.issue-submit:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.issue-cancel{
+  padding:11px 20px;border-radius:9px;border:1px solid var(--border2);
+  background:transparent;color:var(--muted);font-family:var(--font-display);
+  font-size:.88rem;cursor:pointer;transition:all .15s;
+}
+.issue-cancel:hover{border-color:var(--accent);color:var(--text)}
+.issue-preview{
+  margin-top:16px;padding:10px 14px;border-radius:8px;
+  background:var(--surface2);border:1px solid var(--border);
+  font-family:var(--font-mono);font-size:.72rem;color:var(--muted);
+  line-height:1.6;display:none;word-break:break-all;
+}
+.issue-preview.visible{display:block}
+
+@media(max-width:900px){
+  header,.wrapper,footer{padding-left:20px;padding-right:20px}
+  .tool-grid.featured{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .header-right{display:none}
+  .site-title{font-size:2.2rem}
+}
+</style>
+</head>
+<body>
+
+<!-- backgrounds -->
+<div class="bg-grid"></div>
+<div class="bg-glow-1"></div>
+<div class="bg-glow-2"></div>
+<div class="bg-noise"></div>
+
+<!-- ══════════════════════════════════════
+     HEADER
+══════════════════════════════════════ -->
+<header>
+  <div class="header-left">
+    <div class="eyebrow">Personal Toolkit</div>
+    <h1 class="site-title">Your <em>digital</em><br>workspace</h1>
+    <p class="site-sub">All the tools you actually use, in one place. No accounts, no cloud, no noise.</p>
+  </div>
+  <div class="header-right">
+    <div class="time-display" id="clock">00:00</div>
+    <div class="date-display" id="dateline">Monday, January 1</div>
+    <div class="greeting" id="greeting">Good morning</div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════
+     MAIN TOOLS
+══════════════════════════════════════ -->
+<div class="wrapper">
+
+  <div class="section-label">Core Tools</div>
+
+  <div class="tool-grid featured">
+
+    <!-- WikiVerse — featured, full width -->
+    <div class="tool-card featured-card" style="--card-color:#7c6cfc; grid-column: 1 / -1;"
+         onclick="openTool('wikiverse')">
+      <div class="tool-card-header">
+        <div class="tool-icon">📖</div>
+        <span class="tool-badge hot">Featured</span>
+      </div>
+      <div class="tool-name">WikiVerse</div>
+      <div class="tool-desc">Your personal knowledge network. Multiple wikis, rich pages, tags, history, full-text search, and a unique design for each wiki.</div>
+      <div class="featured-stats" id="wikiverse-stats">
+        <div class="featured-stat">
+          <div class="featured-stat-num" id="wv-wiki-count">—</div>
+          <div class="featured-stat-label">Wikis</div>
+        </div>
+        <div class="featured-stat">
+          <div class="featured-stat-num" id="wv-page-count">—</div>
+          <div class="featured-stat-label">Pages</div>
+        </div>
+        <div class="featured-stat">
+          <div class="featured-stat-num" id="wv-word-count">—</div>
+          <div class="featured-stat-label">Total Words</div>
+        </div>
+      </div>
+      <div class="tool-card-footer">
+        <div class="tool-tags">
+          <span class="tool-tag">knowledge</span>
+          <span class="tool-tag">wiki</span>
+          <span class="tool-tag">notes</span>
+        </div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-label" style="margin-top:48px">Utilities</div>
+
+  <div class="tool-grid">
+
+    <!-- ColorStudio -->
+    <div class="tool-card" style="--card-color:#e879f9" onclick="openTool('colorstudio')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🎨</div>
+        <span class="tool-badge">Design</span>
+      </div>
+      <div class="tool-name">ColorStudio</div>
+      <div class="tool-desc">Professional color picker with HEX, RGB, HSL & OKLCH readouts, harmony generator, eyedropper, and exportable saved palettes.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">color</span><span class="tool-tag">design</span><span class="tool-tag">palette</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- MarkPad -->
+    <div class="tool-card" style="--card-color:#38bdf8" onclick="openTool('markpad')">
+      <div class="tool-card-header">
+        <div class="tool-icon">✍️</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">MarkPad</div>
+      <div class="tool-desc">Multi-document Markdown editor with live split preview, formatting toolbar, and export to .md or .html.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">markdown</span><span class="tool-tag">writing</span><span class="tool-tag">editor</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- FocusTimer -->
+    <div class="tool-card" style="--card-color:#f43f5e" onclick="openTool('focustimer')">
+      <div class="tool-card-header">
+        <div class="tool-icon">⏱️</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">FocusTimer</div>
+      <div class="tool-desc">Pomodoro timer with animated ring progress and session log, plus a full stopwatch with lap tracking.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">focus</span><span class="tool-tag">pomodoro</span><span class="tool-tag">stopwatch</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- QuickCalc -->
+    <div class="tool-card" style="--card-color:#f0c060" onclick="openTool('quickcalc')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🧮</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">QuickCalc</div>
+      <div class="tool-desc">Standard and scientific calculator with a scrollable history tape. Full keyboard support, memory functions, and trig modes.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">calculator</span><span class="tool-tag">math</span><span class="tool-tag">scientific</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- DailyLog -->
+    <div class="tool-card" style="--card-color:#22c55e" onclick="openTool('dailylog')">
+      <div class="tool-card-header">
+        <div class="tool-icon">📓</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">DailyLog</div>
+      <div class="tool-desc">Personal journal with one entry per day, mood and weather tags, full-text search across all entries, and Markdown export.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">journal</span><span class="tool-tag">diary</span><span class="tool-tag">daily</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- QuoteWall -->
+    <div class="tool-card" style="--card-color:#a78bfa" onclick="openTool('quotewall')">
+      <div class="tool-card-header">
+        <div class="tool-icon">💬</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">QuoteWall</div>
+      <div class="tool-desc">Collect and browse quotes with author attribution, tags, and starring. Hit Space for a random quote from your collection.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">quotes</span><span class="tool-tag">inspiration</span><span class="tool-tag">collection</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-label" style="margin-top:48px">Developer Tools</div>
+
+  <div class="tool-grid">
+
+    <!-- IconFinder -->
+    <div class="tool-card" style="--card-color:#fb923c" onclick="openTool('iconfinder')">
+      <div class="tool-card-header">
+        <div class="tool-icon">✨</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">IconFinder</div>
+      <div class="tool-desc">Browse and search the full Unicode emoji set by name or category. Click any icon to copy the character, code point, or HTML entity.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">emoji</span><span class="tool-tag">unicode</span><span class="tool-tag">symbols</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- RegexTester -->
+    <div class="tool-card" style="--card-color:#34d399" onclick="openTool('regextester')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🔍</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">RegexTester</div>
+      <div class="tool-desc">Live regex pattern tester with highlighted matches, capture group breakdown, preset patterns, and plain-English pattern explanations.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">regex</span><span class="tool-tag">pattern</span><span class="tool-tag">dev</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- JSONBeam -->
+    <div class="tool-card" style="--card-color:#f59e0b" onclick="openTool('jsonbeam')">
+      <div class="tool-card-header">
+        <div class="tool-icon">📡</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">JSONBeam</div>
+      <div class="tool-desc">Format, minify, and validate JSON with syntax highlighting, interactive tree view, and one-click path copying.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">json</span><span class="tool-tag">format</span><span class="tool-tag">dev</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- GradientBuilder -->
+    <div class="tool-card" style="--card-color:#a855f7" onclick="openTool('gradientbuilder')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🌈</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">GradientBuilder</div>
+      <div class="tool-desc">Visual CSS gradient editor with draggable color stops, angle wheel, linear/radial/conic modes, presets, and instant CSS copy.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">gradient</span><span class="tool-tag">css</span><span class="tool-tag">design</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- ContrastChecker -->
+    <div class="tool-card" style="--card-color:#6366f1" onclick="openTool('contrastchecker')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🎯</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">ContrastChecker</div>
+      <div class="tool-desc">WCAG AA/AAA contrast ratio checker with live text preview, accessible color suggestions, and one-click pair copying.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">a11y</span><span class="tool-tag">wcag</span><span class="tool-tag">contrast</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- TypographyTester -->
+    <div class="tool-card" style="--card-color:#e2e8f0" onclick="openTool('typographytester')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🔤</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">TypographyTester</div>
+      <div class="tool-desc">Live Google Font previewer with size, weight, line height, letter spacing, and waterfall/specimen views. CSS copy in one click.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">fonts</span><span class="tool-tag">typography</span><span class="tool-tag">design</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- BaseConverter -->
+    <div class="tool-card" style="--card-color:#38bdf8" onclick="openTool('baseconverter')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🔢</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">BaseConverter</div>
+      <div class="tool-desc">Convert between binary, octal, decimal, hex, base32, and base64 with an interactive bit viewer and bitwise operation calculator.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">binary</span><span class="tool-tag">hex</span><span class="tool-tag">bitwise</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- LoremForge -->
+    <div class="tool-card" style="--card-color:#a78bfa" onclick="openTool('loremforge')">
+      <div class="tool-card-header">
+        <div class="tool-icon">📝</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">LoremForge</div>
+      <div class="tool-desc">Placeholder text generator in 6 flavors — classic Lorem, hipster, corporate speak, pirate, tech buzzwords, and nature prose.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">lorem</span><span class="tool-tag">placeholder</span><span class="tool-tag">text</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-label" style="margin-top:48px">Personal</div>
+
+  <div class="tool-grid">
+
+    <!-- OutlineBuilder -->
+    <div class="tool-card" style="--card-color:#60a5fa" onclick="openTool('outlinebuilder')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🗂️</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">OutlineBuilder</div>
+      <div class="tool-desc">Hierarchical outliner for plans, arguments, and documents. Indent, collapse, drag to reorder, and export to Markdown or plain text.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">outline</span><span class="tool-tag">planning</span><span class="tool-tag">writing</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- FlashCards -->
+    <div class="tool-card" style="--card-color:#f472b6" onclick="openTool('flashcards')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🃏</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">FlashCards</div>
+      <div class="tool-desc">Create study decks with front and back cards. Flip to reveal, score yourself with Got It / Almost / No Idea, then retry just the ones you missed.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">study</span><span class="tool-tag">flashcards</span><span class="tool-tag">learning</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- ReadingList -->
+    <div class="tool-card" style="--card-color:#818cf8" onclick="openTool('readinglist')">
+      <div class="tool-card-header">
+        <div class="tool-icon">📚</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">ReadingList</div>
+      <div class="tool-desc">Track books, articles, and videos across three shelves — Want to Read, Currently Reading, and Finished — with ratings, notes, and tags.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">books</span><span class="tool-tag">reading</span><span class="tool-tag">tracker</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- PasswordGen -->
+    <div class="tool-card" style="--card-color:#2dd4bf" onclick="openTool('passwordgen')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🔐</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">PasswordGen</div>
+      <div class="tool-desc">Generate secure passwords with configurable length, character sets, and exclusions. Strength meter, batch mode, presets. Nothing is ever stored.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">password</span><span class="tool-tag">security</span><span class="tool-tag">generator</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- RecipeBox -->
+    <div class="tool-card" style="--card-color:#f97316" onclick="openTool('recipebox')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🍽️</div>
+        <span class="tool-badge new">New</span>
+      </div>
+      <div class="tool-name">RecipeBox</div>
+      <div class="tool-desc">Store your recipes with ingredients, step-by-step instructions, and a live serving scaler. Tag by meal type. No ads, no accounts, no noise.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">recipes</span><span class="tool-tag">cooking</span><span class="tool-tag">food</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- HabitTracker -->
+    <div class="tool-card" style="--card-color:#ec4899" onclick="openTool('habittracker')">
+      <div class="tool-card-header">
+        <div class="tool-icon">✅</div>
+        <span class="tool-badge">Habits</span>
+      </div>
+      <div class="tool-name">HabitTracker</div>
+      <div class="tool-desc">Daily habit tracker with streak heatmap and 30-day completion rates.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">habits</span><span class="tool-tag">streaks</span><span class="tool-tag">goals</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- BudgetSnap -->
+    <div class="tool-card" style="--card-color:#4ade80" onclick="openTool('budgetsnap')">
+      <div class="tool-card-header">
+        <div class="tool-icon">💰</div>
+        <span class="tool-badge">Finance</span>
+      </div>
+      <div class="tool-name">BudgetSnap</div>
+      <div class="tool-desc">Income and expense tracker with category bars, monthly view, and CSV export.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">budget</span><span class="tool-tag">finance</span><span class="tool-tag">expenses</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- Countdown -->
+    <div class="tool-card" style="--card-color:#fb7185" onclick="openTool('countdown')">
+      <div class="tool-card-header">
+        <div class="tool-icon">⏳</div>
+        <span class="tool-badge">Timer</span>
+      </div>
+      <div class="tool-name">Countdown</div>
+      <div class="tool-desc">Multiple named countdown timers to future events with live progress bars.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">countdown</span><span class="tool-tag">events</span><span class="tool-tag">timer</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- WorldClock -->
+    <div class="tool-card" style="--card-color:#c084fc" onclick="openTool('worldclock')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🌍</div>
+        <span class="tool-badge">Time</span>
+      </div>
+      <div class="tool-name">WorldClock</div>
+      <div class="tool-desc">50-city world clock with business hours badge, UTC offset, and current local time.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">time zones</span><span class="tool-tag">world</span><span class="tool-tag">clock</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- NoteCards -->
+    <div class="tool-card" style="--card-color:#84cc16" onclick="openTool('notecards')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🗒️</div>
+        <span class="tool-badge">Notes</span>
+      </div>
+      <div class="tool-name">NoteCards</div>
+      <div class="tool-desc">Sticky note board with colorful cards, drag-to-reorder, tags, and Caveat font.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">sticky notes</span><span class="tool-tag">board</span><span class="tool-tag">cards</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- TodoFlow -->
+    <div class="tool-card" style="--card-color:#818cf8" onclick="openTool('todoflow')">
+      <div class="tool-card-header">
+        <div class="tool-icon">📋</div>
+        <span class="tool-badge">Kanban</span>
+      </div>
+      <div class="tool-name">TodoFlow</div>
+      <div class="tool-desc">Kanban board with Backlog, In Progress, and Done columns — drag cards between columns with priority and tags.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">kanban</span><span class="tool-tag">tasks</span><span class="tool-tag">todo</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- PoetryPad -->
+    <div class="tool-card" style="--card-color:#e879f9" onclick="openTool('poetrypad')">
+      <div class="tool-card-header">
+        <div class="tool-icon">✍️</div>
+        <span class="tool-badge">Writing</span>
+      </div>
+      <div class="tool-name">PoetryPad</div>
+      <div class="tool-desc">Poetry writing pad with per-line syllable counter, haiku guide, and rhyme finder.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">poetry</span><span class="tool-tag">writing</span><span class="tool-tag">haiku</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- LifeCalc -->
+    <div class="tool-card" style="--card-color:#f97316" onclick="openTool('lifecalc')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🕰️</div>
+        <span class="tool-badge">Fun</span>
+      </div>
+      <div class="tool-name">LifeCalc</div>
+      <div class="tool-desc">Life stats calculator — see your age in heartbeats, breaths, weeks lived, and life milestones.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">life stats</span><span class="tool-tag">calculator</span><span class="tool-tag">fun</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-label" style="margin-top:48px">Reference</div>
+
+  <div class="tool-grid">
+
+    <!-- UnitConverter -->
+    <div class="tool-card" style="--card-color:#06b6d4" onclick="openTool('unitconverter')">
+      <div class="tool-card-header">
+        <div class="tool-icon">📐</div>
+        <span class="tool-badge">Reference</span>
+      </div>
+      <div class="tool-name">UnitConverter</div>
+      <div class="tool-desc">8 categories of unit conversion — length, weight, temperature, volume, speed, area, data, and energy, all results shown at once.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">units</span><span class="tool-tag">convert</span><span class="tool-tag">math</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-label" style="margin-top:48px">Fun &amp; Tools</div>
+
+  <div class="tool-grid">
+
+    <!-- DiceRoller -->
+    <div class="tool-card" style="--card-color:#f43f5e" onclick="openTool('diceroller')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🎲</div>
+        <span class="tool-badge">Game</span>
+      </div>
+      <div class="tool-name">DiceRoller</div>
+      <div class="tool-desc">RPG dice roller for d4 through d100, with custom expressions like 2d6+1d4+3 and full roll history.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">dice</span><span class="tool-tag">RPG</span><span class="tool-tag">random</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- AmbientMixer -->
+    <div class="tool-card" style="--card-color:#818cf8" onclick="openTool('ambientmixer')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🎧</div>
+        <span class="tool-badge">Audio</span>
+      </div>
+      <div class="tool-name">AmbientMixer</div>
+      <div class="tool-desc">Mix ambient soundscapes — rain, fire, café, ocean, forest, and more, powered by Web Audio API.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">ambient</span><span class="tool-tag">sound</span><span class="tool-tag">focus</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- TipSplit -->
+    <div class="tool-card" style="--card-color:#4ade80" onclick="openTool('tipsplit')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🍽️</div>
+        <span class="tool-badge">Utility</span>
+      </div>
+      <div class="tool-name">TipSplit</div>
+      <div class="tool-desc">Bill splitter with tip calculator — custom tip %, per-person breakdown instantly.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">tip</span><span class="tool-tag">split</span><span class="tool-tag">bill</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- MeetingClock -->
+    <div class="tool-card" style="--card-color:#38bdf8" onclick="openTool('meetingclock')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🕐</div>
+        <span class="tool-badge">Meetings</span>
+      </div>
+      <div class="tool-name">MeetingClock</div>
+      <div class="tool-desc">Agenda timer with per-item time limits, ring progress, and overtime alerts to keep meetings on track.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">meetings</span><span class="tool-tag">agenda</span><span class="tool-tag">timer</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-label" style="margin-top:48px">Game Companions</div>
+
+  <div class="tool-grid">
+
+    <!-- Run Manager — Tower Networking Inc. companion -->
+    <div class="tool-card" style="--card-color:#00c8a0"
+         onclick="openTool('runmanager')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🎮</div>
+        <span class="tool-badge">Companion</span>
+      </div>
+      <div class="tool-name">Run Manager</div>
+      <div class="tool-desc">Tower Networking Inc. companion — plan path traces, design tower layouts, configure network routes, and track your runs through the game.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags">
+          <span class="tool-tag">path trace</span>
+          <span class="tool-tag">tower design</span>
+          <span class="tool-tag">net config</span>
+        </div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-label" style="margin-top:48px">Creative &amp; Music</div>
+
+  <div class="tool-grid">
+
+    <!-- SketchPad -->
+    <div class="tool-card" style="--card-color:#38bdf8" onclick="openTool('sketchpad')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🎨</div>
+        <span class="tool-badge">Canvas</span>
+      </div>
+      <div class="tool-name">SketchPad</div>
+      <div class="tool-desc">Full canvas drawing app with pen, brush, eraser, shapes, flood-fill, undo, and PNG export.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">drawing</span><span class="tool-tag">art</span><span class="tool-tag">canvas</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- ChordFinder -->
+    <div class="tool-card" style="--card-color:#a855f7" onclick="openTool('chordfinder')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🎹</div>
+        <span class="tool-badge">Music</span>
+      </div>
+      <div class="tool-name">ChordFinder</div>
+      <div class="tool-desc">Interactive piano keyboard with chord and scale visualizer — click keys or use your computer keyboard, with real audio playback.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">piano</span><span class="tool-tag">chords</span><span class="tool-tag">scales</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- MiniSynth -->
+    <div class="tool-card" style="--card-color:#f472b6" onclick="openTool('minisynth')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🎛️</div>
+        <span class="tool-badge">Music</span>
+      </div>
+      <div class="tool-name">MiniSynth</div>
+      <div class="tool-desc">Web Audio synthesizer with ADSR envelope, 4 waveforms, reverb, detune, and a playable keyboard with computer key support.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">synth</span><span class="tool-tag">audio</span><span class="tool-tag">keyboard</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- AsciiArt -->
+    <div class="tool-card" style="--card-color:#f59e0b" onclick="openTool('asciiart')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🖋️</div>
+        <span class="tool-badge">Fun</span>
+      </div>
+      <div class="tool-name">AsciiArt</div>
+      <div class="tool-desc">Convert any text into large ASCII art with Block, Simple, Banner, and more font styles. Color themes and copy to clipboard.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">ascii</span><span class="tool-tag">text art</span><span class="tool-tag">fonts</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-label" style="margin-top:48px">Health &amp; Lifestyle</div>
+
+  <div class="tool-grid">
+
+    <!-- BodyMetrics -->
+    <div class="tool-card" style="--card-color:#34d399" onclick="openTool('bodymetrics')">
+      <div class="tool-card-header">
+        <div class="tool-icon">💪</div>
+        <span class="tool-badge">Health</span>
+      </div>
+      <div class="tool-name">BodyMetrics</div>
+      <div class="tool-desc">Calculate your BMI, BMR, and TDEE with metric or imperial units, activity levels, and personalized daily calorie targets.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">BMI</span><span class="tool-tag">calories</span><span class="tool-tag">fitness</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- SleepLog -->
+    <div class="tool-card" style="--card-color:#818cf8" onclick="openTool('sleeplog')">
+      <div class="tool-card-header">
+        <div class="tool-icon">😴</div>
+        <span class="tool-badge">Health</span>
+      </div>
+      <div class="tool-name">SleepLog</div>
+      <div class="tool-desc">Log your sleep schedule and quality each night with a 14-day bar chart, streak counter, and quality emoji ratings.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">sleep</span><span class="tool-tag">health</span><span class="tool-tag">tracking</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- PackList -->
+    <div class="tool-card" style="--card-color:#06b6d4" onclick="openTool('packlist')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🧳</div>
+        <span class="tool-badge">Travel</span>
+      </div>
+      <div class="tool-name">PackList</div>
+      <div class="tool-desc">Smart travel packing checklist — multiple trip profiles, categorized items, one-click templates for Beach, Business, Backpacking and more.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">travel</span><span class="tool-tag">packing</span><span class="tool-tag">checklist</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-label" style="margin-top:48px">Brain &amp; Games</div>
+
+  <div class="tool-grid">
+
+    <!-- Trivia -->
+    <div class="tool-card" style="--card-color:#fbbf24" onclick="openTool('trivia')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🧩</div>
+        <span class="tool-badge">Game</span>
+      </div>
+      <div class="tool-name">Trivia</div>
+      <div class="tool-desc">Quiz game with 50+ questions across Science, History, Geography, Pop Culture, and Math — with difficulty settings and scoring.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">quiz</span><span class="tool-tag">trivia</span><span class="tool-tag">game</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- CipherBox -->
+    <div class="tool-card" style="--card-color:#7c6cfc" onclick="openTool('cipherbox')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🔐</div>
+        <span class="tool-badge">Cipher</span>
+      </div>
+      <div class="tool-name">CipherBox</div>
+      <div class="tool-desc">Encode and decode text with 6 classic ciphers: Caesar, ROT-13, Atbash, Vigenère, Morse Code, and Binary.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">cipher</span><span class="tool-tag">encode</span><span class="tool-tag">morse</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+    <!-- BrainDump -->
+    <div class="tool-card" style="--card-color:#22d3ee" onclick="openTool('braindump')">
+      <div class="tool-card-header">
+        <div class="tool-icon">🧠</div>
+        <span class="tool-badge">Capture</span>
+      </div>
+      <div class="tool-name">BrainDump</div>
+      <div class="tool-desc">Rapid idea capture with Idea, Task, Question, and Random buckets. Tag filtering, search, and instant keyboard entry.</div>
+      <div class="tool-card-footer">
+        <div class="tool-tags"><span class="tool-tag">ideas</span><span class="tool-tag">capture</span><span class="tool-tag">thoughts</span></div>
+        <div class="tool-open-hint">Open</div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- footer -->
+<footer>
+  <div class="footer-brand">⚙️ <span>Personal Toolkit</span> — yours alone</div>
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <div class="footer-note">Everything runs locally. No data leaves your device.</div>
+    <button class="btn btn-ghost btn-sm" onclick="openIssueModal()" style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+      🐛 Report an Issue
+    </button>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════
+     REPORT ISSUE MODAL
+══════════════════════════════════════ -->
+<div class="issue-overlay" id="issue-overlay" onclick="if(event.target===this)closeIssueModal()">
+  <div class="issue-box">
+    <div class="issue-header">
+      <div class="issue-title">🐛 Report an Issue</div>
+      <button class="issue-close" onclick="closeIssueModal()">✕</button>
+    </div>
+    <div class="issue-sub">Opens a pre-filled GitHub issue — you can add more detail before submitting.</div>
+
+    <div class="issue-field">
+      <div class="issue-label">Which app?</div>
+      <div class="issue-chips" id="issue-app-chips">
+        <button class="issue-chip" data-app="Toolkit (Hub)" onclick="selectApp(this)">🗂 Toolkit Hub</button>
+        <button class="issue-chip" data-app="WikiVerse" onclick="selectApp(this)">📖 WikiVerse</button>
+        <button class="issue-chip" data-app="ColorStudio" onclick="selectApp(this)">🎨 ColorStudio</button>
+        <button class="issue-chip" data-app="MarkPad" onclick="selectApp(this)">✍️ MarkPad</button>
+        <button class="issue-chip" data-app="FocusTimer" onclick="selectApp(this)">⏱️ FocusTimer</button>
+        <button class="issue-chip" data-app="QuickCalc" onclick="selectApp(this)">🧮 QuickCalc</button>
+        <button class="issue-chip" data-app="DailyLog" onclick="selectApp(this)">📓 DailyLog</button>
+        <button class="issue-chip" data-app="QuoteWall" onclick="selectApp(this)">💬 QuoteWall</button>
+        <button class="issue-chip" data-app="IconFinder" onclick="selectApp(this)">✨ IconFinder</button>
+        <button class="issue-chip" data-app="RegexTester" onclick="selectApp(this)">🔍 RegexTester</button>
+        <button class="issue-chip" data-app="OutlineBuilder" onclick="selectApp(this)">🗂️ OutlineBuilder</button>
+        <button class="issue-chip" data-app="FlashCards" onclick="selectApp(this)">🃏 FlashCards</button>
+        <button class="issue-chip" data-app="ReadingList" onclick="selectApp(this)">📚 ReadingList</button>
+        <button class="issue-chip" data-app="PasswordGen" onclick="selectApp(this)">🔐 PasswordGen</button>
+        <button class="issue-chip" data-app="RecipeBox" onclick="selectApp(this)">🍽️ RecipeBox</button>
+        <button class="issue-chip" data-app="Run Manager" onclick="selectApp(this)">🎮 Run Manager</button>
+        <button class="issue-chip" data-app="CipherBox" onclick="selectApp(this)">🔐 CipherBox</button>
+        <button class="issue-chip" data-app="SketchPad" onclick="selectApp(this)">🎨 SketchPad</button>
+        <button class="issue-chip" data-app="BodyMetrics" onclick="selectApp(this)">💪 BodyMetrics</button>
+        <button class="issue-chip" data-app="PackList" onclick="selectApp(this)">🧳 PackList</button>
+        <button class="issue-chip" data-app="ChordFinder" onclick="selectApp(this)">🎹 ChordFinder</button>
+        <button class="issue-chip" data-app="AsciiArt" onclick="selectApp(this)">🖋️ AsciiArt</button>
+        <button class="issue-chip" data-app="SleepLog" onclick="selectApp(this)">😴 SleepLog</button>
+        <button class="issue-chip" data-app="BrainDump" onclick="selectApp(this)">🧠 BrainDump</button>
+        <button class="issue-chip" data-app="MiniSynth" onclick="selectApp(this)">🎛️ MiniSynth</button>
+        <button class="issue-chip" data-app="Trivia" onclick="selectApp(this)">🧩 Trivia</button>
+      </div>
+    </div>
+
+    <div class="issue-field">
+      <div class="issue-label">Type of report</div>
+      <div class="issue-chips" id="issue-type-chips">
+        <button class="issue-chip" data-type="bug" onclick="selectType(this)">🐛 Bug Report</button>
+        <button class="issue-chip" data-type="feature" onclick="selectType(this)">✨ Feature Request</button>
+      </div>
+    </div>
+
+    <div class="issue-preview" id="issue-preview"></div>
+
+    <div class="issue-actions">
+      <button class="issue-cancel" onclick="closeIssueModal()">Cancel</button>
+      <button class="issue-submit" id="issue-submit" onclick="submitIssue()" disabled>
+        Open GitHub Issue →
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     IFRAME TOOL OVERLAY
+══════════════════════════════════════ -->
+<div class="tool-overlay" id="tool-overlay">
+  <div class="overlay-color-bar" id="overlay-color-bar"></div>
+  <div class="tool-overlay-bar">
+    <button class="overlay-back" onclick="closeTool()">← Toolkit</button>
+    <div class="overlay-title-wrap">
+      <span class="overlay-tool-icon" id="overlay-icon"></span>
+      <div>
+        <div class="overlay-tool-name" id="overlay-name"></div>
+        <div class="overlay-tool-desc" id="overlay-desc"></div>
+      </div>
+    </div>
+    <div class="overlay-actions">
+      <button class="overlay-action-btn" onclick="reloadTool()">↺ Reload</button>
+      <button class="overlay-action-btn" onclick="closeTool()">✕ Close</button>
+    </div>
+  </div>
+  <div class="overlay-loading" id="overlay-loading">
+    <div class="overlay-spinner"></div>
+    <div class="overlay-loading-name" id="overlay-loading-name">Loading…</div>
+  </div>
+  <iframe id="tool-iframe" src=""></iframe>
+</div>
+
+<!-- Toast -->
+<div class="toast-stack" id="toast-stack"></div>
+
+<script>
+// ══════════════════════════════════════
+//  TOOL REGISTRY
+// ══════════════════════════════════════
+const TOOLS = {
+  wikiverse: {
+    name: 'WikiVerse',
+    icon: '📖',
+    desc: 'Personal knowledge network',
+    color: '#7c6cfc',
+    src: 'wikiverse.html',
+  },
+  colorstudio: {
+    name: 'ColorStudio',
+    icon: '🎨',
+    desc: 'Professional color picker with harmonies & palette',
+    color: '#e879f9',
+    src: 'colorstudio.html',
+  },
+  markpad: {
+    name: 'MarkPad',
+    icon: '✍️',
+    desc: 'Markdown editor with live preview & multi-document',
+    color: '#38bdf8',
+    src: 'markpad.html',
+  },
+  focustimer: {
+    name: 'FocusTimer',
+    icon: '⏱️',
+    desc: 'Pomodoro timer & stopwatch with session history',
+    color: '#f43f5e',
+    src: 'focustimer.html',
+  },
+  quickcalc: {
+    name: 'QuickCalc',
+    icon: '🧮',
+    desc: 'Standard & scientific calculator with history tape',
+    color: '#f0c060',
+    src: 'quickcalc.html',
+  },
+  dailylog: {
+    name: 'DailyLog',
+    icon: '📓',
+    desc: 'Date-stamped personal journal with mood tracking',
+    color: '#22c55e',
+    src: 'dailylog.html',
+  },
+  quotewall: {
+    name: 'QuoteWall',
+    icon: '💬',
+    desc: 'Personal quote collection with tags and random display',
+    color: '#a78bfa',
+    src: 'quotewall.html',
+  },
+  iconfinder: {
+    name: 'IconFinder',
+    icon: '✨',
+    desc: 'Browse & search emoji and Unicode symbols, click to copy',
+    color: '#fb923c',
+    src: 'iconfinder.html',
+  },
+  regextester: {
+    name: 'RegexTester',
+    icon: '🔍',
+    desc: 'Live regex tester with match highlights and plain-English explanations',
+    color: '#34d399',
+    src: 'regextester.html',
+  },
+  outlinebuilder: {
+    name: 'OutlineBuilder',
+    icon: '🗂️',
+    desc: 'Hierarchical outliner with collapsible nodes and Markdown export',
+    color: '#60a5fa',
+    src: 'outlinebuilder.html',
+  },
+  flashcards: {
+    name: 'FlashCards',
+    icon: '🃏',
+    desc: 'Create decks and study with flip cards and spaced repetition scoring',
+    color: '#f472b6',
+    src: 'flashcards.html',
+  },
+  readinglist: {
+    name: 'ReadingList',
+    icon: '📚',
+    desc: 'Track books and articles across Want to Read, Reading, and Finished shelves',
+    color: '#818cf8',
+    src: 'readinglist.html',
+  },
+  passwordgen: {
+    name: 'PasswordGen',
+    icon: '🔐',
+    desc: 'Generate secure passwords with strength meter — nothing ever stored',
+    color: '#2dd4bf',
+    src: 'passwordgen.html',
+  },
+  recipebox: {
+    name: 'RecipeBox',
+    icon: '🍽️',
+    desc: 'Store recipes with ingredients, steps, and a live serving scaler',
+    color: '#f97316',
+    src: 'recipebox.html',
+  },
+  runmanager: {
+    name: 'Run Manager',
+    icon: '🎮',
+    desc: 'Companion tool for Tower Networking Inc.',
+    color: '#00c8a0',
+    src: 'run-Manager.html',
+  },
+  jsonbeam: {
+    name: 'JSONBeam',
+    icon: '📡',
+    desc: 'Format, minify, validate JSON with tree view & path copy',
+    color: '#f59e0b',
+    src: 'jsonbeam.html',
+  },
+  gradientbuilder: {
+    name: 'GradientBuilder',
+    icon: '🌈',
+    desc: 'Visual CSS gradient editor with color stops, angle wheel, and CSS output',
+    color: '#a855f7',
+    src: 'gradientbuilder.html',
+  },
+  contrastchecker: {
+    name: 'ContrastChecker',
+    icon: '🎯',
+    desc: 'WCAG AA/AAA contrast ratio checker with live preview and accessible suggestions',
+    color: '#6366f1',
+    src: 'contrastchecker.html',
+  },
+  typographytester: {
+    name: 'TypographyTester',
+    icon: '🔤',
+    desc: 'Google Font previewer with size, weight, spacing, and waterfall view',
+    color: '#e2e8f0',
+    src: 'typographytester.html',
+  },
+  habittracker: {
+    name: 'HabitTracker',
+    icon: '✅',
+    desc: 'Daily habit tracker with streak heatmap and 30-day completion rates',
+    color: '#ec4899',
+    src: 'habittracker.html',
+  },
+  budgetsnap: {
+    name: 'BudgetSnap',
+    icon: '💰',
+    desc: 'Income and expense tracker with category bars and CSV export',
+    color: '#4ade80',
+    src: 'budgetsnap.html',
+  },
+  countdown: {
+    name: 'Countdown',
+    icon: '⏳',
+    desc: 'Multiple named countdown timers to future events with live progress bars',
+    color: '#fb7185',
+    src: 'countdown.html',
+  },
+  worldclock: {
+    name: 'WorldClock',
+    icon: '🌍',
+    desc: '50-city world clock with business hours badge and UTC offset',
+    color: '#c084fc',
+    src: 'worldclock.html',
+  },
+  unitconverter: {
+    name: 'UnitConverter',
+    icon: '📐',
+    desc: '8-category unit converter — all results shown at once, click to copy',
+    color: '#06b6d4',
+    src: 'unitconverter.html',
+  },
+  notecards: {
+    name: 'NoteCards',
+    icon: '📌',
+    desc: 'Color-coded sticky note board with drag-to-reorder and tags',
+    color: '#84cc16',
+    src: 'notecards.html',
+  },
+  todoflow: {
+    name: 'TodoFlow',
+    icon: '🗃️',
+    desc: 'Kanban board with Backlog, In Progress, and Done columns — drag to move cards',
+    color: '#818cf8',
+    src: 'todoflow.html',
+  },
+  diceroller: {
+    name: 'DiceRoller',
+    icon: '🎲',
+    desc: 'RPG dice roller — d4 through d100, custom expressions like 2d6+1d4+3, roll history',
+    color: '#f43f5e',
+    src: 'diceroller.html',
+  },
+  ambientmixer: {
+    name: 'AmbientMixer',
+    icon: '🎧',
+    desc: 'Web Audio ambient soundscape mixer — rain, fire, café, ocean, and more',
+    color: '#818cf8',
+    src: 'ambientmixer.html',
+  },
+  tipsplit: {
+    name: 'TipSplit',
+    icon: '🧾',
+    desc: 'Bill splitter with tip calculator, custom tip %, and per-person breakdown',
+    color: '#4ade80',
+    src: 'tipsplit.html',
+  },
+  meetingclock: {
+    name: 'MeetingClock',
+    icon: '📋',
+    desc: 'Agenda timer with per-item time limits, ring progress, and overtime alerts',
+    color: '#38bdf8',
+    src: 'meetingclock.html',
+  },
+  loremforge: {
+    name: 'LoremForge',
+    icon: '📝',
+    desc: 'Lorem ipsum generator — classic, hipster, corporate, pirate, and more flavors',
+    color: '#a78bfa',
+    src: 'loremforge.html',
+  },
+  baseconverter: {
+    name: 'BaseConverter',
+    icon: '🔢',
+    desc: 'Number base converter — bin, oct, dec, hex, base32, base64 with bit viewer and bitwise ops',
+    color: '#38bdf8',
+    src: 'baseconverter.html',
+  },
+  lifecalc: {
+    name: 'LifeCalc',
+    icon: '🫀',
+    desc: 'Enter your birthday to see your life in heartbeats, breaths, weeks, and milestones',
+    color: '#f97316',
+    src: 'lifecalc.html',
+  },
+  poetrypad: {
+    name: 'PoetryPad',
+    icon: '🖋️',
+    desc: 'Poetry writing pad with per-line syllable counter, haiku guide, and rhyme finder',
+    color: '#e879f9',
+    src: 'poetrypad.html',
+  },
+  cipherbox: {
+    name: 'CipherBox',
+    icon: '🔐',
+    desc: 'Encode and decode text with Caesar, ROT-13, Atbash, Vigenère, Morse, and Binary ciphers',
+    color: '#7c6cfc',
+    src: 'cipherbox.html',
+  },
+  sketchpad: {
+    name: 'SketchPad',
+    icon: '🎨',
+    desc: 'Canvas drawing app with pen, brush, shapes, fill, eraser, and PNG export',
+    color: '#38bdf8',
+    src: 'sketchpad.html',
+  },
+  bodymetrics: {
+    name: 'BodyMetrics',
+    icon: '💪',
+    desc: 'BMI, BMR, and TDEE health calculator with daily calorie goal breakdowns',
+    color: '#34d399',
+    src: 'bodymetrics.html',
+  },
+  packlist: {
+    name: 'PackList',
+    icon: '🧳',
+    desc: 'Smart travel packing checklist with trip profiles, categories, and one-click templates',
+    color: '#06b6d4',
+    src: 'packlist.html',
+  },
+  chordfinder: {
+    name: 'ChordFinder',
+    icon: '🎹',
+    desc: 'Interactive piano keyboard with chord and scale visualizer, click-to-play audio',
+    color: '#a855f7',
+    src: 'chordfinder.html',
+  },
+  asciiart: {
+    name: 'AsciiArt',
+    icon: '🖋️',
+    desc: 'Convert text to ASCII art with multiple font styles and color themes',
+    color: '#f59e0b',
+    src: 'asciiart.html',
+  },
+  sleeplog: {
+    name: 'SleepLog',
+    icon: '😴',
+    desc: 'Track sleep hours and quality with a 14-day bar chart and weekly stats',
+    color: '#818cf8',
+    src: 'sleeplog.html',
+  },
+  braindump: {
+    name: 'BrainDump',
+    icon: '🧠',
+    desc: 'Rapid idea capture with idea, task, question, and random buckets plus tag filtering',
+    color: '#22d3ee',
+    src: 'braindump.html',
+  },
+  minisynth: {
+    name: 'MiniSynth',
+    icon: '🎹',
+    desc: 'Web Audio synthesizer with ADSR envelope, waveforms, reverb, and keyboard support',
+    color: '#f472b6',
+    src: 'minisynth.html',
+  },
+  trivia: {
+    name: 'Trivia',
+    icon: '🧩',
+    desc: 'Quiz game with 50+ questions across Science, History, Geography, Pop Culture, and Math',
+    color: '#fbbf24',
+    src: 'trivia.html',
+  },
+};
+
+// ══════════════════════════════════════
+//  CLOCK
+// ══════════════════════════════════════
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  document.getElementById('clock').textContent = `${h}:${m}`;
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('dateline').textContent = `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
+  const hr = now.getHours();
+  document.getElementById('greeting').textContent = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+}
+updateClock();
+setInterval(updateClock, 10000);
+
+// ══════════════════════════════════════
+//  WIKIVERSE STATS (read from IDB)
+// ══════════════════════════════════════
+async function loadWikiVerseStats() {
+  try {
+    const req = indexedDB.open('WikiVerseDB');
+    req.onsuccess = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains('wikis')) return;
+      const tx = db.transaction('wikis','readonly');
+      const all = tx.objectStore('wikis').getAll();
+      all.onsuccess = ev => {
+        const wikis = ev.target.result || [];
+        const pages = wikis.reduce((s,w) => s + Object.keys(w.pages||{}).length, 0);
+        const words = wikis.reduce((s,w) =>
+          s + Object.values(w.pages||{}).reduce((ps,p) =>
+            ps + (p.content||'').replace(/<[^>]*>/g,' ').trim().split(/\s+/).filter(Boolean).length, 0), 0);
+        document.getElementById('wv-wiki-count').textContent = wikis.length || '0';
+        document.getElementById('wv-page-count').textContent = pages || '0';
+        document.getElementById('wv-word-count').textContent = words > 999 ? (words/1000).toFixed(1)+'k' : words || '0';
+      };
+    };
+  } catch(e) {}
+}
+loadWikiVerseStats();
+
+// ══════════════════════════════════════
+//  IFRAME TOOL LAUNCHER
+// ══════════════════════════════════════
+let currentTool = null;
+
+function openTool(id) {
+  const tool = TOOLS[id];
+  if (!tool) return;
+  currentTool = id;
+
+  document.getElementById('overlay-icon').textContent = tool.icon;
+  document.getElementById('overlay-name').textContent = tool.name;
+  document.getElementById('overlay-desc').textContent = tool.desc;
+  document.getElementById('overlay-color-bar').style.background = tool.color;
+  document.getElementById('overlay-loading-name').textContent = `Opening ${tool.name}…`;
+  document.getElementById('overlay-loading').classList.remove('hidden');
+
+  document.getElementById('tool-iframe').src = tool.src;
+  document.getElementById('tool-overlay').classList.add('open');
+  document.title = `${tool.name} — Toolkit`;
+  document.addEventListener('keydown', overlayKeyHandler);
+}
+
+function overlayKeyHandler(e) {
+  if (e.key === 'Escape') closeTool();
+}
+
+function closeTool() {
+  document.getElementById('tool-overlay').classList.remove('open');
+  setTimeout(() => {
+    document.getElementById('tool-iframe').src = '';
+    currentTool = null;
+  }, 350);
+  document.title = 'My Toolkit';
+  document.removeEventListener('keydown', overlayKeyHandler);
+  setTimeout(loadWikiVerseStats, 400);
+}
+
+function iframeLoaded() {
+  document.getElementById('overlay-loading').classList.add('hidden');
+}
+
+// Wire load event in JS (not inline attr) so the function is guaranteed defined
+document.getElementById('tool-iframe').addEventListener('load', () => {
+  // Ignore the initial empty src load
+  if (document.getElementById('tool-iframe').src === window.location.href) return;
+  iframeLoaded();
+});
+
+function reloadTool() {
+  document.getElementById('overlay-loading').classList.remove('hidden');
+  const iframe = document.getElementById('tool-iframe');
+  iframe.src = iframe.src;
+}
+
+// ══════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════
+function tkToast(msg, type='info') {
+  const stack = document.getElementById('toast-stack');
+  const t = document.createElement('div');
+  t.className = `tk-toast ${type}`;
+  t.textContent = msg;
+  stack.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+// ══════════════════════════════════════
+//  REPORT ISSUE MODAL
+// ══════════════════════════════════════
+const GITHUB_ISSUE_URL = 'https://github.com/death-dev96/death-dev96.github.io/issues/new';
+
+let selectedApp  = null;
+let selectedType = null;
+
+function openIssueModal() {
+  selectedApp  = null;
+  selectedType = null;
+  document.querySelectorAll('.issue-chip').forEach(c => c.classList.remove('sel-app','sel-type-bug','sel-type-feat','sel-type-toolkit'));
+  document.getElementById('issue-submit').disabled = true;
+  document.getElementById('issue-preview').classList.remove('visible');
+  document.getElementById('issue-overlay').classList.add('open');
+}
+
+function closeIssueModal() {
+  document.getElementById('issue-overlay').classList.remove('open');
+}
+
+function selectApp(el) {
+  document.querySelectorAll('#issue-app-chips .issue-chip').forEach(c => c.classList.remove('sel-app','sel-type-toolkit'));
+  el.classList.add(el.dataset.app === 'Toolkit (Hub)' ? 'sel-type-toolkit' : 'sel-app');
+  selectedApp = el.dataset.app;
+  updateIssuePreview();
+}
+
+function selectType(el) {
+  document.querySelectorAll('#issue-type-chips .issue-chip').forEach(c => c.classList.remove('sel-type-bug','sel-type-feat'));
+  el.classList.add(el.dataset.type === 'bug' ? 'sel-type-bug' : 'sel-type-feat');
+  selectedType = el.dataset.type;
+  updateIssuePreview();
+}
+
+function updateIssuePreview() {
+  const submit  = document.getElementById('issue-submit');
+  const preview = document.getElementById('issue-preview');
+  if (!selectedApp || !selectedType) {
+    submit.disabled = true;
+    preview.classList.remove('visible');
+    return;
+  }
+  submit.disabled = false;
+  const label    = selectedType === 'bug' ? 'bug' : 'enhancement';
+  const appLabel = selectedApp === 'Toolkit (Hub)' ? 'toolkit' : selectedApp.toLowerCase().replace(/\s+/g,'-');
+  const title    = selectedType === 'bug'
+    ? `[${selectedApp}] Bug: `
+    : `[${selectedApp}] Feature: `;
+  const body = selectedType === 'bug'
+    ? `**App:** ${selectedApp}\n\n**Describe the bug:**\n\n**Steps to reproduce:**\n1. \n2. \n\n**Expected behaviour:**\n\n**Actual behaviour:**\n`
+    : `**App:** ${selectedApp}\n\n**Describe the feature:**\n\n**Why would this be useful?**\n`;
+  const url = buildIssueUrl(title, body, [label, appLabel]);
+  preview.textContent = `→ ${url.slice(0, 80)}…`;
+  preview.classList.add('visible');
+}
+
+function buildIssueUrl(title, body, labels) {
+  const params = new URLSearchParams({
+    title,
+    body,
+    labels: labels.join(','),
+  });
+  return `${GITHUB_ISSUE_URL}?${params.toString()}`;
+}
+
+function submitIssue() {
+  if (!selectedApp || !selectedType) return;
+  const label    = selectedType === 'bug' ? 'bug' : 'enhancement';
+  const appLabel = selectedApp === 'Toolkit (Hub)' ? 'toolkit' : selectedApp.toLowerCase().replace(/\s+/g,'-');
+  const title    = selectedType === 'bug'
+    ? `[${selectedApp}] Bug: `
+    : `[${selectedApp}] Feature: `;
+  const body = selectedType === 'bug'
+    ? `**App:** ${selectedApp}\n\n**Describe the bug:**\n\n**Steps to reproduce:**\n1. \n2. \n\n**Expected behaviour:**\n\n**Actual behaviour:**\n`
+    : `**App:** ${selectedApp}\n\n**Describe the feature:**\n\n**Why would this be useful?**\n`;
+  const url = buildIssueUrl(title, body, [label, appLabel]);
+  window.open(url, '_blank', 'noopener');
+  closeIssueModal();
+}
+
+// ESC closes whichever overlay is open
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (document.getElementById('issue-overlay').classList.contains('open')) {
+    closeIssueModal();
+  } else if (document.getElementById('tool-overlay').classList.contains('open')) {
+    closeTool();
+  }
+});
+
+</script>
+
+</body>
+</html>
